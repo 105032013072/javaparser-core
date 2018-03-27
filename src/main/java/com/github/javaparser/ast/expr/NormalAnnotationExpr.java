@@ -66,7 +66,7 @@ public final class NormalAnnotationExpr extends AnnotationExpr {
         customInitialization();
     }
 
-    @Override
+	@Override
     @Generated("com.github.javaparser.generator.core.node.AcceptGenerator")
     public <R, A> R accept(final GenericVisitor<R, A> v, final A arg) {
         return v.visit(this, arg);

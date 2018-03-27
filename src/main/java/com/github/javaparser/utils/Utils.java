@@ -24,8 +24,10 @@ package com.github.javaparser.utils;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.Function;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.javaparser.Predicate;
 
 import static java.util.Arrays.*;
 
@@ -37,7 +39,14 @@ import static java.util.Arrays.*;
 public class Utils {
     public static final String EOL = System.getProperty("line.separator");
 
-    public static final Predicate<String> STRING_NOT_EMPTY = s -> !s.isEmpty();
+   /* public static final Predicate<String> STRING_NOT_EMPTY = s -> !s.isEmpty();*/
+    public static final Predicate<String> STRING_NOT_EMPTY = new Predicate<String>() {
+		
+		@Override
+		public Boolean test(String t) {
+			return !StringUtils.isEmpty(t);
+		}
+	};
 
     /**
      * @deprecated This is no longer in use by JavaParser, please write your own replacement.

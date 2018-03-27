@@ -9,6 +9,7 @@ import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
@@ -42,7 +43,7 @@ public abstract class AbsPackageDeclaration extends Node implements NodeWithAnno
 	    @SuppressWarnings("unchecked")
 	    public PackageDeclaration addAnnotation(String name) {
 	        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
-	                parseName(name), new NodeList<>());
+	                parseName(name), new NodeList<MemberValuePair>());
 	        getAnnotations().add(annotation);
 	        return (PackageDeclaration) this;
 	    }
@@ -51,7 +52,7 @@ public abstract class AbsPackageDeclaration extends Node implements NodeWithAnno
 	    @SuppressWarnings("unchecked")
 	    public NormalAnnotationExpr addAndGetAnnotation(String name) {
 	        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
-	                parseName(name), new NodeList<>());
+	                parseName(name), new NodeList<MemberValuePair>());
 	        getAnnotations().add(annotation);
 	        return annotation;
 	    }

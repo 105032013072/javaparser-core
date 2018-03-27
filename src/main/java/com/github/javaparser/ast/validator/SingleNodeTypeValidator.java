@@ -1,5 +1,7 @@
 package com.github.javaparser.ast.validator;
 
+import java.util.List;
+
 import com.github.javaparser.ast.Node;
 
 /**
@@ -19,6 +21,10 @@ public class SingleNodeTypeValidator<N extends Node> implements Validator {
         if (type.isInstance(node)) {
             validator.accept(type.cast(node), problemReporter);
         }
-        node.findAll(type).forEach(n -> validator.accept(n, problemReporter));
+        //node.findAll(type).forEach(n -> validator.accept(n, problemReporter));
+        List<N> list= node.findAll(type);
+        for (N n : list) {
+        	validator.accept(n, problemReporter);
+		}
     }
 }

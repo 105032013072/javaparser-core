@@ -1,5 +1,5 @@
 package com.github.javaparser;
 
 public interface Function<T,R> {
-  public <R> R  apply(T t);
+  public  R apply(T t);
 }

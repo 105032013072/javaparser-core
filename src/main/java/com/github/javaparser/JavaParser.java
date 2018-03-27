@@ -37,10 +37,12 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.validator.ProblemReporter;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.printer.lexicalpreservation.LexicalPreservingPrinter;
+import com.github.javaparser.resolution.SymbolResolver;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Collections;
 
 import static com.github.javaparser.ParseStart.*;
 import static com.github.javaparser.Problem.PROBLEM_BY_BEGIN_POSITION;
@@ -138,7 +140,8 @@ public final class JavaParser {
             }
 
             configuration.getValidator().accept(resultNode, new ProblemReporter(parser.problems));
-            parser.problems.sort(PROBLEM_BY_BEGIN_POSITION);
+            //parser.problems.sort(PROBLEM_BY_BEGIN_POSITION);
+            Collections.sort(parser.problems, PROBLEM_BY_BEGIN_POSITION);
 
             ParseResult<N> result = new ParseResult<>(resultNode, parser.problems, parser.getTokens(),
                     parser.getCommentsCollection());
@@ -336,7 +339,7 @@ public final class JavaParser {
     private static <T extends Node> T simplifiedParse(ParseStart<T> context, Provider provider) {
         ParseResult<T> result = new JavaParser(staticConfiguration).parse(context, provider);
         if (result.isSuccessful()) {
-            return result.getResult().get();
+            return result.getResult();
         }
         throw new ParseProblemException(result.getProblems());
     }
@@ -532,7 +535,7 @@ public final class JavaParser {
         return simplifiedParse(PACKAGE_DECLARATION, provider(packageDeclaration));
     }
 
-    private void considerInjectingSymbolResolver(ParseResult<?> parseResult, ParserConfiguration parserConfiguration) {
+    /*private void considerInjectingSymbolResolver(ParseResult<?> parseResult, ParserConfiguration parserConfiguration) {
         parserConfiguration.getSymbolResolver().ifPresent(symbolResolver ->
                 parseResult.getResult().ifPresent(result -> {
                     if (result instanceof CompilationUnit) {
@@ -540,5 +543,14 @@ public final class JavaParser {
                     }
                 })
         );
+    }*/
+    
+    private void considerInjectingSymbolResolver(ParseResult<?> parseResult, ParserConfiguration parserConfiguration) {
+    	SymbolResolver symbolResolver=parserConfiguration.getSymbolResolver();
+    	if(symbolResolver!=null){
+    		if(parseResult.getResult()!=null && parseResult.getResult() instanceof CompilationUnit){
+    			((CompilationUnit)(parseResult.getResult())).setData(Node.SYMBOL_RESOLVER_KEY, symbolResolver);
+    		}
+    	}
     }
 }

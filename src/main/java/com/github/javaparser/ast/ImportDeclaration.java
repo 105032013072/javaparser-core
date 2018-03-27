@@ -178,4 +178,16 @@ public final class ImportDeclaration extends Node implements NodeWithName<Import
         }
         return super.replace(node, replacementNode);
     }
+
+	@Override
+	public ImportDeclaration setName(String name) {
+		 if(name!=null &&!"".equals(name)){
+	    	   return setName(parseName(name));
+	       }else return null;
+	}
+
+	@Override
+	public String getNameAsString() {
+		return getName().asString();
+	}
 }

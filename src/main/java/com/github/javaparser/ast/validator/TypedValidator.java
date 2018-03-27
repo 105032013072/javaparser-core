@@ -1,8 +1,10 @@
 package com.github.javaparser.ast.validator;
 
+
+
 import com.github.javaparser.ast.Node;
 
-import java.util.function.BiConsumer;
+
 
 /**
  * A validator that validates a known node type.

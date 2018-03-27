@@ -51,11 +51,11 @@ public final class PackageDeclaration extends AbsPackageDeclaration {
     private Name name;
 
     public PackageDeclaration() {
-        this(null, new NodeList<>(), new Name());
+        this(null, new NodeList<AnnotationExpr>(), new Name());
     }
 
     public PackageDeclaration(Name name) {
-        this(null, new NodeList<>(), name);
+        this(null, new NodeList<AnnotationExpr>(), name);
     }
 
     @AllFieldsConstructor

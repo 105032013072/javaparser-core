@@ -25,11 +25,14 @@ import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.javadoc.JavadocBlockTag;
 import com.github.javaparser.javadoc.description.JavadocDescription;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.javaparser.utils.Utils.*;
 import static com.github.javaparser.utils.Utils.nextWord;
@@ -47,7 +50,7 @@ class JavadocParser {
     }
 
     public static Javadoc parse(String commentContent) {
-        List<String> cleanLines = cleanLines(normalizeEolInTextBlock(commentContent, EOL));
+       /* List<String> cleanLines = cleanLines(normalizeEolInTextBlock(commentContent, EOL));
         int indexOfFirstBlockTag = cleanLines.stream()
                 .filter(JavadocParser::isABlockLine)
                 .map(cleanLines::indexOf)
@@ -61,15 +64,12 @@ class JavadocParser {
         } else {
             descriptionText = trimRight(String.join(EOL, cleanLines.subList(0, indexOfFirstBlockTag)));
 
-            //Combine cleaned lines, but only starting with the first block tag till the end
-            //In this combined string it is easier to handle multiple lines which actually belong together
+        
             String tagBlock = cleanLines.subList(indexOfFirstBlockTag, cleanLines.size())
                 .stream()
                 .collect(Collectors.joining(EOL));
 
-            //Split up the entire tag back again, considering now that some lines belong to the same block tag.
-            //The pattern splits the block at each new line starting with the '@' symbol, thus the symbol
-            //then needs to be added again so that the block parsers handles everything correctly.
+ 
             blockLines = BLOCK_PATTERN
                 .splitAsStream(tagBlock)
                 .filter(STRING_NOT_EMPTY)
@@ -78,7 +78,41 @@ class JavadocParser {
         }
         Javadoc document = new Javadoc(JavadocDescription.parseText(descriptionText));
         blockLines.forEach(l -> document.addBlockTag(parseBlockTag(l)));
-        return document;
+        return document;*/
+    	
+    	
+    	
+    	 List<String> cleanLines = cleanLines(normalizeEolInTextBlock(commentContent, EOL));
+    	 int indexOfFirstBlockTag=-1;
+    	 for (String string : cleanLines) {
+			if(JavadocParser.isABlockLine(string)){
+				indexOfFirstBlockTag=cleanLines.indexOf(string);
+			}
+		}
+    	 
+         List<String> blockLines;
+         String descriptionText;
+         if (indexOfFirstBlockTag == -1) {
+             descriptionText = trimRight(StringUtils.join(cleanLines, EOL));
+             blockLines = Collections.emptyList();
+         } else {
+        	
+             descriptionText = trimRight( StringUtils.join(cleanLines.subList(0, indexOfFirstBlockTag),EOL));
+             String tagBlock =StringUtils.join(cleanLines.subList(indexOfFirstBlockTag, cleanLines.size()),EOL);
+             blockLines=new ArrayList<>();
+           String[] array= BLOCK_PATTERN.split(tagBlock);
+           for (String string : array) {
+        	   if(STRING_NOT_EMPTY.test(string)){
+        		   String str=BLOCK_TAG_PREFIX + string;
+        		   blockLines.add(str);
+        	   }
+		 }
+        }
+         Javadoc document = new Javadoc(JavadocDescription.parseText(descriptionText));
+         for (String l : blockLines) {
+        	 document.addBlockTag(parseBlockTag(l));
+		}
+         return document;
     }
 
     private static JavadocBlockTag parseBlockTag(String line) {
@@ -101,7 +135,7 @@ class JavadocParser {
 
     private static List<String> cleanLines(String content) {
         String[] lines = content.split(EOL);
-        List<String> cleanedLines = Arrays.stream(lines).map(l -> {
+       /* List<String> cleanedLines = Arrays.stream(lines).map(l -> {
             int asteriskIndex = startsWithAsterisk(l);
             if (asteriskIndex == -1) {
                 return l;
@@ -117,10 +151,20 @@ class JavadocParser {
                 }
                 return l.substring(asteriskIndex + 1);
             }
-        }).collect(Collectors.toList());
-        // lines containing only whitespace are normalized to empty lines
-        cleanedLines = cleanedLines.stream().map(l -> l.trim().isEmpty() ? "" : l).collect(Collectors.toList());
-        // if the first starts with a space, remove it
+        }).collect(Collectors.toList());*/
+        // cleanedLines = cleanedLines.stream().map(l -> l.trim().isEmpty() ? "" : l).collect(Collectors.toList());
+       
+        List<String> cleanedLines=new ArrayList<>();
+        for (String line : lines) {
+        	 //cleanedLines.add(parserLine(line));
+        	String strLine=parserLine(line);
+        	strLine=strLine.trim().isEmpty() ? "" : strLine;
+        	cleanedLines.add(strLine);
+		}
+        
+      
+  
+        
         if (!cleanedLines.get(0).isEmpty() && (cleanedLines.get(0).charAt(0) == ' ' || cleanedLines.get(0).charAt(0) == '\t')) {
             cleanedLines.set(0, cleanedLines.get(0).substring(1));
         }
@@ -134,7 +178,26 @@ class JavadocParser {
         return cleanedLines;
     }
 
-    // Visible for testing
+    private static String parserLine(String line) {
+		
+    	int asteriskIndex = startsWithAsterisk(line);
+        if (asteriskIndex == -1) {
+            return line;
+        } else {
+            // if a line starts with space followed by an asterisk drop to the asterisk
+            // if there is a space immediately after the asterisk drop it also
+            if (line.length() > (asteriskIndex + 1)) {
+
+                char c = line.charAt(asteriskIndex + 1);
+                if (c == ' ' || c == '\t') {
+                    return line.substring(asteriskIndex + 2);
+                }
+            }
+            return line.substring(asteriskIndex + 1);
+        }
+	}
+
+	// Visible for testing
     static int startsWithAsterisk(String line) {
         if (line.startsWith("*")) {
             return 0;

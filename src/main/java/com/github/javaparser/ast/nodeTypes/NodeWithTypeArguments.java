@@ -43,7 +43,7 @@ public interface NodeWithTypeArguments<N extends Node> {
     /**
      * @return the types that can be found in the type arguments: &lt;String, Integer&gt;.
      */
-    Optional<NodeList<Type>> getTypeArguments();
+    NodeList<Type> getTypeArguments();
 
     /**
      * Allows you to set the generic arguments

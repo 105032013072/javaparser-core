@@ -42,9 +42,9 @@ import com.github.javaparser.ast.type.Type;
  *
  * @see JavaParser#parse(ParseStart, Provider)
  */
-@FunctionalInterface
+
 public interface ParseStart<R> {
-    ParseStart<CompilationUnit> COMPILATION_UNIT = GeneratedJavaParser::CompilationUnit;
+    /*ParseStart<CompilationUnit> COMPILATION_UNIT = GeneratedJavaParser::CompilationUnit;
     ParseStart<BlockStmt> BLOCK = GeneratedJavaParser::BlockParseStart;
     ParseStart<Statement> STATEMENT = GeneratedJavaParser::BlockStatementParseStart;
     ParseStart<ImportDeclaration> IMPORT_DECLARATION = GeneratedJavaParser::ImportDeclarationParseStart;
@@ -59,7 +59,139 @@ public interface ParseStart<R> {
     ParseStart<Name> NAME = GeneratedJavaParser::NameParseStart;
     ParseStart<SimpleName> SIMPLE_NAME = GeneratedJavaParser::SimpleNameParseStart;
     ParseStart<Parameter> PARAMETER = GeneratedJavaParser::ParameterParseStart;
-    ParseStart<PackageDeclaration> PACKAGE_DECLARATION = GeneratedJavaParser::PackageDeclarationParseStart;
+    ParseStart<PackageDeclaration> PACKAGE_DECLARATION = GeneratedJavaParser::PackageDeclarationParseStart;*/
+	ParseStart<CompilationUnit> COMPILATION_UNIT =new ParseStart<CompilationUnit>() {
+		@Override
+		public CompilationUnit parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.CompilationUnit();
+		}
+	};
+	
+	
+	ParseStart<BlockStmt> BLOCK =new ParseStart<BlockStmt>() {
+		@Override
+		public BlockStmt parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.BlockParseStart();
+		}
+	} ;
+	
+    ParseStart<Statement> STATEMENT = new ParseStart<Statement>() {
 
+		@Override
+		public Statement parse(GeneratedJavaParser parser) throws ParseException {
+		
+			return parser.BlockStatementParseStart();
+		}
+	};
+    
+    ParseStart<ImportDeclaration> IMPORT_DECLARATION =new  ParseStart<ImportDeclaration>() {
+		@Override
+		public ImportDeclaration parse(GeneratedJavaParser parser) throws ParseException {
+
+			return parser.ImportDeclarationParseStart();
+		}
+    	
+	};
+    
+    ParseStart<Expression> EXPRESSION = new ParseStart<Expression>() {
+		@Override
+		public Expression parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.ExpressionParseStart();
+		}
+	};
+    
+    ParseStart<AnnotationExpr> ANNOTATION =new  ParseStart<AnnotationExpr>() {
+
+		@Override
+		public AnnotationExpr parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.AnnotationParseStart();
+		}
+	};
+    
+    ParseStart<BodyDeclaration<?>> ANNOTATION_BODY =new ParseStart<BodyDeclaration<?>>() {
+
+		@Override
+		public BodyDeclaration<?> parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.AnnotationBodyDeclarationParseStart();
+		}
+	};
+    
+    ParseStart<BodyDeclaration<?>> CLASS_BODY =new ParseStart<BodyDeclaration<?>>() {
+
+		@Override
+		public BodyDeclaration<?> parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.ClassOrInterfaceBodyDeclarationParseStart();
+		}
+	};
+    
+    ParseStart<ClassOrInterfaceType> CLASS_OR_INTERFACE_TYPE =new ParseStart<ClassOrInterfaceType>() {
+
+		@Override
+		public ClassOrInterfaceType parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.ClassOrInterfaceTypeParseStart();
+		}
+	}; 
+    
+    ParseStart<Type> TYPE =new ParseStart<Type>() {
+
+		@Override
+		public Type parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.ResultTypeParseStart();
+		}
+	}; 
+    
+    ParseStart<VariableDeclarationExpr> VARIABLE_DECLARATION_EXPR =new ParseStart<VariableDeclarationExpr>() {
+
+		@Override
+		public VariableDeclarationExpr parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.VariableDeclarationExpressionParseStart();
+		}
+	}; 
+    
+    ParseStart<ExplicitConstructorInvocationStmt> EXPLICIT_CONSTRUCTOR_INVOCATION_STMT =new ParseStart<ExplicitConstructorInvocationStmt>() {
+		@Override
+		public ExplicitConstructorInvocationStmt parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.ExplicitConstructorInvocationParseStart();
+		}
+	}; 
+    
+    ParseStart<Name> NAME =new ParseStart<Name>() {
+
+		@Override
+		public Name parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.NameParseStart();
+		}
+	};
+    
+    ParseStart<SimpleName> SIMPLE_NAME =new ParseStart<SimpleName>() {
+
+		@Override
+		public SimpleName parse(GeneratedJavaParser parser) throws ParseException {
+
+			return parser.SimpleNameParseStart();
+		}
+	}; 
+    
+    ParseStart<Parameter> PARAMETER =new ParseStart<Parameter>() {
+		@Override
+		public Parameter parse(GeneratedJavaParser parser) throws ParseException {
+			return parser.ParameterParseStart();
+		}
+	};
+    
+    ParseStart<PackageDeclaration> PACKAGE_DECLARATION =new  ParseStart<PackageDeclaration>() {
+
+		@Override
+		public PackageDeclaration parse(GeneratedJavaParser parser) throws ParseException {
+			
+			return parser.PackageDeclarationParseStart();
+		}
+	};
+	
     R parse(GeneratedJavaParser parser) throws ParseException;
 }

@@ -95,11 +95,11 @@ public final class CompilationUnit extends Node {
     private Storage storage;
 
     public CompilationUnit() {
-        this(null, null, new NodeList<>(), new NodeList<>(), null);
+        this(null, null, new NodeList<ImportDeclaration>(), new NodeList<TypeDeclaration<?>>(), null);
     }
 
     public CompilationUnit(String packageDeclaration) {
-        this(null, new PackageDeclaration(new Name(packageDeclaration)), new NodeList<>(), new NodeList<>(), null);
+        this(null, new PackageDeclaration(new Name(packageDeclaration)), new NodeList<ImportDeclaration>(), new NodeList<TypeDeclaration<?>>(), null);
     }
 
     @AllFieldsConstructor

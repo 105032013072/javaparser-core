@@ -24,8 +24,7 @@ package com.github.javaparser;
 import com.github.javaparser.ast.comments.CommentsCollection;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+
 
 import static com.github.javaparser.utils.Utils.EOL;
 import static java.util.Collections.singletonList;
@@ -105,22 +104,22 @@ public class ParseResult<T> {
      * Calling this method is comparable to calling getResult().get().getTokenRange().get() 
      */
     @Deprecated
-    public Optional<List<JavaToken>> getTokens() {
-        return Optional.ofNullable(tokens);
+    public List<JavaToken> getTokens() {
+        return tokens;
     }
 
     /**
      * @return the complete collection of comments encountered while parsing.
      */
-    public Optional<CommentsCollection> getCommentsCollection() {
-        return Optional.ofNullable(commentsCollection);
+    public CommentsCollection getCommentsCollection() {
+        return commentsCollection;
     }
 
     /**
      * @return the AST of the parsed source code, or empty if parsing failed completely.
      */
-    public Optional<T> getResult() {
-        return Optional.ofNullable(result);
+    public T getResult() {
+        return result;
     }
 
     @Override
