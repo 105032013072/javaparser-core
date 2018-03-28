@@ -46,11 +46,17 @@ import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import javax.annotation.Generated;
-import java.util.EnumSet;
-import static com.github.javaparser.utils.Utils.assertNotNull;
-import java.util.function.Consumer;
-import java.util.Optional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+
+import static com.github.javaparser.utils.Utils.assertNotNull;
+import static com.github.javaparser.JavaParser.parseClassOrInterfaceType;
+import static com.github.javaparser.ast.Modifier.ABSTRACT;
+import static com.github.javaparser.ast.Modifier.FINAL;
+import static java.util.Collections.unmodifiableList;
 /**
  * A definition of a class or interface.<br/><code>class X { ... }</code>
  *
@@ -283,4 +289,238 @@ public final class ClassOrInterfaceDeclaration extends TypeDeclaration<ClassOrIn
     public Optional<ClassOrInterfaceDeclaration> toClassOrInterfaceDeclaration() {
         return Optional.of(this);
     }
+    
+    
+    //for NodeWithImplements
+ 
+
+    public  ClassOrInterfaceType getImplementedTypes(int i) {
+        return getImplementedTypes().get(i);
+    }
+
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration setImplementedType(int i, ClassOrInterfaceType implement) {
+        getImplementedTypes().set(i, implement);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration addImplementedType(ClassOrInterfaceType implement) {
+        getImplementedTypes().add(implement);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    /** @deprecated use addImplementedType instead */
+    public ClassOrInterfaceDeclaration addImplements(String name) {
+        return addImplementedType(name);
+    }
+
+    /** @deprecated use addImplementedType instead */
+    public  ClassOrInterfaceDeclaration addImplements(Class<?> clazz) {
+        return addImplementedType(clazz);
+    }
+
+    /**
+     * Add an implements to this
+     *
+     * @param name the name of the type to extends from
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration addImplementedType(String name) {
+        getImplementedTypes().add(parseClassOrInterfaceType(name));
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    /**
+     * Add an implements to this and automatically add the import
+     *
+     * @param clazz the type to implements from
+     * @return this
+     */
+    public  ClassOrInterfaceDeclaration addImplementedType(Class<?> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addImplementedType(clazz.getSimpleName());
+    }
+    
+    //for NodeWithExtends
+ 
+
+    public  ClassOrInterfaceType getExtendedTypes(int i) {
+        return getExtendedTypes().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ClassOrInterfaceDeclaration setExtendedType(int i, ClassOrInterfaceType extend) {
+        getExtendedTypes().set(i, extend);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ClassOrInterfaceDeclaration addExtendedType(ClassOrInterfaceType extend) {
+        getExtendedTypes().add(extend);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    /**
+     * @deprecated use addExtendedType
+     */
+    public  ClassOrInterfaceDeclaration addExtends(Class<?> clazz) {
+        return addExtendedType(clazz);
+    }
+
+    /**
+     * @deprecated use addExtendedType
+     */
+    public  ClassOrInterfaceDeclaration addExtends(String name) {
+        return addExtendedType(name);
+    }
+
+    /**
+     * Add an "extends" to this and automatically add the import
+     *
+     * @param clazz the class to extand from
+     * @return this
+     */
+    public  ClassOrInterfaceDeclaration addExtendedType(Class<?> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addExtendedType(clazz.getSimpleName());
+    }
+
+    /**
+     * Add an "extends" to this
+     *
+     * @param name the name of the type to extends from
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration addExtendedType(String name) {
+        getExtendedTypes().add(parseClassOrInterfaceType(name));
+        return (ClassOrInterfaceDeclaration) this;
+    }
+    
+    //for NodeWithTypeParameters
+   
+    public  TypeParameter getTypeParameter(int i) {
+        return getTypeParameters().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration setTypeParameter(int i, TypeParameter typeParameter) {
+        getTypeParameters().set(i, typeParameter);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration addTypeParameter(TypeParameter typeParameter) {
+        getTypeParameters().add(typeParameter);
+        return (ClassOrInterfaceDeclaration) this;
+    }
+    
+    public boolean isGeneric() {
+        return getTypeParameters().size() > 0;
+    }
+    
+    //for NodeWithAbstractModifier
+    public  boolean isAbstract() {
+        return getModifiers().contains(ABSTRACT);
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration setAbstract(boolean set) {
+        return setModifier(ABSTRACT, set);
+    }
+    
+    //for NodeWithFinalModifier
+    
+    public  boolean isFinal() {
+        return getModifiers().contains(FINAL);
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassOrInterfaceDeclaration setFinal(boolean set) {
+        return setModifier(FINAL, set);
+    }
+    
+    //for NodeWithConstructors
+    public  ConstructorDeclaration getDefaultConstructor() {
+      
+     	NodeList<BodyDeclaration<?>> list= getMembers();
+     	
+     	for (BodyDeclaration<?> bd : list) {
+ 			if(bd instanceof ConstructorDeclaration){
+ 				ConstructorDeclaration cd=(ConstructorDeclaration) bd;
+ 				if(cd.getParameters().isEmpty()) return cd;
+ 			}
+ 		}
+     	return null;
+     }
+
+     /**
+      * Adds a constructor to this
+      *
+      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
+      * @return the created constructor
+      */
+     public  ConstructorDeclaration addConstructor(Modifier... modifiers) {
+         ConstructorDeclaration constructorDeclaration = new ConstructorDeclaration();
+        
+        
+         List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+         EnumSet enumSet=EnumSet.noneOf(Modifier.class);
+         enumSet.addAll(list);
+         constructorDeclaration.setModifiers(enumSet);
+         constructorDeclaration.setName(getName());
+         getMembers().add(constructorDeclaration);
+         return constructorDeclaration;
+     }
+
+     /**
+      * Find all constructors for this class.
+      *
+      * @return the constructors found. This list is immutable.
+      */
+     public  List<ConstructorDeclaration> getConstructors() {
+         
+     	
+     	List<ConstructorDeclaration> result=new ArrayList<>();
+     	NodeList<BodyDeclaration<?>> members=getMembers();
+     	for (BodyDeclaration<?> m : members) {
+ 			if(m instanceof ConstructorDeclaration){
+ 				result.add((ConstructorDeclaration) m);
+ 			}
+ 		}
+      return unmodifiableList(result);
+     }
+
+     /**
+      * Try to find a {@link ConstructorDeclaration} by its parameters types
+      *
+      * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+      * foo(Map&lt;Integer,String&gt; myMap,int number)
+      * @return the constructor found (multiple in case of overloading)
+      */
+     public  ConstructorDeclaration getConstructorByParameterTypes(String... paramTypes) {
+         //return getConstructors().stream().filter(m -> m.hasParametersOfType(paramTypes)).findFirst();
+     	for (ConstructorDeclaration m : getConstructors()) {
+ 		  if(m.hasParametersOfType(paramTypes))	 return m;
+ 		}
+     	return null;
+     }
+
+     /**
+      * Try to find a {@link ConstructorDeclaration} by its parameters types
+      *
+      * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+      * foo(Map&lt;Integer,String&gt; myMap,int number)
+      * @return the constructors found (multiple in case of overloading)
+      */
+     public  ConstructorDeclaration getConstructorByParameterTypes(Class<?>... paramTypes) {
+        // return getConstructors().stream().filter(m -> m.hasParametersOfType(paramTypes)).findFirst();
+     	for (ConstructorDeclaration m : getConstructors()) {
+ 			if(m.hasParametersOfType(paramTypes)) return m;
+ 		}
+     	return null;
+     }
 }

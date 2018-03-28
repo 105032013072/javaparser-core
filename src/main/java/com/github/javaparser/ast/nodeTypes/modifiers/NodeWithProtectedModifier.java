@@ -9,12 +9,8 @@ import static com.github.javaparser.ast.Modifier.*;
  * A node that can be protected.
  */
 public interface NodeWithProtectedModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isProtected() {
-        return getModifiers().contains(PROTECTED);
-    }
+	public abstract boolean isProtected();
 
     @SuppressWarnings("unchecked")
-    default N setProtected(boolean set) {
-        return setModifier(PROTECTED, set);
-    }
+    public abstract N setProtected(boolean set);
 }

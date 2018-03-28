@@ -30,9 +30,5 @@ public interface NodeWithBody<N extends Node> {
 
     N setBody(final Statement body);
 
-    default BlockStmt createBlockStatementAsBody() {
-        BlockStmt b = new BlockStmt();
-        setBody(b);
-        return b;
-    }
+    public abstract BlockStmt createBlockStatementAsBody();
 }

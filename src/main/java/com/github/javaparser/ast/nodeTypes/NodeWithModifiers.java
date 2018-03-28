@@ -24,9 +24,11 @@ package com.github.javaparser.ast.nodeTypes;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.stream.Collectors;
+import java.util.List;
+
 
 /**
  * A Node with Modifiers.
@@ -46,28 +48,10 @@ public interface NodeWithModifiers<N extends Node> {
     N setModifiers(EnumSet<Modifier> modifiers);
 
     @SuppressWarnings("unchecked")
-    default N addModifier(Modifier... modifiers) {
-        EnumSet<Modifier> newModifiers = getModifiers().clone();
-        newModifiers.addAll(Arrays.stream(modifiers)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));
-        setModifiers(newModifiers);
-        return (N) this;
-    }
+    public abstract N addModifier(Modifier... modifiers);
 
     @SuppressWarnings("unchecked")
-    default N removeModifier(Modifier... m) {
-        EnumSet<Modifier> newModifiers = getModifiers().clone();
-        newModifiers.removeAll(Arrays.stream(m)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));
-        setModifiers(newModifiers);
-        return (N) this;
-    }
-    default N setModifier(Modifier m, boolean set) {
-        if (set) {
-            return addModifier(m);
-        } else {
-            return removeModifier(m);
-        }
-    }
+    public abstract N removeModifier(Modifier... m);
+    public abstract N setModifier(Modifier m, boolean set);
 
 }

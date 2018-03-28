@@ -35,25 +35,15 @@ public interface NodeWithArguments<N extends Node> {
 
     NodeList<Expression> getArguments();
 
-    default Expression getArgument(int i) {
-        return getArguments().get(i);
-    }
+    public abstract Expression getArgument(int i);
 
     @SuppressWarnings("unchecked")
-    default N addArgument(String arg) {
-        return addArgument(parseExpression(arg));
-    }
+     public abstract N addArgument(String arg);
 
     @SuppressWarnings("unchecked")
-    default N addArgument(Expression arg) {
-        getArguments().add(arg);
-        return (N) this;
-    }
+     public abstract N addArgument(Expression arg);
 
     @SuppressWarnings("unchecked")
-    default N setArgument(int i, Expression arg) {
-        getArguments().set(i, arg);
-        return (N) this;
-    }
+     public abstract N setArgument(int i, Expression arg);
 
 }

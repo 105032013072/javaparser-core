@@ -9,13 +9,9 @@ import static com.github.javaparser.ast.Modifier.*;
  * A node that can be public.
  */
 public interface NodeWithPublicModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isPublic() {
-        return getModifiers().contains(PUBLIC);
-    }
+	public abstract boolean isPublic();
 
     @SuppressWarnings("unchecked")
-    default N setPublic(boolean set) {
-        return setModifier(PUBLIC, set);
-    }
+    public abstract N setPublic(boolean set);
 
 }

@@ -9,12 +9,8 @@ import static com.github.javaparser.ast.Modifier.ABSTRACT;
  * A node that can be abstract.
  */
 public interface NodeWithAbstractModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isAbstract() {
-        return getModifiers().contains(ABSTRACT);
-    }
+	public abstract boolean isAbstract();
 
     @SuppressWarnings("unchecked")
-    default N setAbstract(boolean set) {
-        return setModifier(ABSTRACT, set);
-    }
+    public abstract N setAbstract(boolean set);
 }

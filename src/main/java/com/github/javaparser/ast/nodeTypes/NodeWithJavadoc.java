@@ -26,13 +26,12 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.javadoc.Javadoc;
 
-import java.util.Optional;
 
 /**
  * A node that can be documented with a Javadoc comment.
  */
 public interface NodeWithJavadoc<N extends Node> {
-    Optional<Comment> getCommentOptional();
+    Comment getCommentOptional();
 
     Node setComment(Comment comment);
 
@@ -42,26 +41,16 @@ public interface NodeWithJavadoc<N extends Node> {
      *
      * @return The JavadocComment for this node wrapped in an optional as it may be absent.
      */
-    default Optional<JavadocComment> getJavadocComment() {
-        return getCommentOptional()
-                .filter(comment -> comment instanceof JavadocComment)
-                .map(comment -> (JavadocComment) comment);
-    }
+    public abstract JavadocComment getJavadocComment();
 
     /**
      * Gets the Javadoc for this node. You can set the Javadoc by calling setJavadocComment passing a Javadoc.
      *
      * @return The Javadoc for this node wrapped in an optional as it may be absent.
      */
-    default Optional<Javadoc> getOptionalJavadoc() {
-        return getJavadocComment().map(JavadocComment::parse);
-    }
+    public abstract  Javadoc getOptionalJavadoc();
     
-    default Javadoc getJavadoc() {
-    	Optional<Javadoc> oj=getOptionalJavadoc();
-    	if(oj.isPresent()) return oj.get();
-    	else return null;
-    }
+    public abstract Javadoc getJavadoc();
 
     /**
      * Use this to store additional information to this node.
@@ -69,26 +58,14 @@ public interface NodeWithJavadoc<N extends Node> {
      * @param comment to be set
      */
     @SuppressWarnings("unchecked")
-    default N setJavadocComment(String comment) {
-        return setJavadocComment(new JavadocComment(comment));
-    }
+    public abstract N setJavadocComment(String comment);
 
-    default N setJavadocComment(JavadocComment comment) {
-        setComment(comment);
-        return (N) this;
-    }
+    public abstract N setJavadocComment(JavadocComment comment);
 
-    default N setJavadocComment(String indentation, Javadoc javadoc) {
-        JavadocComment comment = javadoc.toComment(indentation);
-        return setJavadocComment(comment);
-    }
+    public abstract N setJavadocComment(String indentation, Javadoc javadoc);
 
-    default boolean removeJavaDocComment() {
-        return hasJavaDocComment() && getCommentOptional().get().remove();
-    }
+    public abstract boolean removeJavaDocComment();
 
-    default boolean hasJavaDocComment() {
-        return getCommentOptional().isPresent() && getCommentOptional().get() instanceof JavadocComment;
-    }
+    public abstract boolean hasJavaDocComment();
 
 }

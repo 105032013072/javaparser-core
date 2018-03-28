@@ -9,12 +9,8 @@ import static com.github.javaparser.ast.Modifier.*;
  * A node that can be private.
  */
 public interface NodeWithPrivateModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isPrivate() {
-        return getModifiers().contains(PRIVATE);
-    }
+	public abstract boolean isPrivate();
 
     @SuppressWarnings("unchecked")
-    default N setPrivate(boolean set) {
-        return setModifier(PRIVATE, set);
-    }
+    public abstract N setPrivate(boolean set);
 }

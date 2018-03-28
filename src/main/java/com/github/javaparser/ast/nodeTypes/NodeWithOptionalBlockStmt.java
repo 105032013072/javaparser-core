@@ -24,21 +24,16 @@ package com.github.javaparser.ast.nodeTypes;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
-import java.util.Optional;
 
 /**
  * A node with a body that is a BlockStmt, which is optional.
  */
 public interface NodeWithOptionalBlockStmt<N extends Node> {
-    Optional<BlockStmt> getOptionalBody();
+    BlockStmt getOptionalBody();
 
     N setBody(BlockStmt block);
 
     N removeBody();
 
-    default BlockStmt createBody() {
-        BlockStmt block = new BlockStmt();
-        setBody(block);
-        return block;
-    }
+    public abstract BlockStmt createBody();
 }

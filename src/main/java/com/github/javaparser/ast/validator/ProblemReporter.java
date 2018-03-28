@@ -25,7 +25,7 @@ public class ProblemReporter {
      * @param node the node in which the problem occurred, used to find the Range of the problem.
      */
     public void report(NodeWithTokenRange<?> node, String message, Object... args) {
-        report(node.getTokenRange().orElse(null), message, args);
+        report(node.getTokenRange(), message, args);
     }
 
     public void report(TokenRange range, String message, Object... args) {

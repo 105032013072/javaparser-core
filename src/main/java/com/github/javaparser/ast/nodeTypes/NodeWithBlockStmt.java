@@ -32,9 +32,5 @@ public interface NodeWithBlockStmt<N extends Node> {
 
     N setBody(BlockStmt block);
 
-    default BlockStmt createBody() {
-        BlockStmt block = new BlockStmt();
-        setBody(block);
-        return block;
-    }
+    public abstract BlockStmt createBody();
 }

@@ -61,15 +61,9 @@ public interface NodeWithType<N extends Node, T extends Type> {
      * @return this
      */
     @SuppressWarnings("unchecked")
-    default N setType(Class<?> typeClass) {
-        tryAddImportToParentCompilationUnit(typeClass);
-        return setType((T) parseType(typeClass.getSimpleName()));
-    }
+    public abstract N setType(Class<?> typeClass);
 
     @SuppressWarnings("unchecked")
-    default N setType(final String typeString) {
-        assertNonEmpty(typeString);
-        return setType((T) parseType(typeString));
-    }
+    public abstract N setType(final String typeString);
 
 }

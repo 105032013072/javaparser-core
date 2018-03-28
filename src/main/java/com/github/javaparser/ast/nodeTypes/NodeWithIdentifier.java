@@ -30,12 +30,7 @@ public interface NodeWithIdentifier<N extends Node> {
 
     N setIdentifier(String identifier);
 
-    default String getId() {
-        return getIdentifier();
-    }
+    public abstract String getId();
 
-    default N setId(String identifier) {
-        assertNonEmpty(identifier);
-        return setIdentifier(identifier);
-    }
+    public abstract N setId(String identifier);
 }

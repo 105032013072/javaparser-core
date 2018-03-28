@@ -20,11 +20,14 @@
  */
 package com.github.javaparser.ast.body;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.SimpleName;
@@ -39,17 +42,26 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.javadoc.Javadoc;
 import com.github.javaparser.metamodel.AnnotationMemberDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationMemberDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
+import com.github.javaparser.utils.Utils;
+
 import javax.annotation.Generated;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.List;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.ast.Modifier.*;
+
 
 /**
  * The "int id();" in <code>@interface X { int id(); }</code>
@@ -71,11 +83,11 @@ public final class AnnotationMemberDeclaration extends BodyDeclaration<Annotatio
     private Expression defaultValue;
 
     public AnnotationMemberDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new ClassOrInterfaceType(), new SimpleName(), null);
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new ClassOrInterfaceType(), new SimpleName(), null);
     }
 
     public AnnotationMemberDeclaration(EnumSet<Modifier> modifiers, Type type, String name, Expression defaultValue) {
-        this(null, modifiers, new NodeList<>(), type, new SimpleName(name), defaultValue);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), type, new SimpleName(name), defaultValue);
     }
 
     @AllFieldsConstructor
@@ -109,8 +121,8 @@ public final class AnnotationMemberDeclaration extends BodyDeclaration<Annotatio
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getDefaultValue() {
-        return Optional.ofNullable(defaultValue);
+    public Expression getDefaultValue() {
+        return defaultValue;
     }
 
     /**
@@ -269,7 +281,151 @@ public final class AnnotationMemberDeclaration extends BodyDeclaration<Annotatio
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<AnnotationMemberDeclaration> toAnnotationMemberDeclaration() {
-        return Optional.of(this);
+    public AnnotationMemberDeclaration toAnnotationMemberDeclaration() {
+        return this;
     }
+    
+    
+    
+    //for NodeWithJavadoc
+     public  JavadocComment getJavadocComment() {
+    	
+    	Comment comment= getCommentOptional();
+    	if(comment instanceof JavadocComment){
+    		return (JavadocComment) comment;
+    	}else return null;
+    }
+
+    /**
+     * Gets the Javadoc for this node. You can set the Javadoc by calling setJavadocComment passing a Javadoc.
+     *
+     * @return The Javadoc for this node wrapped in an optional as it may be absent.
+     */
+    public   Javadoc getOptionalJavadoc() {
+    	JavadocComment javadocComment=getJavadocComment();
+    	if(javadocComment!=null){
+    		return javadocComment.parse();
+    	}else return null;
+    	
+    	
+    }
+    
+    public  Javadoc getJavadoc() {
+    	Javadoc oj=getOptionalJavadoc();
+    	if(oj!=null) return oj;
+    	else return null;
+    }
+
+    /**
+     * Use this to store additional information to this node.
+     *
+     * @param comment to be set
+     */
+    @SuppressWarnings("unchecked")
+    public  AnnotationMemberDeclaration setJavadocComment(String comment) {
+        return setJavadocComment(new JavadocComment(comment));
+    }
+
+    public  AnnotationMemberDeclaration setJavadocComment(JavadocComment comment) {
+        setComment(comment);
+        return (AnnotationMemberDeclaration) this;
+    }
+
+    public  AnnotationMemberDeclaration setJavadocComment(String indentation, Javadoc javadoc) {
+        JavadocComment comment = javadoc.toComment(indentation);
+        return setJavadocComment(comment);
+    }
+
+    public  boolean removeJavaDocComment() {
+        return hasJavaDocComment() && getCommentOptional().remove();
+    }
+
+    public  boolean hasJavaDocComment() {
+        return getCommentOptional()!=null && getCommentOptional() instanceof JavadocComment;
+    }
+
+    
+    //for NodeWithSimpleName
+    
+    public  AnnotationMemberDeclaration setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+    
+   //for NodeWithType
+
+   @SuppressWarnings("unchecked")
+  public AnnotationMemberDeclaration setType(Class<?> typeClass) {
+       tryAddImportToParentCompilationUnit(typeClass);
+       return setType((Type) parseType(typeClass.getSimpleName()));
+   }
+
+   @SuppressWarnings("unchecked")
+  public AnnotationMemberDeclaration setType(final String typeString) {
+       Utils.assertNonEmpty(typeString);
+       return setType((Type) parseType(typeString));
+   }
+   
+   //for NodeWithPublicModifier
+   
+   public boolean isPublic() {
+       return getModifiers().contains(PUBLIC);
+   }
+
+   @SuppressWarnings("unchecked")
+   public AnnotationMemberDeclaration setPublic(boolean set) {
+       return setModifier(PUBLIC, set);
+   }
+
+   //for NodeWithAbstractModifier
+   
+   public  boolean isAbstract() {
+       return getModifiers().contains(ABSTRACT);
+   }
+
+   @SuppressWarnings("unchecked")
+   public AnnotationMemberDeclaration setAbstract(boolean set) {
+       return setModifier(ABSTRACT, set);
+   }
+   
+   //for NodeWithModifiers
+   @SuppressWarnings("unchecked")
+  public AnnotationMemberDeclaration addModifier(Modifier... modifiers) {
+       EnumSet<Modifier> newModifiers = getModifiers().clone();
+       /*newModifiers.addAll(Arrays.stream(modifiers)
+               .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+       List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+       EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+       enm.addAll(list);
+       newModifiers.addAll(enm);
+       setModifiers(newModifiers);
+       return (AnnotationMemberDeclaration) this;
+   }
+
+   @SuppressWarnings("unchecked")
+public AnnotationMemberDeclaration removeModifier(Modifier... m) {
+       EnumSet<Modifier> newModifiers = getModifiers().clone();
+      /* newModifiers.removeAll(Arrays.stream(m)
+               .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+       List<Modifier> list=new ArrayList<>(Arrays.asList(m));
+       EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+       enm.addAll(list);
+       newModifiers.removeAll(enm);
+       
+       setModifiers(newModifiers);
+       return (AnnotationMemberDeclaration) this;
+   }
+   public AnnotationMemberDeclaration setModifier(Modifier m, boolean set) {
+       if (set) {
+           return addModifier(m);
+       } else {
+           return removeModifier(m);
+       }
+   }
+   
 }

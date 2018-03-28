@@ -121,8 +121,8 @@ public final class MethodDeclaration extends CallableDeclaration<MethodDeclarati
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<BlockStmt> getOptionalBody() {
-        return Optional.ofNullable(body);
+    public BlockStmt getOptionalBody() {
+        return body;
     }
     public BlockStmt getBody() {
         return this.body;

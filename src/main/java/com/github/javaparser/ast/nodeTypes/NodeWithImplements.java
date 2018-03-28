@@ -33,35 +33,23 @@ import static com.github.javaparser.JavaParser.parseClassOrInterfaceType;
 public interface NodeWithImplements<N extends Node> {
     NodeList<ClassOrInterfaceType> getImplementedTypes();
 
-    default ClassOrInterfaceType getImplementedTypes(int i) {
-        return getImplementedTypes().get(i);
-    }
+    public abstract ClassOrInterfaceType getImplementedTypes(int i);
 
     N setImplementedTypes(NodeList<ClassOrInterfaceType> implementsList);
     
     void tryAddImportToParentCompilationUnit(Class<?> clazz);
     
     @SuppressWarnings("unchecked")
-    default N setImplementedType(int i, ClassOrInterfaceType implement) {
-        getImplementedTypes().set(i, implement);
-        return (N) this;
-    }
+    public abstract N setImplementedType(int i, ClassOrInterfaceType implement);
 
     @SuppressWarnings("unchecked")
-    default N addImplementedType(ClassOrInterfaceType implement) {
-        getImplementedTypes().add(implement);
-        return (N) this;
-    }
+    public abstract N addImplementedType(ClassOrInterfaceType implement);
 
     /** @deprecated use addImplementedType instead */
-    default N addImplements(String name) {
-        return addImplementedType(name);
-    }
+    public abstract N addImplements(String name);
 
     /** @deprecated use addImplementedType instead */
-    default N addImplements(Class<?> clazz) {
-        return addImplementedType(clazz);
-    }
+    public abstract N addImplements(Class<?> clazz);
 
     /**
      * Add an implements to this
@@ -70,10 +58,7 @@ public interface NodeWithImplements<N extends Node> {
      * @return this
      */
     @SuppressWarnings("unchecked")
-    default N addImplementedType(String name) {
-        getImplementedTypes().add(parseClassOrInterfaceType(name));
-        return (N) this;
-    }
+    public abstract N addImplementedType(String name);
 
     /**
      * Add an implements to this and automatically add the import
@@ -81,8 +66,5 @@ public interface NodeWithImplements<N extends Node> {
      * @param clazz the type to implements from
      * @return this
      */
-    default N addImplementedType(Class<?> clazz) {
-        tryAddImportToParentCompilationUnit(clazz);
-        return addImplementedType(clazz.getSimpleName());
-    }
+    public abstract N addImplementedType(Class<?> clazz);
 }

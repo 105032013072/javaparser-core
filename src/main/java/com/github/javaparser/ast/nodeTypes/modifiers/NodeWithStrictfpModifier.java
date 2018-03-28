@@ -9,12 +9,8 @@ import static com.github.javaparser.ast.Modifier.STRICTFP;
  * A node that can be strictfp.
  */
 public interface NodeWithStrictfpModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isStrictfp() {
-        return getModifiers().contains(STRICTFP);
-    }
+	public abstract boolean isStrictfp();
 
     @SuppressWarnings("unchecked")
-    default N setStrictfp(boolean set) {
-        return setModifier(STRICTFP, set);
-    }
+    public abstract N setStrictfp(boolean set);
 }

@@ -35,37 +35,25 @@ public interface NodeWithExtends<N extends Node> {
 
     void tryAddImportToParentCompilationUnit(Class<?> clazz);
 
-    default ClassOrInterfaceType getExtendedTypes(int i) {
-        return getExtendedTypes().get(i);
-    }
+    public abstract ClassOrInterfaceType getExtendedTypes(int i);
 
     N setExtendedTypes(NodeList<ClassOrInterfaceType> extendsList);
 
     @SuppressWarnings("unchecked")
-    default N setExtendedType(int i, ClassOrInterfaceType extend) {
-        getExtendedTypes().set(i, extend);
-        return (N) this;
-    }
+    public abstract N setExtendedType(int i, ClassOrInterfaceType extend);
 
     @SuppressWarnings("unchecked")
-    default N addExtendedType(ClassOrInterfaceType extend) {
-        getExtendedTypes().add(extend);
-        return (N) this;
-    }
+    public abstract N addExtendedType(ClassOrInterfaceType extend);
 
     /**
      * @deprecated use addExtendedType
      */
-    default N addExtends(Class<?> clazz) {
-        return addExtendedType(clazz);
-    }
+    public abstract N addExtends(Class<?> clazz);
 
     /**
      * @deprecated use addExtendedType
      */
-    default N addExtends(String name) {
-        return addExtendedType(name);
-    }
+    public abstract N addExtends(String name);
 
     /**
      * Add an "extends" to this and automatically add the import
@@ -73,10 +61,7 @@ public interface NodeWithExtends<N extends Node> {
      * @param clazz the class to extand from
      * @return this
      */
-    default N addExtendedType(Class<?> clazz) {
-        tryAddImportToParentCompilationUnit(clazz);
-        return addExtendedType(clazz.getSimpleName());
-    }
+    public abstract N addExtendedType(Class<?> clazz);
 
     /**
      * Add an "extends" to this
@@ -85,8 +70,5 @@ public interface NodeWithExtends<N extends Node> {
      * @return this
      */
     @SuppressWarnings("unchecked")
-    default N addExtendedType(String name) {
-        getExtendedTypes().add(parseClassOrInterfaceType(name));
-        return (N) this;
-    }
+    public abstract N addExtendedType(String name);
 }

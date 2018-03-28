@@ -8,24 +8,9 @@ import com.github.javaparser.ast.type.UnionType;
  * This validator validates according to Java 7 syntax rules.
  */
 public class Java7Validator extends Java6Validator {
-    protected final SingleNodeTypeValidator<TryStmt> tryWithLimitedResources = new SingleNodeTypeValidator<>(TryStmt.class, (n, reporter) -> {
-        if (n.getCatchClauses().isEmpty()
-                && n.getResources().isEmpty()
-                && !n.getFinallyBlock().isPresent()) {
-            reporter.report(n, "Try has no finally, no catch, and no resources.");
-        }
-        for (Expression resource : n.getResources()) {
-            if (!resource.isVariableDeclarationExpr()) {
-                reporter.report(n, "Try with resources only supports variable declarations.");
-            }
-        }
-    });
-    protected final SingleNodeTypeValidator<UnionType> multiCatch = new SingleNodeTypeValidator<>(UnionType.class, (n, reporter) -> {
-        // Case "0 elements" is caught elsewhere.
-        if (n.getElements().size() == 1) {
-            reporter.report(n, "Union type (multi catch) must have at least two elements.");
-        }
-    });
+	
+	protected final SingleNodeTypeValidator<TryStmt> tryWithLimitedResources =createTryWithLimitedResources();
+	protected final SingleNodeTypeValidator<UnionType> multiCatch=createMultiCatch();
 
     public Java7Validator() {
         super();
@@ -36,4 +21,41 @@ public class Java7Validator extends Java6Validator {
         remove(noUnderscoresInIntegerLiterals);
         replace(noMultiCatch, multiCatch);
     }
+
+
+	private SingleNodeTypeValidator<UnionType> createMultiCatch() {
+		TypedValidator typedValidator=new TypedValidator<UnionType>() {
+
+			@Override
+			public void accept(UnionType n, ProblemReporter problemReporter) {
+				
+				if (n.getElements().size() == 1) {
+					problemReporter.report(n, "Union type (multi catch) must have at least two elements.");
+		        }
+			}
+		};
+		return new SingleNodeTypeValidator<>(UnionType.class,typedValidator);
+	}
+
+
+	private SingleNodeTypeValidator<TryStmt> createTryWithLimitedResources() {
+		TypedValidator typedValidator=new TypedValidator<TryStmt>() {
+
+			@Override
+			public void accept(TryStmt n, ProblemReporter problemReporter) {
+				 if (n.getCatchClauses().isEmpty()
+			                && n.getResources().isEmpty()
+			                && n.getFinallyBlock()==null) {
+					 problemReporter.report(n, "Try has no finally, no catch, and no resources.");
+			        }
+			        for (Expression resource : n.getResources()) {
+			            if (!resource.isVariableDeclarationExpr()) {
+			            	problemReporter.report(n, "Try with resources only supports variable declarations.");
+			            }
+			        }
+				
+			}
+		};
+		return new SingleNodeTypeValidator<>(TryStmt.class, typedValidator);
+	}
 }

@@ -32,12 +32,13 @@ import com.github.javaparser.ast.type.VoidType;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
+
 
 import static com.github.javaparser.JavaParser.parseType;
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
+
+
+import java.util.ArrayList;
 
 /**
  * A node having members.
@@ -54,21 +55,13 @@ public interface NodeWithMembers<N extends Node> {
 
     void tryAddImportToParentCompilationUnit(Class<?> clazz);
 
-    default BodyDeclaration<?> getMember(int i) {
-        return getMembers().get(i);
-    }
+    public abstract BodyDeclaration<?> getMember(int i);
 
     @SuppressWarnings("unchecked")
-    default N setMember(int i, BodyDeclaration<?> member) {
-        getMembers().set(i, member);
-        return (N) this;
-    }
+    public abstract N setMember(int i, BodyDeclaration<?> member);
 
     @SuppressWarnings("unchecked")
-    default N addMember(BodyDeclaration<?> member) {
-        getMembers().add(member);
-        return (N) this;
-    }
+    public abstract N addMember(BodyDeclaration<?> member);
 
     N setMembers(NodeList<BodyDeclaration<?>> members);
 
@@ -80,10 +73,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addField(Class<?> typeClass, String name, Modifier... modifiers) {
-        tryAddImportToParentCompilationUnit(typeClass);
-        return addField(typeClass.getSimpleName(), name, modifiers);
-    }
+    public abstract FieldDeclaration addField(Class<?> typeClass, String name, Modifier... modifiers);
 
     /**
      * Add a field to this.
@@ -93,9 +83,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addField(String type, String name, Modifier... modifiers) {
-        return addField(parseType(type), name, modifiers);
-    }
+    public abstract FieldDeclaration addField(String type, String name, Modifier... modifiers);
 
     /**
      * Add a field to this.
@@ -105,15 +93,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addField(Type type, String name, Modifier... modifiers) {
-        FieldDeclaration fieldDeclaration = new FieldDeclaration();
-        VariableDeclarator variable = new VariableDeclarator(type, name);
-        fieldDeclaration.getVariables().add(variable);
-        fieldDeclaration.setModifiers(Arrays.stream(modifiers)
-                .collect(toCollection(() -> EnumSet.noneOf(Modifier.class))));
-        getMembers().add(fieldDeclaration);
-        return fieldDeclaration;
-    }
+    public abstract FieldDeclaration addField(Type type, String name, Modifier... modifiers);
 
     /**
      * Add a field to this.
@@ -124,11 +104,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addFieldWithInitializer(Type type, String name, Expression initializer, Modifier... modifiers) {
-        FieldDeclaration declaration = addField(type, name, modifiers);
-        declaration.getVariables().iterator().next().setInitializer(initializer);
-        return declaration;
-    }
+    public abstract FieldDeclaration addFieldWithInitializer(Type type, String name, Expression initializer, Modifier... modifiers);
 
     /**
      * Add a private field to this.
@@ -137,9 +113,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addPrivateField(Class<?> typeClass, String name) {
-        return addField(typeClass, name, Modifier.PRIVATE);
-    }
+    public abstract FieldDeclaration addPrivateField(Class<?> typeClass, String name);
 
     /**
      * Add a private field to this and automatically add the import of the type if
@@ -149,9 +123,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addPrivateField(String type, String name) {
-        return addField(type, name, Modifier.PRIVATE);
-    }
+    public abstract FieldDeclaration addPrivateField(String type, String name);
 
     /**
      * Add a public field to this.
@@ -160,9 +132,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addPublicField(Class<?> typeClass, String name) {
-        return addField(typeClass, name, Modifier.PUBLIC);
-    }
+    public abstract FieldDeclaration addPublicField(Class<?> typeClass, String name);
 
     /**
      * Add a public field to this and automatically add the import of the type if
@@ -172,9 +142,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addPublicField(String type, String name) {
-        return addField(type, name, Modifier.PUBLIC);
-    }
+    public abstract FieldDeclaration addPublicField(String type, String name);
 
     /**
      * Add a protected field to this.
@@ -183,9 +151,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addProtectedField(Class<?> typeClass, String name) {
-        return addField(typeClass, name, Modifier.PROTECTED);
-    }
+    public abstract FieldDeclaration addProtectedField(Class<?> typeClass, String name);
 
     /**
      * Add a protected field to this and automatically add the import of the type
@@ -195,9 +161,7 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return the {@link FieldDeclaration} created
      */
-    default FieldDeclaration addProtectedField(String type, String name) {
-        return addField(type, name, Modifier.PROTECTED);
-    }
+    public abstract FieldDeclaration addProtectedField(String type, String name);
 
     /**
      * Adds a methods with void return by default to this.
@@ -206,35 +170,17 @@ public interface NodeWithMembers<N extends Node> {
      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
      * @return the {@link MethodDeclaration} created
      */
-    default MethodDeclaration addMethod(String methodName, Modifier... modifiers) {
-        MethodDeclaration methodDeclaration = new MethodDeclaration();
-        methodDeclaration.setName(methodName);
-        methodDeclaration.setType(new VoidType());
-        methodDeclaration.setModifiers(Arrays.stream(modifiers)
-                .collect(toCollection(() -> EnumSet.noneOf(Modifier.class))));
-        getMembers().add(methodDeclaration);
-        return methodDeclaration;
-    }
+    public abstract MethodDeclaration addMethod(String methodName, Modifier... modifiers);
 
     /**
      * Add an initializer block ({@link InitializerDeclaration}) to this.
      */
-    default BlockStmt addInitializer() {
-        BlockStmt block = new BlockStmt();
-        InitializerDeclaration initializerDeclaration = new InitializerDeclaration(false, block);
-        getMembers().add(initializerDeclaration);
-        return block;
-    }
+    public abstract BlockStmt addInitializer();
 
     /**
      * Add a static initializer block ({@link InitializerDeclaration}) to this.
      */
-    default BlockStmt addStaticInitializer() {
-        BlockStmt block = new BlockStmt();
-        InitializerDeclaration initializerDeclaration = new InitializerDeclaration(true, block);
-        getMembers().add(initializerDeclaration);
-        return block;
-    }
+    public abstract BlockStmt addStaticInitializer();
 
     /**
      * Try to find a {@link MethodDeclaration} by its name
@@ -242,23 +188,14 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the method
      * @return the methods found (multiple in case of overloading)
      */
-    default List<MethodDeclaration> getMethodsByName(String name) {
-        return unmodifiableList(getMethods().stream()
-                .filter(m -> m.getNameAsString().equals(name))
-                .collect(toList()));
-    }
+    public abstract List<MethodDeclaration> getMethodsByName(String name);
 
     /**
      * Find all methods in the members of this node.
      *
      * @return the methods found. This list is immutable.
      */
-    default List<MethodDeclaration> getMethods() {
-        return unmodifiableList(getMembers().stream()
-                .filter(m -> m instanceof MethodDeclaration)
-                .map(m -> (MethodDeclaration) m)
-                .collect(toList()));
-    }
+    public abstract List<MethodDeclaration> getMethods();
 
     /**
      * Try to find a {@link MethodDeclaration} by its parameters types
@@ -267,11 +204,7 @@ public interface NodeWithMembers<N extends Node> {
      * foo(Map&lt;Integer,String&gt; myMap,int number)
      * @return the methods found (multiple in case of overloading)
      */
-    default List<MethodDeclaration> getMethodsByParameterTypes(String... paramTypes) {
-        return unmodifiableList(getMethods().stream()
-                .filter(m -> m.hasParametersOfType(paramTypes))
-                .collect(toList()));
-    }
+    public abstract List<MethodDeclaration> getMethodsByParameterTypes(String... paramTypes);
 
     /**
      * Try to find {@link MethodDeclaration}s by their name and parameters types
@@ -280,11 +213,7 @@ public interface NodeWithMembers<N extends Node> {
      * foo(Map&lt;Integer,String&gt; myMap,int number)
      * @return the methods found (multiple in case of overloading)
      */
-    default List<MethodDeclaration> getMethodsBySignature(String name, String... paramTypes) {
-        return unmodifiableList(getMethodsByName(name).stream()
-                .filter(m -> m.hasParametersOfType(paramTypes))
-                .collect(toList()));
-    }
+    public abstract List<MethodDeclaration> getMethodsBySignature(String name, String... paramTypes);
 
     /**
      * Try to find a {@link MethodDeclaration} by its parameters types
@@ -293,11 +222,7 @@ public interface NodeWithMembers<N extends Node> {
      * foo(Map&lt;Integer,String&gt; myMap,int number)
      * @return the methods found (multiple in case of overloading)
      */
-    default List<MethodDeclaration> getMethodsByParameterTypes(Class<?>... paramTypes) {
-        return unmodifiableList(getMethods().stream()
-                .filter(m -> m.hasParametersOfType(paramTypes))
-                .collect(toList()));
-    }
+    public abstract List<MethodDeclaration> getMethodsByParameterTypes(Class<?>... paramTypes);
 
     /**
      * Try to find a {@link FieldDeclaration} by its name
@@ -305,24 +230,12 @@ public interface NodeWithMembers<N extends Node> {
      * @param name the name of the field
      * @return null if not found, the FieldDeclaration otherwise
      */
-    default Optional<FieldDeclaration> getFieldByName(String name) {
-        return getMembers().stream()
-                .filter(m -> m instanceof FieldDeclaration)
-                .map(f -> (FieldDeclaration) f)
-                .filter(f -> f.getVariables().stream()
-                        .anyMatch(var -> var.getNameAsString().equals(name)))
-                .findFirst();
-    }
+    public abstract FieldDeclaration getFieldByName(String name);
 
     /**
      * Find all fields in the members of this node.
      *
      * @return the fields found. This list is immutable.
      */
-    default List<FieldDeclaration> getFields() {
-        return unmodifiableList(getMembers().stream()
-                .filter(m -> m instanceof FieldDeclaration)
-                .map(m -> (FieldDeclaration) m)
-                .collect(toList()));
-    }
+    public abstract List<FieldDeclaration> getFields();
 }

@@ -36,25 +36,15 @@ import com.github.javaparser.ast.type.TypeParameter;
 public interface NodeWithTypeParameters<N extends Node> {
     NodeList<TypeParameter> getTypeParameters();
 
-    default TypeParameter getTypeParameter(int i) {
-        return getTypeParameters().get(i);
-    }
+    public abstract TypeParameter getTypeParameter(int i);
 
     @SuppressWarnings("unchecked")
-    default N setTypeParameter(int i, TypeParameter typeParameter) {
-        getTypeParameters().set(i, typeParameter);
-        return (N) this;
-    }
+    public abstract N setTypeParameter(int i, TypeParameter typeParameter);
 
     @SuppressWarnings("unchecked")
-    default N addTypeParameter(TypeParameter typeParameter) {
-        getTypeParameters().add(typeParameter);
-        return (N) this;
-    }
+    public abstract N addTypeParameter(TypeParameter typeParameter);
 
     N setTypeParameters(NodeList<TypeParameter> typeParameters);
 
-    default boolean isGeneric() {
-        return getTypeParameters().size() > 0;
-    }
+    public abstract boolean isGeneric();
 }

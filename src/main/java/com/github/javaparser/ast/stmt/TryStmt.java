@@ -149,8 +149,8 @@ public final class TryStmt extends Statement {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<BlockStmt> getFinallyBlock() {
-        return Optional.ofNullable(finallyBlock);
+    public BlockStmt getFinallyBlock() {
+        return finallyBlock;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")

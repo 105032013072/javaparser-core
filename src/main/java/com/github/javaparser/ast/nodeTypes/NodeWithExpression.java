@@ -34,7 +34,5 @@ public interface NodeWithExpression<N extends Node> {
 
     N setExpression(Expression expression);
 
-    default N setExpression(String expression) {
-        return setExpression(parseExpression(expression));
-    }
+    public abstract N setExpression(String expression);
 }

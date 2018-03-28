@@ -6,6 +6,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.modules.ModuleDeclaration;
@@ -38,60 +39,22 @@ public class Java1_0Validator extends Validators {
     protected final Validator noReflection=createNoReflection();
     protected final Validator noGenerics =createNoGenerics();
     protected final SingleNodeTypeValidator<TryStmt> tryWithoutResources=createTryWithoutResources();
-    
-   /*
-   
-  
-    protected final SingleNodeTypeValidator<TryStmt> tryWithoutResources = new SingleNodeTypeValidator<>(TryStmt.class, (n, reporter) -> {
-        if (n.getCatchClauses().isEmpty() && !n.getFinallyBlock().isPresent()) {
-            reporter.report(n, "Try has no finally and no catch.");
-        }
-        if (n.getResources().isNonEmpty()) {
-            reporter.report(n, "Catch with resource is not supported.");
-        }
-    });
-    protected final Validator noAnnotations = new TreeVisitorValidator((node, reporter) -> {
-        if (node instanceof AnnotationExpr || node instanceof AnnotationDeclaration) {
-            reporter.report(node, "Annotations are not supported.");
-        }
-    });
-    protected final Validator noEnums = new SimpleValidator<>(EnumDeclaration.class,
-            n -> true,
-            (n, reporter) -> reporter.report(n, "Enumerations are not supported.")
-    );
-    protected final Validator noVarargs = new SimpleValidator<>(Parameter.class,
-            Parameter::isVarArgs,
-            (n, reporter) -> reporter.report(n, "Varargs are not supported.")
-    );
-    protected final Validator noForEach = new SimpleValidator<>(ForeachStmt.class,
-            n -> true,
-            (n, reporter) -> reporter.report(n, "For-each loops are not supported.")
-    );
-    protected final Validator noStaticImports = new SimpleValidator<>(ImportDeclaration.class,
-            ImportDeclaration::isStatic,
-            (n, reporter) -> reporter.report(n, "Static imports are not supported.")
-    );
-    protected final Validator noStringsInSwitch = new SimpleValidator<>(SwitchEntryStmt.class,
-            n -> n.getLabel().map(l -> l instanceof StringLiteralExpr).orElse(false),
-            (n, reporter) -> reporter.report(n.getLabel().get(), "Strings in switch statements are not supported.")
-    );
+    protected final Validator noAnnotations =createNoAnnotations();
+    protected final Validator noEnums=createNoEnums();
+    protected final Validator noVarargs=createNoVarargs();
+    protected final Validator noForEach =createNoForEach();
+    protected final Validator noStaticImports = createNoStaticImports();
+    protected final Validator noStringsInSwitch = createNoStringsInSwitch();
     protected final Validator noBinaryIntegerLiterals = new NoBinaryIntegerLiteralsValidator();
     protected final Validator noUnderscoresInIntegerLiterals = new NoUnderscoresInIntegerLiteralsValidator();
-    protected final Validator noMultiCatch = new SimpleValidator<>(UnionType.class,
-            n -> true,
-            (n, reporter) -> reporter.report(n, "Multi-catch is not supported.")
-    );
-    protected final Validator noLambdas = new SimpleValidator<>(LambdaExpr.class,
-            n -> true,
-            (n, reporter) -> reporter.report(n, "Lambdas are not supported.")
-    );
-    protected final Validator noModules = new SimpleValidator<>(ModuleDeclaration.class,
-            n -> true,
-            (n, reporter) -> reporter.report(n, "Modules are not supported.")
-    );*/
-
+    protected final Validator noMultiCatch =createNoMultiCatch();
+    protected final Validator noLambdas=createNoLambdas();
+    protected final Validator noModules=createNoModules();
+    
+    
+  
     public Java1_0Validator() {
-        /*super(new CommonValidators());
+       super(new CommonValidators());
         add(modifiersWithoutStrictfpAndDefaultAndStaticInterfaceMethodsAndPrivateInterfaceMethods);
         add(noAssertKeyword);
         add(noInnerClasses);
@@ -108,22 +71,198 @@ public class Java1_0Validator extends Validators {
         add(noUnderscoresInIntegerLiterals);
         add(noMultiCatch);
         add(noLambdas);
-        add(noModules);*/
+        add(noModules);
     }
+
+
+	private Validator createNoModules() {
+		Predicate predicate=new Predicate<ModuleDeclaration>() {
+			@Override
+			public Boolean test(ModuleDeclaration t) {
+				return true;
+			}
+		};
+		
+		BiConsumer<ModuleDeclaration, ProblemReporter> biConsumer=new BiConsumer<ModuleDeclaration, ProblemReporter>() {
+
+			@Override
+			public void accept(ModuleDeclaration n, ProblemReporter reporter) {
+				reporter.report(n, "Modules are not supported.");
+			}
+		};
+	  return new SimpleValidator<>(ModuleDeclaration.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoLambdas() {
+		Predicate predicate=new Predicate<LambdaExpr>() {
+			@Override
+			public Boolean test(LambdaExpr t) {
+				return true;
+			}
+		};
+		
+		BiConsumer<LambdaExpr, ProblemReporter> biConsumer=new BiConsumer<LambdaExpr, ProblemReporter>() {
+
+			@Override
+			public void accept(LambdaExpr n, ProblemReporter reporter) {
+				reporter.report(n, "Lambdas are not supported.");
+			}
+		};
+		return new SimpleValidator<>(LambdaExpr.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoMultiCatch() {
+		Predicate predicate=new Predicate<UnionType>() {
+			@Override
+			public Boolean test(UnionType t) {
+				return true;
+			}
+		};
+		
+		BiConsumer<UnionType, ProblemReporter> biConsumer=new BiConsumer<UnionType, ProblemReporter>() {
+
+			@Override
+			public void accept(UnionType n, ProblemReporter reporter) {
+				reporter.report(n, "Multi-catch is not supported.");
+			}
+		};
+		return new SimpleValidator<>(UnionType.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoStringsInSwitch() {
+		Predicate predicate=new Predicate<SwitchEntryStmt>() {
+			@Override
+			public Boolean test(SwitchEntryStmt t) {
+				Expression exp=t.getLabel();
+				if(exp!=null){
+					return exp instanceof StringLiteralExpr;
+				}else return false;
+			}
+		};
+		
+		BiConsumer<SwitchEntryStmt, ProblemReporter> biConsumer=new BiConsumer<SwitchEntryStmt, ProblemReporter>() {
+
+			@Override
+			public void accept(SwitchEntryStmt n, ProblemReporter reporter) {
+				reporter.report(n.getLabel(), "Strings in switch statements are not supported.");
+			}
+		};
+		return  new SimpleValidator<>(SwitchEntryStmt.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoStaticImports() {
+		Predicate predicate=new Predicate<ImportDeclaration>() {
+			@Override
+			public Boolean test(ImportDeclaration t) {
+				return t.isStatic();
+			}
+		};
+		
+		BiConsumer<ImportDeclaration, ProblemReporter> biConsumer=new BiConsumer<ImportDeclaration, ProblemReporter>() {
+
+			@Override
+			public void accept(ImportDeclaration n, ProblemReporter reporter) {
+				reporter.report(n, "Static imports are not supported.");
+			}
+		};
+		return new SimpleValidator<>(ImportDeclaration.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoForEach() {
+		Predicate predicate=new Predicate<ForeachStmt>() {
+			@Override
+			public Boolean test(ForeachStmt t) {
+				return true;
+			}
+		};
+		
+		BiConsumer<ForeachStmt, ProblemReporter> biConsumer=new BiConsumer<ForeachStmt, ProblemReporter>() {
+
+			@Override
+			public void accept(ForeachStmt n, ProblemReporter reporter) {
+				reporter.report(n, "For-each loops are not supported.");
+			}
+		};
+		return new SimpleValidator<>(ForeachStmt.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoVarargs() {
+		Predicate predicate=new Predicate<Parameter>() {
+			@Override
+			public Boolean test(Parameter t) {
+				return t.isVarArgs();
+			}
+		};
+		
+		BiConsumer<Parameter, ProblemReporter> biConsumer=new BiConsumer<Parameter, ProblemReporter>() {
+
+			@Override
+			public void accept(Parameter n, ProblemReporter reporter) {
+				reporter.report(n, "Varargs are not supported.");
+			}
+		};
+		return new SimpleValidator<>(Parameter.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoEnums() {
+		
+		Predicate predicate=new Predicate<EnumDeclaration>() {
+			@Override
+			public Boolean test(EnumDeclaration t) {
+				return true;
+			}
+		};
+		
+		BiConsumer<EnumDeclaration, ProblemReporter> biConsumer=new BiConsumer<EnumDeclaration, ProblemReporter>() {
+
+			@Override
+			public void accept(EnumDeclaration n, ProblemReporter reporter) {
+				reporter.report(n, "Enumerations are not supported.");
+			}
+		};
+	
+		return new SimpleValidator<>(EnumDeclaration.class,predicate,biConsumer);
+	}
+
+
+	private Validator createNoAnnotations() {
+		Validator validator=new Validator() {
+			
+			@Override
+			public void accept(Node node, ProblemReporter problemReporter) {
+				if (node instanceof AnnotationExpr || node instanceof AnnotationDeclaration) {
+					problemReporter.report(node, "Annotations are not supported.");
+		        }
+			}
+		};
+
+       return new TreeVisitorValidator(validator);
+	}
 
 
 	private SingleNodeTypeValidator<TryStmt> createTryWithoutResources() {
 		
+		TypedValidator typedValidator=new TypedValidator<TryStmt>() {
+
+			@Override
+			public void accept(TryStmt node, ProblemReporter problemReporter) {
+				if (node.getCatchClauses().isEmpty() && node.getFinallyBlock()==null) {
+					problemReporter.report(node, "Try has no finally and no catch.");
+		        }
+		        if (node.getResources().isNonEmpty()) {
+		        	problemReporter.report(node, "Catch with resource is not supported.");
+		        }
+			}
+		};
 		
-		
-		new SingleNodeTypeValidator<>(TryStmt.class, (n, reporter) -> {
-	        if (n.getCatchClauses().isEmpty() && !n.getFinallyBlock().isPresent()) {
-	            reporter.report(n, "Try has no finally and no catch.");
-	        }
-	        if (n.getResources().isNonEmpty()) {
-	            reporter.report(n, "Catch with resource is not supported.");
-	        }
-	    });
+		return new SingleNodeTypeValidator<>(TryStmt.class, typedValidator);
 	}
 
 

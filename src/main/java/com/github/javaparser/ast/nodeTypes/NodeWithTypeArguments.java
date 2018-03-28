@@ -26,7 +26,6 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.metamodel.DerivedProperty;
 
-import java.util.Optional;
 
 import static com.github.javaparser.ast.NodeList.nodeList;
 
@@ -56,28 +55,20 @@ public interface NodeWithTypeArguments<N extends Node> {
      * @return whether the type arguments look like &lt;>.
      */
     @DerivedProperty
-    default boolean isUsingDiamondOperator() {
-        return getTypeArguments().isPresent() && getTypeArguments().get().isEmpty();
-    }
+    public abstract boolean isUsingDiamondOperator();
 
     /**
      * Sets the type arguments to &lt>.
      */
     @SuppressWarnings("unchecked")
-    default N setDiamondOperator() {
-        return setTypeArguments(new NodeList<>());
-    }
+    public abstract N setDiamondOperator();
 
     /**
      * Removes all type arguments, including the surrounding &lt;>.
      */
     @SuppressWarnings("unchecked")
-    default N removeTypeArguments() {
-        return setTypeArguments((NodeList<Type>) null);
-    }
+    public abstract N removeTypeArguments();
 
     @SuppressWarnings("unchecked")
-    default N setTypeArguments(Type... typeArguments) {
-        return setTypeArguments(nodeList(typeArguments));
-    }
+    public abstract N setTypeArguments(Type... typeArguments);
 }

@@ -6,31 +6,21 @@ import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 
-import java.util.Optional;
-
 /**
  * This validator validates according to Java 5 syntax rules.
  */
 public class Java5Validator extends Java1_4Validator {
-    Validator genericsWithoutDiamondOperator = new TreeVisitorValidator((node, reporter) -> {
-        if (node instanceof NodeWithTypeArguments) {
-            Optional<NodeList<Type>> typeArguments = ((NodeWithTypeArguments<? extends Node>) node).getTypeArguments();
-            if (typeArguments.isPresent() && typeArguments.get().isEmpty()) {
-                reporter.report(node, "The diamond operator is not supported.");
-            }
-        }
-    });
-
-    protected Validator noPrimitiveGenericArguments = new TreeVisitorValidator((node, reporter) -> {
-        if (node instanceof NodeWithTypeArguments) {
-            Optional<NodeList<Type>> typeArguments = ((NodeWithTypeArguments<? extends Node>) node).getTypeArguments();
-            typeArguments.ifPresent(types -> types.forEach(ty -> {
-                if (ty instanceof PrimitiveType) {
-                    reporter.report(node, "Type arguments may not be primitive.");
-                }
-            }));
-        }
-    });
+    /*
+   
+    */
+    
+    Validator genericsWithoutDiamondOperator=createGenericsWithoutDiamondOperator();
+    protected Validator noPrimitiveGenericArguments = createNoPrimitiveGenericArguments();
+    
+    
+    
+    
+    
 
     protected final Validator enumNotAllowed = new ReservedKeywordValidator("enum");
 
@@ -49,4 +39,41 @@ public class Java5Validator extends Java1_4Validator {
         remove(noForEach);
         remove(noStaticImports);
     }
+
+	private Validator createNoPrimitiveGenericArguments() {
+		Validator validator=new Validator() {
+			
+			@Override
+			public void accept(Node node, ProblemReporter problemReporter) {
+				if(node instanceof NodeWithTypeArguments){
+					 NodeList<Type> typeArguments = ((NodeWithTypeArguments<? extends Node>) node).getTypeArguments();
+				     if(typeArguments!=null){
+				    	 for (Type type : typeArguments) {
+				    		 if (type instanceof PrimitiveType) {
+				    			 problemReporter.report(node, "Type arguments may not be primitive.");
+				                }
+						}
+				     }
+				}
+				
+			}
+		};
+		return new TreeVisitorValidator(validator);
+	}
+
+	private Validator createGenericsWithoutDiamondOperator() {
+		Validator validator=new Validator() {
+			
+			@Override
+			public void accept(Node node, ProblemReporter problemReporter) {
+				if (node instanceof NodeWithTypeArguments){
+					NodeList<Type> typeArguments = ((NodeWithTypeArguments<? extends Node>) node).getTypeArguments();
+					if (typeArguments!=null && typeArguments.isEmpty()) {
+						problemReporter.report(node, "The diamond operator is not supported.");
+		            }
+				}
+			}
+		};
+		return new TreeVisitorValidator(validator);
+	}
 }

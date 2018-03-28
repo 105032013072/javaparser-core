@@ -37,78 +37,40 @@ import static com.github.javaparser.JavaParser.*;
 public interface NodeWithStatements<N extends Node> {
     NodeList<Statement> getStatements();
 
-    default Statement getStatement(int i) {
-        return getStatements().get(i);
-    }
+    public abstract Statement getStatement(int i);
 
     @SuppressWarnings("unchecked")
-    default N setStatement(int i, Statement statement) {
-        getStatements().set(i, statement);
-        return (N) this;
-    }
+    public abstract N setStatement(int i, Statement statement);
 
     N setStatements(final NodeList<Statement> statements);
 
     @SuppressWarnings("unchecked")
-    default N addStatement(Statement statement) {
-        getStatements().add(statement);
-        return (N) this;
-    }
+    public abstract N addStatement(Statement statement);
 
     @SuppressWarnings("unchecked")
-    default N addStatement(int index, final Statement statement) {
-        getStatements().add(index, statement);
-        return (N) this;
-    }
+    public abstract N addStatement(int index, final Statement statement);
 
-    default N addStatement(Expression expr) {
-        return addStatement(new ExpressionStmt(expr));
-    }
+    public abstract N addStatement(Expression expr);
 
     /**
      * It will use {@link JavaParser#parseStatement(String)} inside, so it should end with a semi column
      */
-    default N addStatement(String statement) {
-        return addStatement(parseStatement(statement));
-    }
+    public abstract N addStatement(String statement);
 
-    default N addStatement(int index, final Expression expr) {
-        Statement stmt = new ExpressionStmt(expr);
-        return addStatement(index, stmt);
-    }
+    public abstract N addStatement(int index, final Expression expr);
 
-    default <A extends Statement> A addAndGetStatement(A statement) {
-        getStatements().add(statement);
-        return statement;
-    }
+    public abstract <A extends Statement> A addAndGetStatement(A statement);
 
-    default Statement addAndGetStatement(int index, final Statement statement) {
-        getStatements().add(index, statement);
-        return statement;
-    }
+    public abstract Statement addAndGetStatement(int index, final Statement statement);
 
-    default ExpressionStmt addAndGetStatement(Expression expr) {
-        ExpressionStmt statement = new ExpressionStmt(expr);
-        return addAndGetStatement(statement);
-    }
+    public abstract ExpressionStmt addAndGetStatement(Expression expr);
 
-    default ExpressionStmt addAndGetStatement(String statement) {
-        return addAndGetStatement(new NameExpr(statement));
-    }
+    public abstract ExpressionStmt addAndGetStatement(String statement);
 
-    default boolean isEmpty() {
-        return getStatements().isEmpty();
-    }
+    public abstract boolean isEmpty();
 
     @SuppressWarnings("unchecked")
-    default N copyStatements(NodeList<Statement> nodeList) {
-        for (Statement n : nodeList) {
-            addStatement(n.clone());
-        }
-        return (N) this;
-    }
+    public abstract N copyStatements(NodeList<Statement> nodeList);
 
-    default N copyStatements(NodeWithStatements<?> other) {
-        return copyStatements(other.getStatements());
-    }
+    public abstract N copyStatements(NodeWithStatements<?> other);
 }

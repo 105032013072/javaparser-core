@@ -10,13 +10,9 @@ import static com.github.javaparser.ast.Modifier.STATIC;
  */
 public interface NodeWithStaticModifier<N extends Node> extends NodeWithModifiers<N> {
 
-    default boolean isStatic() {
-        return getModifiers().contains(STATIC);
-    }
+	public abstract boolean isStatic();
 
     @SuppressWarnings("unchecked")
-    default N setStatic(boolean set) {
-        return setModifier(STATIC, set);
-    }
+    public abstract N setStatic(boolean set);
 
 }

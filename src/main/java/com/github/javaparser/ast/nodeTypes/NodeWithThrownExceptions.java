@@ -37,9 +37,7 @@ public interface NodeWithThrownExceptions<N extends Node> {
 
     void tryAddImportToParentCompilationUnit(Class<?> clazz);
 
-    default ReferenceType getThrownException(int i) {
-        return getThrownExceptions().get(i);
-    }
+    public abstract ReferenceType getThrownException(int i);
 
     /**
      * Adds this type to the throws clause
@@ -48,10 +46,7 @@ public interface NodeWithThrownExceptions<N extends Node> {
      * @return this
      */
     @SuppressWarnings("unchecked")
-    default N addThrownException(ReferenceType throwType) {
-        getThrownExceptions().add(throwType);
-        return (N) this;
-    }
+    public abstract N addThrownException(ReferenceType throwType);
 
     /**
      * Adds this class to the throws clause
@@ -59,10 +54,7 @@ public interface NodeWithThrownExceptions<N extends Node> {
      * @param clazz the exception class
      * @return this
      */
-    default N addThrownException(Class<? extends Throwable> clazz) {
-        tryAddImportToParentCompilationUnit(clazz);
-        return addThrownException(parseClassOrInterfaceType(clazz.getSimpleName()));
-    }
+    public abstract N addThrownException(Class<? extends Throwable> clazz);
 
     /**
      * Check whether this elements throws this exception class.
@@ -72,9 +64,7 @@ public interface NodeWithThrownExceptions<N extends Node> {
      * @param clazz the class of the exception
      * @return true if found in throws clause, false if not
      */
-    default boolean isThrown(Class<? extends Throwable> clazz) {
-        return isThrown(clazz.getSimpleName());
-    }
+    public abstract boolean isThrown(Class<? extends Throwable> clazz);
 
     /**
      * Check whether this elements throws this exception class
@@ -84,7 +74,5 @@ public interface NodeWithThrownExceptions<N extends Node> {
      * @param throwableName the class of the exception
      * @return true if found in throws clause, false if not
      */
-    default boolean isThrown(String throwableName) {
-        return getThrownExceptions().stream().anyMatch(t -> t.toString().equals(throwableName));
-    }
+    public abstract boolean isThrown(String throwableName);
 }

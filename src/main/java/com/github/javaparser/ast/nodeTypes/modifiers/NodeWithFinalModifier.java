@@ -9,12 +9,8 @@ import static com.github.javaparser.ast.Modifier.FINAL;
  * A node that can be final.
  */
 public interface NodeWithFinalModifier<N extends Node> extends NodeWithModifiers<N> {
-    default boolean isFinal() {
-        return getModifiers().contains(FINAL);
-    }
+	public abstract boolean isFinal();
 
     @SuppressWarnings("unchecked")
-    default N setFinal(boolean set) {
-        return setModifier(FINAL, set);
-    }
+    public abstract N setFinal(boolean set);
 }

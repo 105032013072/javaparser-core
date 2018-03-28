@@ -25,6 +25,8 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.nodeTypes.modifiers.NodeWithAbstractModifier;
 import com.github.javaparser.ast.visitor.CloneVisitor;
@@ -32,16 +34,20 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.AnnotationDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.ast.Modifier.ABSTRACT;
 
 /**
  * An annotation type declaration.<br/><code>@interface X { ... }</code>
@@ -51,13 +57,13 @@ import java.util.Optional;
 public final class AnnotationDeclaration extends TypeDeclaration<AnnotationDeclaration> implements NodeWithAbstractModifier<AnnotationDeclaration>, Resolvable<ResolvedAnnotationDeclaration> {
 
     public AnnotationDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new SimpleName(), new NodeList<>());
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new SimpleName(), new NodeList<BodyDeclaration<?>>());
     }
 
     public AnnotationDeclaration(EnumSet<Modifier> modifiers, String name) {
-        this(null, modifiers, new NodeList<>(), new SimpleName(name), new NodeList<>());
+        this(null, modifiers, new NodeList<AnnotationExpr>(), new SimpleName(name), new NodeList<BodyDeclaration<?>>());
     }
-
+ 
     @AllFieldsConstructor
     public AnnotationDeclaration(EnumSet<Modifier> modifiers, NodeList<AnnotationExpr> annotations, SimpleName name, NodeList<BodyDeclaration<?>> members) {
         this(null, modifiers, annotations, name, members);
@@ -136,7 +142,55 @@ public final class AnnotationDeclaration extends TypeDeclaration<AnnotationDecla
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<AnnotationDeclaration> toAnnotationDeclaration() {
-        return Optional.of(this);
+    public AnnotationDeclaration toAnnotationDeclaration() {
+        return this;
     }
+    
+    //for NodeWithAbstractModifier
+    public  boolean isAbstract() {
+        return getModifiers().contains(ABSTRACT);
+    }
+
+    @SuppressWarnings("unchecked")
+	public AnnotationDeclaration setAbstract(boolean set) {
+        return setModifier(ABSTRACT, set);
+    }
+    
+    
+    //for NodeWithModifiers
+    public  AnnotationDeclaration addModifier(Modifier... modifiers) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+ 
+        List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.addAll(enm);
+        setModifiers(newModifiers);
+        return (AnnotationDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public AnnotationDeclaration removeModifier(Modifier... m) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+       /* newModifiers.removeAll(Arrays.stream(m)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+        List<Modifier> list=new ArrayList<>(Arrays.asList(m));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.removeAll(enm);
+        
+        setModifiers(newModifiers);
+        return (AnnotationDeclaration) this;
+    }
+    public  AnnotationDeclaration setModifier(Modifier m, boolean set) {
+        if (set) {
+            return addModifier(m);
+        } else {
+            return removeModifier(m);
+        }
+    }
+
+	
+    
+    
 }
