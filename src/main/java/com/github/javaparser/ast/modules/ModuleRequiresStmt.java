@@ -12,13 +12,21 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.ModuleRequiresStmtMetaModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
+
 import static com.github.javaparser.ast.Modifier.TRANSITIVE;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.ast.Modifier.STATIC;
+import static com.github.javaparser.JavaParser.parseName;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
 
 /**
  * A require statement in module-info.java. <code>require a.b.C;</code>
@@ -155,7 +163,63 @@ public final class ModuleRequiresStmt extends ModuleStmt implements NodeWithStat
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ModuleRequiresStmt> toModuleRequiresStmt() {
-        return Optional.of(this);
+    public ModuleRequiresStmt toModuleRequiresStmt() {
+        return this;
+    }
+    
+    // for NodeWithStaticModifier
+    public boolean isStatic() {
+        return getModifiers().contains(STATIC);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ModuleRequiresStmt setStatic(boolean set) {
+        return setModifier(STATIC, set);
+    }
+    
+    // for NodeWithName
+    @SuppressWarnings("unchecked")
+    public  ModuleRequiresStmt setName(String name){
+    	assertNonEmpty(name);
+        return setName(parseName(name));
+    	}
+
+    public  String getNameAsString(){
+    	return getName().asString();
+    	}
+    
+    //for NodeWithModifiers
+    @SuppressWarnings("unchecked")
+    public ModuleRequiresStmt addModifier(Modifier... modifiers) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+        /*newModifiers.addAll(Arrays.stream(modifiers)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+        List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.addAll(enm);
+        setModifiers(newModifiers);
+        return (ModuleRequiresStmt) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ModuleRequiresStmt removeModifier(Modifier... m) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+       /* newModifiers.removeAll(Arrays.stream(m)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+        List<Modifier> list=new ArrayList<>(Arrays.asList(m));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.removeAll(enm);
+        
+        setModifiers(newModifiers);
+        return (ModuleRequiresStmt) this;
+    }
+    public ModuleRequiresStmt setModifier(Modifier m, boolean set) {
+        if (set) {
+            return addModifier(m);
+        } else {
+            return removeModifier(m);
+        }
     }
 }

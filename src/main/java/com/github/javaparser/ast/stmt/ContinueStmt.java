@@ -26,15 +26,17 @@ import com.github.javaparser.ast.nodeTypes.NodeWithOptionalLabel;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ContinueStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+
 
 /**
  * A continue statement with an optional label;
@@ -84,8 +86,8 @@ public final class ContinueStmt extends Statement implements NodeWithOptionalLab
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<SimpleName> getLabel() {
-        return Optional.ofNullable(label);
+    public SimpleName getLabel() {
+        return label;
     }
 
     /**
@@ -171,7 +173,18 @@ public final class ContinueStmt extends Statement implements NodeWithOptionalLab
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ContinueStmt> toContinueStmt() {
-        return Optional.of(this);
+    public ContinueStmt toContinueStmt() {
+        return this;
+    }
+    
+    // for NodeWithOptionalLabel
+    public ContinueStmt setLabel(String label) {
+        assertNonEmpty(label);
+        return setLabel(new SimpleName(label));
+    }
+
+    public String getLabelAsString() {
+        //return getLabel().flatMap(l -> Optional.of(l.getIdentifier()));
+    	return getLabel().getIdentifier();
     }
 }

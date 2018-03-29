@@ -30,18 +30,21 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNonEmpty;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.MethodReferenceExprMetaModel;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.NonEmptyProperty;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+import static com.github.javaparser.ast.NodeList.nodeList;
 
 /**
  * Method reference expressions introduced in Java 8 specifically designed to simplify lambda Expressions.
@@ -117,8 +120,8 @@ public final class MethodReferenceExpr extends Expression implements NodeWithTyp
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -223,7 +226,45 @@ public final class MethodReferenceExpr extends Expression implements NodeWithTyp
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<MethodReferenceExpr> toMethodReferenceExpr() {
-        return Optional.of(this);
+    public MethodReferenceExpr toMethodReferenceExpr() {
+        return this;
+    }
+    
+    
+    //for NodeWithTypeArguments
+    @DerivedProperty
+	public boolean isUsingDiamondOperator() {
+        return getTypeArguments()!=null && getTypeArguments().isEmpty();
+    }
+
+    /**
+     * Sets the type arguments to &lt>.
+     */
+    @SuppressWarnings("unchecked")
+	public MethodReferenceExpr setDiamondOperator() {
+        return setTypeArguments(new NodeList<Type>());
+    }
+
+    /**
+     * Removes all type arguments, including the surrounding &lt;>.
+     */
+    @SuppressWarnings("unchecked")
+	public MethodReferenceExpr removeTypeArguments() {
+        return setTypeArguments((NodeList<Type>) null);
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodReferenceExpr setTypeArguments(Type... typeArguments) {
+        return setTypeArguments(nodeList(typeArguments));
+    }
+    
+    // for NodeWithIdentifier
+    public String getId() {
+        return getIdentifier();
+    }
+
+    public  MethodReferenceExpr setId(String identifier) {
+        assertNonEmpty(identifier);
+        return setIdentifier(identifier);
     }
 }

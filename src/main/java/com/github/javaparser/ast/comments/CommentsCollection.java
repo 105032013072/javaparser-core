@@ -23,10 +23,12 @@ package com.github.javaparser.ast.comments;
 
 import com.github.javaparser.Range;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import static com.github.javaparser.ast.Node.NODE_BY_BEGIN_POSITION;
 
@@ -44,24 +46,48 @@ public class CommentsCollection {
     }
 
     public Set<LineComment> getLineComments() {
-        return comments.stream()
+        /*return comments.stream()
                 .filter(comment -> comment instanceof LineComment)
                 .map(comment -> (LineComment) comment)
-                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));
+                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));*/
+    	Set<LineComment> set=new TreeSet<>(NODE_BY_BEGIN_POSITION);
+    	for (Comment comment : comments) {
+			if(comment instanceof LineComment){
+				set.add((LineComment) comment);
+			}
+		}
+    	return set;
+    	
+    	
     }
 
     public Set<BlockComment> getBlockComments() {
-        return comments.stream()
+        /*return comments.stream()
                 .filter(comment -> comment instanceof BlockComment)
                 .map(comment -> (BlockComment) comment)
-                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));
+                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));*/
+    	Set<BlockComment> set=new TreeSet<>(NODE_BY_BEGIN_POSITION);
+    	for (Comment comment : comments) {
+			if(comment instanceof BlockComment){
+				set.add((BlockComment) comment);
+			}
+		}
+    	return set;
+    	
     }
 
     public Set<JavadocComment> getJavadocComments() {
-        return comments.stream()
+       /* return comments.stream()
                 .filter(comment -> comment instanceof JavadocComment)
                 .map(comment -> (JavadocComment) comment)
-                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));
+                .collect(Collectors.toCollection(() -> new TreeSet<>(NODE_BY_BEGIN_POSITION)));*/
+    	Set<JavadocComment> set=new TreeSet<>(NODE_BY_BEGIN_POSITION);
+    	for (Comment comment  : comments) {
+			if(comment instanceof JavadocComment){
+				set.add((JavadocComment) comment);
+			}
+		}
+    	return set;
     }
 
     public void addComment(Comment comment) {
@@ -69,15 +95,15 @@ public class CommentsCollection {
     }
 
     public boolean contains(Comment comment) {
-        if (!comment.getRange().isPresent()) {
+        if (comment.getRange()==null) {
             return false;
         }
-        Range commentRange = comment.getRange().get();
+        Range commentRange = comment.getRange();
         for (Comment c : getComments()) {
-            if (!c.getRange().isPresent()) {
+            if (c.getRange()==null) {
                 return false;
             }
-            Range cRange = c.getRange().get();
+            Range cRange = c.getRange();
             // we tolerate a difference of one element in the end column:
             // it depends how \r and \n are calculated...
             if (cRange.begin.equals(commentRange.begin) &&
@@ -99,10 +125,18 @@ public class CommentsCollection {
 
     public CommentsCollection minus(CommentsCollection other) {
         CommentsCollection result = new CommentsCollection();
-        result.comments.addAll(
+        /*result.comments.addAll(
                 comments.stream()
                         .filter(comment -> !other.contains(comment))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));*/
+       List<Comment> list=new ArrayList<>();
+        for (Comment comment : comments) {
+		if(!other.contains(comment)){
+			list.add(comment);
+		}
+		result.comments.addAll(list);
+	}
+        
         return result;
     }
 

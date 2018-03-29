@@ -24,15 +24,17 @@ import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.metamodel.SuperExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+
 
 /**
  * An occurrence of the "super" keyword. <br/><code>World.super.greet()</code> is a MethodCallExpr of method name greet,
@@ -80,8 +82,8 @@ public final class SuperExpr extends Expression {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getClassExpr() {
-        return Optional.ofNullable(classExpr);
+    public Expression getClassExpr() {
+        return classExpr;
     }
 
     /**
@@ -167,7 +169,7 @@ public final class SuperExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SuperExpr> toSuperExpr() {
-        return Optional.of(this);
+    public SuperExpr toSuperExpr() {
+        return this;
     }
 }

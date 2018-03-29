@@ -25,7 +25,12 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
@@ -38,6 +43,9 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.ParameterMetaModel;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -47,6 +55,11 @@ import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
+import com.github.javaparser.utils.Utils;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.JavaParser.parseName;
+import static com.github.javaparser.JavaParser.parseExpression;
+import static com.github.javaparser.ast.Modifier.FINAL;
 
 /**
  * The parameters to a method or lambda. Lambda parameters may have inferred types, in that case "type" is UnknownType.
@@ -74,11 +87,11 @@ public final class Parameter extends Node implements NodeWithType<Parameter, Typ
     private SimpleName name;
 
     public Parameter() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new ClassOrInterfaceType(), false, new NodeList<>(), new SimpleName());
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new ClassOrInterfaceType(), false, new NodeList<AnnotationExpr>(), new SimpleName());
     }
 
     public Parameter(Type type, SimpleName name) {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), type, false, new NodeList<>(), name);
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), type, false, new NodeList<AnnotationExpr>(), name);
     }
 
     /**
@@ -88,11 +101,11 @@ public final class Parameter extends Node implements NodeWithType<Parameter, Typ
      * @param name name of the parameter
      */
     public Parameter(Type type, String name) {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), type, false, new NodeList<>(), new SimpleName(name));
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), type, false, new NodeList<AnnotationExpr>(), new SimpleName(name));
     }
 
     public Parameter(EnumSet<Modifier> modifiers, Type type, SimpleName name) {
-        this(null, modifiers, new NodeList<>(), type, false, new NodeList<>(), name);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), type, false, new NodeList<AnnotationExpr>(), name);
     }
 
     @AllFieldsConstructor
@@ -311,4 +324,269 @@ public final class Parameter extends Node implements NodeWithType<Parameter, Typ
     public ResolvedParameterDeclaration resolve() {
         return getSymbolResolver().resolveDeclaration(this, ResolvedParameterDeclaration.class);
     }
+    
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public Parameter setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public Parameter setType(final String typeString) {
+        Utils.assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
+    }
+    
+    //for NodeWithAnnotations
+    @Override
+    public AnnotationExpr getAnnotation(int i) {
+    	 return getAnnotations().get(i);
+    }
+    
+   
+    @SuppressWarnings("unchecked")
+	public Parameter setAnnotation(int i, AnnotationExpr element) {
+        getAnnotations().set(i, element);
+        return (Parameter) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public Parameter addAnnotation(AnnotationExpr element) {
+        getAnnotations().add(element);
+        return (Parameter) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public Parameter addAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return (Parameter) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    @SuppressWarnings("unchecked")
+	public NormalAnnotationExpr addAndGetAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return annotation;
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public Parameter addAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    public  NormalAnnotationExpr addAndGetAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAndGetAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a marker annotation
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public Parameter addMarkerAnnotation(String name) {
+        MarkerAnnotationExpr markerAnnotationExpr = new MarkerAnnotationExpr(
+                parseName(name));
+        getAnnotations().add(markerAnnotationExpr);
+        return (Parameter) this;
+    }
+
+    /**
+     * Annotates this with a marker annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public Parameter addMarkerAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addMarkerAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param expression the part between ()
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public Parameter addSingleMemberAnnotation(String name, Expression expression) {
+        SingleMemberAnnotationExpr singleMemberAnnotationExpr = new SingleMemberAnnotationExpr(
+                parseName(name), expression);
+        getAnnotations().add(singleMemberAnnotationExpr);
+        return (Parameter) this;
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public Parameter addSingleMemberAnnotation(String name, String value) {
+        return addSingleMemberAnnotation(name, parseExpression(value));
+    }
+
+    /**
+     * Annotates this with a single member annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public Parameter addSingleMemberAnnotation(Class<? extends Annotation> clazz,
+                                        String value) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addSingleMemberAnnotation(clazz.getSimpleName(), value);
+    }
+
+    /**
+     * Check whether an annotation with this name is present on this element
+     *
+     * @param annotationName the name of the annotation
+     * @return true if found, false if not
+     */
+    public boolean isAnnotationPresent(String annotationName) {
+       // return getAnnotations().stream().anyMatch(a -> a.getName().getIdentifier().equals(annotationName));
+    	for (AnnotationExpr a : getAnnotations()) {
+			if(a.getName().getIdentifier().equals(annotationName)) return true;
+		}
+    	return false;
+    }
+
+    /**
+     * Check whether an annotation with this class is present on this element
+     *
+     * @param annotationClass the class of the annotation
+     * @return true if found, false if not
+     */
+    public  boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return isAnnotationPresent(annotationClass.getSimpleName());
+    }
+
+    /**
+     * Try to find an annotation by its name
+     *
+     * @param annotationName the name of the annotation
+     */
+    public  AnnotationExpr getOptionalAnnotationByName(String annotationName) {
+       // return getAnnotations().stream().filter(a -> a.getName().getIdentifier().equals(annotationName)).findFirst();
+    	for (AnnotationExpr a : getAnnotations()) {
+		   if(a.getName().getIdentifier().equals(annotationName))	return a;
+		}
+    	return null;
+    }
+    
+    public  AnnotationExpr getAnnotationByName(String annotationName){
+    	NodeList<AnnotationExpr> annotationList =getAnnotations();
+    	for (AnnotationExpr annotationExpr : annotationList) {
+			if(annotationExpr.getName().getIdentifier().equals(annotationName)) return annotationExpr;
+		}
+    	return null;
+    }
+
+    /**
+     * Try to find an annotation by its class
+     *
+     * @param annotationClass the class of the annotation
+     */
+    public  AnnotationExpr getOptionalAnnotationByClass(Class<? extends Annotation> annotationClass) {
+        return getOptionalAnnotationByName(annotationClass.getSimpleName());
+    }
+    
+    public  AnnotationExpr getAnnotationByClass(Class<? extends Annotation> annotationClass) {
+    	AnnotationExpr optional=getOptionalAnnotationByName(annotationClass.getSimpleName());
+    	if(optional!=null) return optional;
+    	else return null;
+    }
+    //for NodeWithSimpleName
+    public  Parameter setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+   
+   //for NodeWithFinalModifier
+   public  boolean isFinal() {
+       return getModifiers().contains(FINAL);
+   }
+
+   @SuppressWarnings("unchecked")
+public Parameter setFinal(boolean set) {
+       return setModifier(FINAL, set);
+   }
+   
+   //for  NodeWithModifiers
+	
+   @SuppressWarnings("unchecked")
+public Parameter addModifier(Modifier... modifiers) {
+       EnumSet<Modifier> newModifiers = getModifiers().clone();
+       
+       List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+       EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+       enm.addAll(list);
+       newModifiers.addAll(enm);
+       setModifiers(newModifiers);
+       return (Parameter) this;
+   }
+
+   @SuppressWarnings("unchecked")
+public Parameter removeModifier(Modifier... m) {
+       EnumSet<Modifier> newModifiers = getModifiers().clone();
+
+       List<Modifier> list=new ArrayList<>(Arrays.asList(m));
+       EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+       enm.addAll(list);
+       newModifiers.removeAll(enm);
+       
+       setModifiers(newModifiers);
+       return (Parameter) this;
+   }
+   public  Parameter setModifier(Modifier m, boolean set) {
+       if (set) {
+           return addModifier(m);
+       } else {
+           return removeModifier(m);
+       }
+   }
+
+
+
+
 }

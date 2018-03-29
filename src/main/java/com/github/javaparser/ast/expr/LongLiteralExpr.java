@@ -28,9 +28,10 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.LongLiteralExprMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * All ways to specify a long literal.
@@ -96,13 +97,16 @@ public final class LongLiteralExpr extends LiteralStringValueExpr {
             result = result.substring(0, result.length() - 1);
         }
         if (result.startsWith("0x") || result.startsWith("0X")) {
-            return Long.parseUnsignedLong(result.substring(2), 16);
+        	return Long.parseLong(result.substring(2), 16);
+            //return Long.parseUnsignedLong(result.substring(2), 16);
         }
         if (result.startsWith("0b") || result.startsWith("0B")) {
-            return Long.parseUnsignedLong(result.substring(2), 2);
+        	return Long.parseLong(result.substring(2), 2);
+           // return Long.parseUnsignedLong(result.substring(2), 2);
         }
         if (result.length() > 1 && result.startsWith("0")) {
-            return Long.parseUnsignedLong(result.substring(1), 8);
+        	return Long.parseLong(result.substring(1), 8);
+            //return Long.parseUnsignedLong(result.substring(1), 8);
         }
         return Long.parseLong(result);
     }
@@ -151,7 +155,7 @@ public final class LongLiteralExpr extends LiteralStringValueExpr {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LongLiteralExpr> toLongLiteralExpr() {
-        return Optional.of(this);
+    public LongLiteralExpr toLongLiteralExpr() {
+        return this;
     }
 }

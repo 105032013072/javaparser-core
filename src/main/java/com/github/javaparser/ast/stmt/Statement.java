@@ -26,10 +26,12 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.StatementMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+
 import static com.github.javaparser.utils.CodeGenerationUtils.f;
-import java.util.Optional;
+
 
 /**
  * A base class for all statements.
@@ -375,107 +377,107 @@ public abstract class Statement extends Node {
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<AssertStmt> toAssertStmt() {
-        return Optional.empty();
+    public AssertStmt toAssertStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BlockStmt> toBlockStmt() {
-        return Optional.empty();
+    public BlockStmt toBlockStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BreakStmt> toBreakStmt() {
-        return Optional.empty();
+    public BreakStmt toBreakStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ContinueStmt> toContinueStmt() {
-        return Optional.empty();
+    public ContinueStmt toContinueStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<DoStmt> toDoStmt() {
-        return Optional.empty();
+    public DoStmt toDoStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<EmptyStmt> toEmptyStmt() {
-        return Optional.empty();
+    public EmptyStmt toEmptyStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ExplicitConstructorInvocationStmt> toExplicitConstructorInvocationStmt() {
-        return Optional.empty();
+    public ExplicitConstructorInvocationStmt toExplicitConstructorInvocationStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ExpressionStmt> toExpressionStmt() {
-        return Optional.empty();
+    public ExpressionStmt toExpressionStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ForStmt> toForStmt() {
-        return Optional.empty();
+    public ForStmt toForStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ForeachStmt> toForeachStmt() {
-        return Optional.empty();
+    public ForeachStmt toForeachStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<IfStmt> toIfStmt() {
-        return Optional.empty();
+    public IfStmt toIfStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LabeledStmt> toLabeledStmt() {
-        return Optional.empty();
+    public LabeledStmt toLabeledStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LocalClassDeclarationStmt> toLocalClassDeclarationStmt() {
-        return Optional.empty();
+    public LocalClassDeclarationStmt toLocalClassDeclarationStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ReturnStmt> toReturnStmt() {
-        return Optional.empty();
+    public ReturnStmt toReturnStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SwitchEntryStmt> toSwitchEntryStmt() {
-        return Optional.empty();
+    public SwitchEntryStmt toSwitchEntryStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SwitchStmt> toSwitchStmt() {
-        return Optional.empty();
+    public SwitchStmt toSwitchStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SynchronizedStmt> toSynchronizedStmt() {
-        return Optional.empty();
+    public SynchronizedStmt toSynchronizedStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ThrowStmt> toThrowStmt() {
-        return Optional.empty();
+    public ThrowStmt toThrowStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<TryStmt> toTryStmt() {
-        return Optional.empty();
+    public TryStmt toTryStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnparsableStmt> toUnparsableStmt() {
-        return Optional.empty();
+    public UnparsableStmt toUnparsableStmt() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<WhileStmt> toWhileStmt() {
-        return Optional.empty();
+    public WhileStmt toWhileStmt() {
+        return null;
     }
 }

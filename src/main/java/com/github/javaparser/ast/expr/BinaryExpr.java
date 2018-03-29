@@ -31,9 +31,10 @@ import com.github.javaparser.metamodel.BinaryExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.printer.Printable;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * An expression with an expression on the left, an expression on the right, and an operator in the middle.
@@ -80,8 +81,8 @@ public final class BinaryExpr extends Expression {
             return codeRepresentation;
         }
 
-        public Optional<AssignExpr.Operator> toAssignOperator() {
-            return Optional.ofNullable(assignOperatorEquivalent);
+        public AssignExpr.Operator toAssignOperator() {
+            return assignOperatorEquivalent;
         }
     }
 
@@ -233,7 +234,7 @@ public final class BinaryExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BinaryExpr> toBinaryExpr() {
-        return Optional.of(this);
+    public BinaryExpr toBinaryExpr() {
+        return this;
     }
 }

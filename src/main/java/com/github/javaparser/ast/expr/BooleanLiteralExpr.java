@@ -29,9 +29,9 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.BooleanLiteralExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
 
 /**
  * The boolean literals.
@@ -137,7 +137,7 @@ public final class BooleanLiteralExpr extends LiteralExpr {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BooleanLiteralExpr> toBooleanLiteralExpr() {
-        return Optional.of(this);
+    public BooleanLiteralExpr toBooleanLiteralExpr() {
+        return this;
     }
 }

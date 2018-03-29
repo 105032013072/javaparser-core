@@ -28,18 +28,28 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.LambdaExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+import static com.github.javaparser.JavaParser.parseType;
+
+
 
 /**
  * <h1>A lambda expression</h1>
@@ -66,7 +76,7 @@ public final class LambdaExpr extends Expression implements NodeWithParameters<L
     private Statement body;
 
     public LambdaExpr() {
-        this(null, new NodeList<>(), new ReturnStmt(), false);
+        this(null, new NodeList<Parameter>(), new ReturnStmt(), false);
     }
 
     @AllFieldsConstructor
@@ -173,11 +183,11 @@ public final class LambdaExpr extends Expression implements NodeWithParameters<L
      * Otherwise (when the body is a block) return Optional.empty().
      */
     @DerivedProperty
-    public Optional<Expression> getExpressionBody() {
+    public Expression getExpressionBody() {
         if (body.isExpressionStmt()) {
-            return Optional.of(body.asExpressionStmt().getExpression());
+            return body.asExpressionStmt().getExpression();
         } else {
-            return Optional.empty();
+            return null;
         }
     }
 
@@ -230,7 +240,160 @@ public final class LambdaExpr extends Expression implements NodeWithParameters<L
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LambdaExpr> toLambdaExpr() {
-        return Optional.of(this);
+    public LambdaExpr toLambdaExpr() {
+        return this;
+    }
+    
+    // for NodeWithParameters
+    
+    public Parameter getParameter(int i) {
+        return getParameters().get(i);
+    }
+
+
+    @SuppressWarnings("unchecked")
+	public LambdaExpr setParameter(int i, Parameter parameter) {
+        getParameters().set(i, parameter);
+        return (LambdaExpr) this;
+    }
+
+
+    public  LambdaExpr addParameter(Type type, String name) {
+        return addParameter(new Parameter(type, name));
+    }
+
+    public LambdaExpr addParameter(Class<?> paramClass, String name) {
+        tryAddImportToParentCompilationUnit(paramClass);
+        return addParameter(parseType(paramClass.getSimpleName()), name);
+    }
+
+    /**
+     * Remember to import the class in the compilation unit yourself
+     *
+     * @param className the name of the class, ex : org.test.Foo or Foo if you added manually the import
+     * @param name the name of the parameter
+     */
+    public LambdaExpr addParameter(String className, String name) {
+        return addParameter(parseType(className), name);
+    }
+
+    @SuppressWarnings("unchecked")
+	public LambdaExpr addParameter(Parameter parameter) {
+        getParameters().add(parameter);
+        return (LambdaExpr) this;
+    }
+
+    public Parameter addAndGetParameter(Type type, String name) {
+        return addAndGetParameter(new Parameter(type, name));
+    }
+
+    public  Parameter addAndGetParameter(Class<?> paramClass, String name) {
+        tryAddImportToParentCompilationUnit(paramClass);
+        return addAndGetParameter(parseType(paramClass.getSimpleName()), name);
+    }
+
+    /**
+     * Remember to import the class in the compilation unit yourself
+     *
+     * @param className the name of the class, ex : org.test.Foo or Foo if you added manually the import
+     * @param name the name of the parameter
+     * @return the {@link Parameter} created
+     */
+    public  Parameter addAndGetParameter(String className, String name) {
+        return addAndGetParameter(parseType(className), name);
+    }
+
+    public  Parameter addAndGetParameter(Parameter parameter) {
+        getParameters().add(parameter);
+        return parameter;
+    }
+
+    /**
+     * Try to find a {@link Parameter} by its name
+     *
+     * @param name the name of the param
+     * @return null if not found, the param found otherwise
+     */
+    public  Parameter getParameterByName(String name) {
+       /* return getParameters().stream()
+                .filter(p -> p.getNameAsString().equals(name)).findFirst();*/
+    	for (Parameter p : getParameters()) {
+			if(p.getNameAsString().equals(name)) return p;
+		}
+    	
+    	return null;
+    }
+
+    /**
+     * Try to find a {@link Parameter} by its type
+     *
+     * @param type the type of the param
+     * @return null if not found, the param found otherwise
+     */
+    public  Parameter getParameterByType(String type) {
+       /* return getParameters().stream()
+                .filter(p -> p.getType().toString().equals(type)).findFirst();*/
+    	
+    	for (Parameter p : getParameters()) {
+			if( p.getType().toString().equals(type)) return p;
+		}
+    	return null;
+    }
+
+    /**
+     * Try to find a {@link Parameter} by its type
+     *
+     * @param type the type of the param <b>take care about generics, it wont work</b>
+     * @return null if not found, the param found otherwise
+     */
+    public  Parameter getParameterByType(Class<?> type) {
+       
+    	for (Parameter p : getParameters()) {
+			if(p.getType().toString().equals(type.getSimpleName())) return p;
+		}
+    	return null;
+    }
+
+    /**
+     * Check if the parameters have certain types.
+     *
+     * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+     * foo(Map&lt;Integer,String&gt; myMap,int number)
+     * @return true if all parameters match
+     */
+    public  boolean hasParametersOfType(String... paramTypes) {
+      
+    	
+    	Set<String> sourceSet=new HashSet<>();
+    	for (Parameter p : getParameters()) {
+			sourceSet.add(p.getType().toString());
+		}
+    	
+    	Set<String> targetSet= new HashSet<>(Arrays.asList(paramTypes));
+    	return sourceSet.equals(targetSet);
+    }
+
+    /**
+     * Check if the parameters have certain types. Note that this is a match in SimpleName, so "java.awt.List" and
+     * "java.util.List" are identical to this algorithm.
+     *
+     * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+     * foo(Map&lt;Integer,String&gt; myMap,int number)
+     * @return true if all parameters match
+     */
+    public  boolean hasParametersOfType(Class<?>... paramTypes) {
+       /* return getParameters().stream().map(p -> p.getType().toString())
+                .collect(toSet())
+                .equals(Stream.of(paramTypes).map(Class::getSimpleName).collect(toSet()));*/
+    	Set<String> sourceSet=new HashSet<>();
+    	for (Parameter p : getParameters()) {
+			sourceSet.add(p.getType().toString());
+		}
+    	
+    	Set<String> targetSet= new HashSet<>();
+    	for (Class<?> c : paramTypes) {
+			targetSet.add(c.getSimpleName());
+		}
+    	return sourceSet.equals(targetSet);
     }
 }

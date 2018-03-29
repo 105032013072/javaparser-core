@@ -25,7 +25,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.utils.Utils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Optional;
+
 import java.util.Arrays;
 import javax.annotation.Generated;
 
@@ -149,9 +149,18 @@ public enum ObservableProperty {
     private boolean derived;
 
     public static ObservableProperty fromCamelCaseName(String camelCaseName) {
-        Optional<ObservableProperty> observableProperty = Arrays.stream(values()).filter(v -> v.camelCaseName().equals(camelCaseName)).findFirst();
-        if (observableProperty.isPresent()) {
-            return observableProperty.get();
+        //Optional<ObservableProperty> observableProperty = Arrays.stream(values()).filter(v -> v.camelCaseName().equals(camelCaseName)).findFirst();
+    	ObservableProperty observableProperty=null;
+    	for (ObservableProperty v : values()) {
+			if(v.camelCaseName().equals(camelCaseName)) {
+				observableProperty=v;
+				break;
+			}
+		}
+    	
+    	
+    	if (observableProperty!=null) {
+            return observableProperty;
         } else {
             throw new IllegalArgumentException("No property found with the given camel case name: " + camelCaseName);
         }
@@ -200,10 +209,10 @@ public enum ObservableProperty {
         try {
             if (rawValue instanceof Node) {
                 return (Node) rawValue;
-            } else if (rawValue instanceof Optional) {
-                Optional<Node> opt = (Optional<Node>) rawValue;
-                if (opt.isPresent()) {
-                    return opt.get();
+            } else if (rawValue instanceof Node) {
+                Node opt = (Node) rawValue;
+                if (opt!=null) {
+                    return opt;
                 } else {
                     return null;
                 }
@@ -233,9 +242,9 @@ public enum ObservableProperty {
             if (rawValue instanceof NodeList) {
                 return (NodeList) rawValue;
             } else {
-                Optional<NodeList> opt = (Optional<NodeList>) rawValue;
-                if (opt.isPresent()) {
-                    return opt.get();
+                NodeList opt = (NodeList) rawValue;
+                if (opt!=null) {
+                    return opt;
                 } else {
                     return null;
                 }
@@ -286,9 +295,9 @@ public enum ObservableProperty {
         if (result == null) {
             return true;
         }
-        if (result instanceof Optional) {
+        /*if (result instanceof Optional) {
             return !((Optional) result).isPresent();
-        }
+        }*/
         return false;
     }
 

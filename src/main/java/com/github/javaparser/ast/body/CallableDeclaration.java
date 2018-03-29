@@ -49,10 +49,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import static com.github.javaparser.ast.Modifier.*;
 import static com.github.javaparser.JavaParser.parseClassOrInterfaceType;
+import static com.github.javaparser.JavaParser.parseType;
 
 /**
  * Represents a declaration which is callable eg. a method or a constructor.
@@ -691,6 +695,163 @@ public abstract class CallableDeclaration<T extends CallableDeclaration<?>> exte
 		public T setStrictfp(boolean set) {
 	        return setModifier(STRICTFP, set);
 	    }
+	    
+	    //for NodeWithParameters
+	    public Parameter getParameter(int i) {
+	        return getParameters().get(i);
+	    }
+
+
+	    @SuppressWarnings("unchecked")
+		public T setParameter(int i, Parameter parameter) {
+	        getParameters().set(i, parameter);
+	        return (T) this;
+	    }
+
+	    public T addParameter(Type type, String name) {
+	        return addParameter(new Parameter(type, name));
+	    }
+
+	    public  T addParameter(Class<?> paramClass, String name) {
+	        tryAddImportToParentCompilationUnit(paramClass);
+	        return addParameter(parseType(paramClass.getSimpleName()), name);
+	    }
+
+	    /**
+	     * Remember to import the class in the compilation unit yourself
+	     *
+	     * @param className the name of the class, ex : org.test.Foo or Foo if you added manually the import
+	     * @param name the name of the parameter
+	     */
+	    public T addParameter(String className, String name) {
+	        return addParameter(parseType(className), name);
+	    }
+
+	    @SuppressWarnings("unchecked")
+		public T addParameter(Parameter parameter) {
+	        getParameters().add(parameter);
+	        return (T) this;
+	    }
+
+	    public  Parameter addAndGetParameter(Type type, String name) {
+	        return addAndGetParameter(new Parameter(type, name));
+	    }
+
+	    public  Parameter addAndGetParameter(Class<?> paramClass, String name) {
+	        tryAddImportToParentCompilationUnit(paramClass);
+	        return addAndGetParameter(parseType(paramClass.getSimpleName()), name);
+	    }
+
+	    /**
+	     * Remember to import the class in the compilation unit yourself
+	     *
+	     * @param className the name of the class, ex : org.test.Foo or Foo if you added manually the import
+	     * @param name the name of the parameter
+	     * @return the {@link Parameter} created
+	     */
+	    public  Parameter addAndGetParameter(String className, String name) {
+	        return addAndGetParameter(parseType(className), name);
+	    }
+
+	    public  Parameter addAndGetParameter(Parameter parameter) {
+	        getParameters().add(parameter);
+	        return parameter;
+	    }
+
+	    /**
+	     * Try to find a {@link Parameter} by its name
+	     *
+	     * @param name the name of the param
+	     * @return null if not found, the param found otherwise
+	     */
+	    public  Parameter getParameterByName(String name) {
+	       /* return getParameters().stream()
+	                .filter(p -> p.getNameAsString().equals(name)).findFirst();*/
+	    	for (Parameter p : getParameters()) {
+				if(p.getNameAsString().equals(name)) return p;
+			}
+	    	return null;
+	    	
+	    }
+
+	    /**
+	     * Try to find a {@link Parameter} by its type
+	     *
+	     * @param type the type of the param
+	     * @return null if not found, the param found otherwise
+	     */
+	    public  Parameter getParameterByType(String type) {
+	       /* return getParameters().stream()
+	                .filter(p -> p.getType().toString().equals(type)).findFirst();*/
+	    	
+	    	for (Parameter p : getParameters()) {
+				if( p.getType().toString().equals(type)) return p;
+			}
+	    	return null;
+	    }
+
+	    /**
+	     * Try to find a {@link Parameter} by its type
+	     *
+	     * @param type the type of the param <b>take care about generics, it wont work</b>
+	     * @return null if not found, the param found otherwise
+	     */
+	    public  Parameter getParameterByType(Class<?> type) {
+	       /* return getParameters().stream()
+	                .filter(p -> p.getType().toString().equals(type.getSimpleName())).findFirst();*/
+	    	for (Parameter p : getParameters()) {
+				if(p.getType().toString().equals(type.getSimpleName())) return p;
+			}
+	    	return null;
+	    	
+	    }
+
+	    /**
+	     * Check if the parameters have certain types.
+	     *
+	     * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+	     * foo(Map&lt;Integer,String&gt; myMap,int number)
+	     * @return true if all parameters match
+	     */
+	    public  boolean hasParametersOfType(String... paramTypes) {
+	       /* return getParameters().stream()
+	                .map(p -> p.getType().toString())
+	                .collect(toSet())
+	                .equals(Stream.of(paramTypes).collect(toSet()));*/
+	    	
+	    	Set<String> sourceSet=new HashSet<>();
+	    	for (Parameter p : getParameters()) {
+				sourceSet.add(p.getType().toString());
+			}
+	    	
+	    	Set<String> targetSet= new HashSet<>(Arrays.asList(paramTypes));
+	    	return sourceSet.equals(targetSet);
+	    }
+
+	    /**
+	     * Check if the parameters have certain types. Note that this is a match in SimpleName, so "java.awt.List" and
+	     * "java.util.List" are identical to this algorithm.
+	     *
+	     * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+	     * foo(Map&lt;Integer,String&gt; myMap,int number)
+	     * @return true if all parameters match
+	     */
+	    public  boolean hasParametersOfType(Class<?>... paramTypes) {
+	       /* return getParameters().stream().map(p -> p.getType().toString())
+	                .collect(toSet())
+	                .equals(Stream.of(paramTypes).map(Class::getSimpleName).collect(toSet()));*/
+	    	Set<String> sourceSet=new HashSet<>();
+	    	for (Parameter p : getParameters()) {
+				sourceSet.add(p.getType().toString());
+			}
+	    	
+	    	Set<String> targetSet= new HashSet<>();
+	    	for (Class<?> c : paramTypes) {
+				targetSet.add(c.getSimpleName());
+			}
+	    	return sourceSet.equals(targetSet);
+	    }
+	    
 	    
 	    //for NodeWithModifiers
 	   

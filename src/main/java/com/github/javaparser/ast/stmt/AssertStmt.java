@@ -26,16 +26,18 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.AssertStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+
 
 /**
  * A usage of the keyword "assert"
@@ -91,8 +93,8 @@ public final class AssertStmt extends Statement {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getMessage() {
-        return Optional.ofNullable(message);
+    public Expression getMessage() {
+        return message;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -196,7 +198,7 @@ public final class AssertStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<AssertStmt> toAssertStmt() {
-        return Optional.of(this);
+    public AssertStmt toAssertStmt() {
+        return this;
     }
 }

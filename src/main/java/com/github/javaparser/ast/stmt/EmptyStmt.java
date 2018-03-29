@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.stmt;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
@@ -29,8 +30,7 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.EmptyStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * An empty statement is a ";" where a statement is expected.
@@ -111,7 +111,7 @@ public final class EmptyStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<EmptyStmt> toEmptyStmt() {
-        return Optional.of(this);
+    public EmptyStmt toEmptyStmt() {
+        return this;
     }
 }

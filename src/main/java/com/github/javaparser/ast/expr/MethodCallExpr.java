@@ -30,19 +30,22 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.MethodCallExprMetaModel;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import java.util.function.Consumer;
-
+import static com.github.javaparser.ast.NodeList.nodeList;
+import static com.github.javaparser.JavaParser.parseExpression;
 /**
  * A method call on an object. <br/><code>circle.circumference()</code> <br/>In <code>a.&lt;String&gt;bb(15);</code> a
  * is the scope, String is a type argument, bb is the name and 15 is an argument.
@@ -62,27 +65,27 @@ public final class MethodCallExpr extends Expression implements NodeWithTypeArgu
     private NodeList<Expression> arguments;
 
     public MethodCallExpr() {
-        this(null, null, new NodeList<>(), new SimpleName(), new NodeList<>());
+        this(null, null, new NodeList<Type>(), new SimpleName(), new NodeList<Expression>());
     }
 
     public MethodCallExpr(String name, Expression... arguments) {
-        this(null, null, new NodeList<>(), new SimpleName(name), new NodeList<>(arguments));
+        this(null, null, new NodeList<Type>(), new SimpleName(name), new NodeList<Expression>(arguments));
     }
 
     public MethodCallExpr(final Expression scope, final String name) {
-        this(null, scope, new NodeList<>(), new SimpleName(name), new NodeList<>());
+        this(null, scope, new NodeList<Type>(), new SimpleName(name), new NodeList<Expression>());
     }
 
     public MethodCallExpr(final Expression scope, final SimpleName name) {
-        this(null, scope, new NodeList<>(), name, new NodeList<>());
+        this(null, scope, new NodeList<Type>(), name, new NodeList<Expression>());
     }
 
     public MethodCallExpr(final Expression scope, final String name, final NodeList<Expression> arguments) {
-        this(null, scope, new NodeList<>(), new SimpleName(name), arguments);
+        this(null, scope, new NodeList<Type>(), new SimpleName(name), arguments);
     }
 
     public MethodCallExpr(final Expression scope, final SimpleName name, final NodeList<Expression> arguments) {
-        this(null, scope, new NodeList<>(), name, arguments);
+        this(null, scope, new NodeList<Type>(), name, arguments);
     }
 
     @AllFieldsConstructor
@@ -126,8 +129,8 @@ public final class MethodCallExpr extends Expression implements NodeWithTypeArgu
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getScope() {
-        return Optional.ofNullable(scope);
+    public Expression getScope() {
+        return scope;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -172,8 +175,8 @@ public final class MethodCallExpr extends Expression implements NodeWithTypeArgu
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -295,7 +298,73 @@ public final class MethodCallExpr extends Expression implements NodeWithTypeArgu
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<MethodCallExpr> toMethodCallExpr() {
-        return Optional.of(this);
+    public MethodCallExpr toMethodCallExpr() {
+        return this;
     }
+    
+    //for NodeWithTypeArguments
+    @DerivedProperty
+	public boolean isUsingDiamondOperator() {
+        return getTypeArguments()!=null && getTypeArguments().isEmpty();
+    }
+
+    /**
+     * Sets the type arguments to &lt>.
+     */
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr setDiamondOperator() {
+        return setTypeArguments(new NodeList<Type>());
+    }
+
+    /**
+     * Removes all type arguments, including the surrounding &lt;>.
+     */
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr removeTypeArguments() {
+        return setTypeArguments((NodeList<Type>) null);
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr setTypeArguments(Type... typeArguments) {
+        return setTypeArguments(nodeList(typeArguments));
+    }
+    
+    //for NodeWithArguments
+    public  Expression getArgument(int i) {
+        return getArguments().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr addArgument(String arg) {
+        return addArgument(parseExpression(arg));
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr addArgument(Expression arg) {
+        getArguments().add(arg);
+        return (MethodCallExpr) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodCallExpr setArgument(int i, Expression arg) {
+        getArguments().set(i, arg);
+        return (MethodCallExpr) this;
+    }
+    
+    //for NodeWithSimpleName
+    public  MethodCallExpr setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+    public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+    
+    // for NodeWithOptionalScope
+    public Expression traverseScope() {
+        return getScope();
+    }
+
 }

@@ -25,15 +25,17 @@ import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.BreakStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+
 
 /**
  * A usage of the break keyword.
@@ -82,8 +84,8 @@ public final class BreakStmt extends Statement {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<SimpleName> getLabel() {
-        return Optional.ofNullable(label);
+    public SimpleName getLabel() {
+        return label;
     }
 
     /**
@@ -169,7 +171,7 @@ public final class BreakStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BreakStmt> toBreakStmt() {
-        return Optional.of(this);
+    public BreakStmt toBreakStmt() {
+        return this;
     }
 }

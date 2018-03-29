@@ -22,6 +22,8 @@ package com.github.javaparser.ast.body;
 
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.SimpleName;
@@ -31,6 +33,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.javadoc.Javadoc;
+
 import java.util.Arrays;
 import java.util.List;
 import static com.github.javaparser.utils.Utils.assertNotNull;
@@ -39,12 +43,13 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.EnumConstantDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedEnumConstantDeclaration;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseExpression;
 
 /**
  * One of the values an enum can take. A(1) and B(2) in this example: <code>enum X { A(1), B(2) }</code>
@@ -60,11 +65,11 @@ public final class EnumConstantDeclaration extends BodyDeclaration<EnumConstantD
     private NodeList<BodyDeclaration<?>> classBody;
 
     public EnumConstantDeclaration() {
-        this(null, new NodeList<>(), new SimpleName(), new NodeList<>(), new NodeList<>());
+        this(null, new NodeList<AnnotationExpr>(), new SimpleName(), new NodeList<Expression>(), new NodeList<BodyDeclaration<?>>());
     }
 
     public EnumConstantDeclaration(String name) {
-        this(null, new NodeList<>(), new SimpleName(name), new NodeList<>(), new NodeList<>());
+        this(null, new NodeList<AnnotationExpr>(), new SimpleName(name), new NodeList<Expression>(), new NodeList<BodyDeclaration<?>>());
     }
 
     @AllFieldsConstructor
@@ -233,7 +238,100 @@ public final class EnumConstantDeclaration extends BodyDeclaration<EnumConstantD
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<EnumConstantDeclaration> toEnumConstantDeclaration() {
-        return Optional.of(this);
+    public EnumConstantDeclaration toEnumConstantDeclaration() {
+        return this;
     }
+    //for NodeWithArguments
+    
+    public  Expression getArgument(int i) {
+        return getArguments().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+	public EnumConstantDeclaration addArgument(String arg) {
+        return addArgument(parseExpression(arg));
+    }
+
+    @SuppressWarnings("unchecked")
+	public EnumConstantDeclaration addArgument(Expression arg) {
+        getArguments().add(arg);
+        return (EnumConstantDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public EnumConstantDeclaration setArgument(int i, Expression arg) {
+        getArguments().set(i, arg);
+        return (EnumConstantDeclaration) this;
+    }
+    
+    //for NodeWithJavadoc
+  public  JavadocComment getJavadocComment() {
+    	
+    	Comment comment= getCommentOptional();
+    	if(comment instanceof JavadocComment){
+    		return (JavadocComment) comment;
+    	}else return null;
+    }
+
+    /**
+     * Gets the Javadoc for this node. You can set the Javadoc by calling setJavadocComment passing a Javadoc.
+     *
+     * @return The Javadoc for this node wrapped in an optional as it may be absent.
+     */
+    public   Javadoc getOptionalJavadoc() {
+    	JavadocComment javadocComment=getJavadocComment();
+    	if(javadocComment!=null){
+    		return javadocComment.parse();
+    	}
+    	return null;
+    	
+    	//return getJavadocComment().map(JavadocComment::parse);
+    }
+    
+    public  Javadoc getJavadoc() {
+    	Javadoc oj=getOptionalJavadoc();
+    	if(oj!=null) return oj;
+    	else return null;
+    }
+
+    /**
+     * Use this to store additional information to this node.
+     *
+     * @param comment to be set
+     */
+    @SuppressWarnings("unchecked")
+    public  EnumConstantDeclaration setJavadocComment(String comment) {
+        return setJavadocComment(new JavadocComment(comment));
+    }
+
+    public  EnumConstantDeclaration setJavadocComment(JavadocComment comment) {
+        setComment(comment);
+        return (EnumConstantDeclaration) this;
+    }
+
+    public  EnumConstantDeclaration setJavadocComment(String indentation, Javadoc javadoc) {
+        JavadocComment comment = javadoc.toComment(indentation);
+        return setJavadocComment(comment);
+    }
+
+    public  boolean removeJavaDocComment() {
+        return hasJavaDocComment() && getCommentOptional().remove();
+    }
+
+    public  boolean hasJavaDocComment() {
+        return getCommentOptional()!=null && getCommentOptional() instanceof JavadocComment;
+    }
+
+    
+    //for NodeWithSimpleName 
+    
+    public  EnumConstantDeclaration setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
 }

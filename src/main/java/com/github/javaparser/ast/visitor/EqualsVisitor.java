@@ -30,7 +30,7 @@ import com.github.javaparser.ast.modules.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import java.util.List;
-import java.util.Optional;
+
 import javax.annotation.Generated;
 
 /**
@@ -112,13 +112,6 @@ public class EqualsVisitor implements GenericVisitor<Boolean, Visitable> {
         return n.accept(this, n2);
     }
 
-    private <T extends Node> boolean nodeEquals(final Optional<T> n, final Optional<T> n2) {
-        return nodeEquals(n.orElse(null), n2.orElse(null));
-    }
-
-    private <T extends Node> boolean nodesEquals(final Optional<NodeList<T>> n, final Optional<NodeList<T>> n2) {
-        return nodesEquals(n.orElse(null), n2.orElse(null));
-    }
 
     private boolean objEquals(final Object n, final Object n2) {
         if (n == n2) {

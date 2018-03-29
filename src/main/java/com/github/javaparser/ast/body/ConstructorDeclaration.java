@@ -41,11 +41,11 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ConstructorDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
-import java.util.function.Consumer;
-import java.util.Optional;
 
 /**
  * A constructor declaration: <code>class X { X() { } }</code> where X(){} is the constructor declaration.
@@ -60,15 +60,15 @@ public final class ConstructorDeclaration extends CallableDeclaration<Constructo
     private BlockStmt body;
 
     public ConstructorDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new NodeList<>(), new SimpleName(), new NodeList<>(), new NodeList<>(), new BlockStmt(), null);
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), new SimpleName(), new NodeList<Parameter>(), new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public ConstructorDeclaration(String name) {
-        this(null, EnumSet.of(Modifier.PUBLIC), new NodeList<>(), new NodeList<>(), new SimpleName(name), new NodeList<>(), new NodeList<>(), new BlockStmt(), null);
+        this(null, EnumSet.of(Modifier.PUBLIC), new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), new SimpleName(name), new NodeList<Parameter>(), new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public ConstructorDeclaration(EnumSet<Modifier> modifiers, String name) {
-        this(null, modifiers, new NodeList<>(), new NodeList<>(), new SimpleName(name), new NodeList<>(), new NodeList<>(), new BlockStmt(), null);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), new SimpleName(name), new NodeList<Parameter>(), new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public ConstructorDeclaration(EnumSet<Modifier> modifiers, NodeList<AnnotationExpr> annotations, NodeList<TypeParameter> typeParameters, SimpleName name, NodeList<Parameter> parameters, NodeList<ReferenceType> thrownExceptions, BlockStmt body) {
@@ -242,7 +242,16 @@ public final class ConstructorDeclaration extends CallableDeclaration<Constructo
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ConstructorDeclaration> toConstructorDeclaration() {
-        return Optional.of(this);
+    public ConstructorDeclaration toConstructorDeclaration() {
+        return this;
     }
+    
+    
+    //for NodeWithBlockStmt
+    public  BlockStmt createBody() {
+        BlockStmt block = new BlockStmt();
+        setBody(block);
+        return block;
+    }
+    
 }

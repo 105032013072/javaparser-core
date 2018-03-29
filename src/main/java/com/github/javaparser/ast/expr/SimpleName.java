@@ -123,4 +123,14 @@ public final class SimpleName extends Node implements NodeWithIdentifier<SimpleN
             return false;
         return super.replace(node, replacementNode);
     }
+    
+    //for NodeWithIdentifier
+    public String getId() {
+        return getIdentifier();
+    }
+
+    public SimpleName setId(String identifier) {
+        assertNonEmpty(identifier);
+        return setIdentifier(identifier);
+    }
 }

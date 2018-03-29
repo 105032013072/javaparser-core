@@ -24,7 +24,12 @@ import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SimpleName;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeArguments;
@@ -33,17 +38,28 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.ClassOrInterfaceTypeMetaModel;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
+
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import static java.util.stream.Collectors.joining;
+
 import javax.annotation.Generated;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import java.util.function.Consumer;
+import static com.github.javaparser.ast.NodeList.nodeList;
+
+import static com.github.javaparser.JavaParser.parseExpression;
+import static com.github.javaparser.JavaParser.parseName;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
 
 /**
  * A class or an interface type. <br/><code>Object</code> <br/><code>HashMap&lt;String, String></code>
@@ -68,22 +84,22 @@ public final class ClassOrInterfaceType extends ReferenceType implements NodeWit
     private NodeList<Type> typeArguments;
 
     public ClassOrInterfaceType() {
-        this(null, null, new SimpleName(), null, new NodeList<>());
+        this(null, null, new SimpleName(), null, new NodeList<AnnotationExpr>());
     }
 
     /**
      * @deprecated use JavaParser.parseClassOrInterfaceType instead. This constructor does not understand generics.
      */
     public ClassOrInterfaceType(final String name) {
-        this(null, null, new SimpleName(name), null, new NodeList<>());
+        this(null, null, new SimpleName(name), null, new NodeList<AnnotationExpr>());
     }
 
     public ClassOrInterfaceType(final ClassOrInterfaceType scope, final String name) {
-        this(null, scope, new SimpleName(name), null, new NodeList<>());
+        this(null, scope, new SimpleName(name), null, new NodeList<AnnotationExpr>());
     }
 
     public ClassOrInterfaceType(final ClassOrInterfaceType scope, final SimpleName name, final NodeList<Type> typeArguments) {
-        this(null, scope, name, typeArguments, new NodeList<>());
+        this(null, scope, name, typeArguments, new NodeList<AnnotationExpr>());
     }
 
     @AllFieldsConstructor
@@ -121,8 +137,8 @@ public final class ClassOrInterfaceType extends ReferenceType implements NodeWit
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<ClassOrInterfaceType> getScope() {
-        return Optional.ofNullable(scope);
+    public ClassOrInterfaceType getScope() {
+        return scope;
     }
 
     public boolean isBoxedType() {
@@ -170,8 +186,8 @@ public final class ClassOrInterfaceType extends ReferenceType implements NodeWit
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -223,9 +239,21 @@ public final class ClassOrInterfaceType extends ReferenceType implements NodeWit
     @Override
     public String asString() {
         StringBuilder str = new StringBuilder();
-        getScope().ifPresent(s -> str.append(s.asString()).append("."));
+        //getScope().ifPresent(s -> str.append(s.asString()).append("."));
+        if(getScope()!=null){
+        	str.append(getScope().asString()).append(".");
+        }
+        
         str.append(name.asString());
-        getTypeArguments().ifPresent(ta -> str.append(ta.stream().map(Type::asString).collect(joining(",", "<", ">"))));
+        //getTypeArguments().ifPresent(ta -> str.append(ta.stream().map(Type::asString).collect(joining(",", "<", ">"))));
+        NodeList<Type> list= getTypeArguments();
+        if(list!=null){
+        	String []array=new String[list.size()];
+        	for(int i = 0;i<list.size();i++){
+        		array[i]=list.get(i).asString();
+        	}
+        	str.append("<").append(StringUtils.join(array,",")).append(">");
+        }
         return str.toString();
     }
 
@@ -296,7 +324,237 @@ public final class ClassOrInterfaceType extends ReferenceType implements NodeWit
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ClassOrInterfaceType> toClassOrInterfaceType() {
-        return Optional.of(this);
+    public ClassOrInterfaceType toClassOrInterfaceType() {
+        return this;
     }
+    
+    // for NodeWithSimpleName
+    public  ClassOrInterfaceType setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+   
+   //for NodeWithAnnotations
+   public AnnotationExpr getAnnotation(int i) {
+       return getAnnotations().get(i);
+   }
+
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType setAnnotation(int i, AnnotationExpr element) {
+       getAnnotations().set(i, element);
+       return (ClassOrInterfaceType) this;
+   }
+
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType addAnnotation(AnnotationExpr element) {
+       getAnnotations().add(element);
+       return (ClassOrInterfaceType) this;
+   }
+
+   /**
+    * Annotates this
+    *
+    * @param name the name of the annotation
+    * @return this
+    */
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType addAnnotation(String name) {
+       NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+               parseName(name), new NodeList<MemberValuePair>());
+       getAnnotations().add(annotation);
+       return (ClassOrInterfaceType) this;
+   }
+
+   /**
+    * Annotates this
+    *
+    * @param name the name of the annotation
+    * @return the {@link NormalAnnotationExpr} added
+    */
+   @SuppressWarnings("unchecked")
+   public NormalAnnotationExpr addAndGetAnnotation(String name) {
+       NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+               parseName(name), new NodeList<MemberValuePair>());
+       getAnnotations().add(annotation);
+       return annotation;
+   }
+
+   /**
+    * Annotates this node and automatically add the import
+    *
+    * @param clazz the class of the annotation
+    * @return this
+    */
+   public ClassOrInterfaceType addAnnotation(Class<? extends Annotation> clazz) {
+       tryAddImportToParentCompilationUnit(clazz);
+       return addAnnotation(clazz.getSimpleName());
+   }
+
+   /**
+    * Annotates this node and automatically add the import
+    *
+    * @param clazz the class of the annotation
+    * @return the {@link NormalAnnotationExpr} added
+    */
+   public NormalAnnotationExpr addAndGetAnnotation(Class<? extends Annotation> clazz) {
+       tryAddImportToParentCompilationUnit(clazz);
+       return addAndGetAnnotation(clazz.getSimpleName());
+   }
+
+   /**
+    * Annotates this with a marker annotation
+    *
+    * @param name the name of the annotation
+    * @return this
+    */
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType addMarkerAnnotation(String name) {
+       MarkerAnnotationExpr markerAnnotationExpr = new MarkerAnnotationExpr(
+               parseName(name));
+       getAnnotations().add(markerAnnotationExpr);
+       return (ClassOrInterfaceType) this;
+   }
+
+   /**
+    * Annotates this with a marker annotation and automatically add the import
+    *
+    * @param clazz the class of the annotation
+    * @return this
+    */
+   public ClassOrInterfaceType addMarkerAnnotation(Class<? extends Annotation> clazz) {
+       tryAddImportToParentCompilationUnit(clazz);
+       return addMarkerAnnotation(clazz.getSimpleName());
+   }
+
+   /**
+    * Annotates this with a single member annotation
+    *
+    * @param name the name of the annotation
+    * @param expression the part between ()
+    * @return this
+    */
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType addSingleMemberAnnotation(String name, Expression expression) {
+       SingleMemberAnnotationExpr singleMemberAnnotationExpr = new SingleMemberAnnotationExpr(
+               parseName(name), expression);
+       getAnnotations().add(singleMemberAnnotationExpr);
+       return (ClassOrInterfaceType) this;
+   }
+
+   /**
+    * Annotates this with a single member annotation
+    *
+    * @param name the name of the annotation
+    * @param value the value, don't forget to add \"\" for a string value
+    * @return this
+    */
+   public ClassOrInterfaceType addSingleMemberAnnotation(String name, String value) {
+       return addSingleMemberAnnotation(name, parseExpression(value));
+   }
+
+   /**
+    * Annotates this with a single member annotation and automatically add the import
+    *
+    * @param clazz the class of the annotation
+    * @param value the value, don't forget to add \"\" for a string value
+    * @return this
+    */
+   public ClassOrInterfaceType addSingleMemberAnnotation(Class<? extends Annotation> clazz,
+                                       String value) {
+       tryAddImportToParentCompilationUnit(clazz);
+       return addSingleMemberAnnotation(clazz.getSimpleName(), value);
+   }
+
+   /**
+    * Check whether an annotation with this name is present on this element
+    *
+    * @param annotationName the name of the annotation
+    * @return true if found, false if not
+    */
+   public boolean isAnnotationPresent(String annotationName) {
+      // return getAnnotations().stream().anyMatch(a -> a.getName().getIdentifier().equals(annotationName));
+   	for (AnnotationExpr a : getAnnotations()) {
+			if(a.getName().getIdentifier().equals(annotationName)) return true;
+		}
+   	return false;
+   }
+
+   /**
+    * Check whether an annotation with this class is present on this element
+    *
+    * @param annotationClass the class of the annotation
+    * @return true if found, false if not
+    */
+   public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+       return isAnnotationPresent(annotationClass.getSimpleName());
+   }
+
+   /**
+    * Try to find an annotation by its name
+    *
+    * @param annotationName the name of the annotation
+    */
+   public AnnotationExpr getOptionalAnnotationByName(String annotationName) {
+      // return getAnnotations().stream().filter(a -> a.getName().getIdentifier().equals(annotationName)).findFirst();
+   	for (AnnotationExpr a : getAnnotations()) {
+		   if(a.getName().getIdentifier().equals(annotationName))	return a;
+		}
+   	return null;
+   }
+   
+   public AnnotationExpr getAnnotationByName(String annotationName){
+   	NodeList<AnnotationExpr> annotationList =getAnnotations();
+   	for (AnnotationExpr annotationExpr : annotationList) {
+			if(annotationExpr.getName().getIdentifier().equals(annotationName)) return annotationExpr;
+		}
+   	return null;
+   }
+
+   /**
+    * Try to find an annotation by its class
+    *
+    * @param annotationClass the class of the annotation
+    */
+   public AnnotationExpr getOptionalAnnotationByClass(Class<? extends Annotation> annotationClass) {
+       return getOptionalAnnotationByName(annotationClass.getSimpleName());
+   }
+   
+   public AnnotationExpr getAnnotationByClass(Class<? extends Annotation> annotationClass) {
+   	AnnotationExpr optional=getOptionalAnnotationByName(annotationClass.getSimpleName());
+   	if(optional!=null) return optional;
+   	else return null;
+   }
+   
+   //for  NodeWithTypeArguments
+   @DerivedProperty
+   public boolean isUsingDiamondOperator() {
+       return getTypeArguments()!=null && getTypeArguments().isEmpty();
+   }
+
+   /**
+    * Sets the type arguments to &lt>.
+    */
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType setDiamondOperator() {
+       return setTypeArguments(new NodeList<Type>());
+   }
+
+   /**
+    * Removes all type arguments, including the surrounding &lt;>.
+    */
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType removeTypeArguments() {
+       return setTypeArguments((NodeList<Type>) null);
+   }
+
+   @SuppressWarnings("unchecked")
+   public ClassOrInterfaceType setTypeArguments(Type... typeArguments) {
+       return setTypeArguments(nodeList(typeArguments));
+   }
+   
 }

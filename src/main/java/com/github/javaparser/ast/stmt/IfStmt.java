@@ -27,7 +27,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithCondition;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
@@ -35,9 +35,11 @@ import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.IfStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+
 
 /**
  * An if-then-else statement. The else is optional.
@@ -94,8 +96,8 @@ public final class IfStmt extends Statement implements NodeWithCondition<IfStmt>
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Statement> getElseStmt() {
-        return Optional.ofNullable(elseStmt);
+    public Statement getElseStmt() {
+        return elseStmt;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -254,7 +256,7 @@ public final class IfStmt extends Statement implements NodeWithCondition<IfStmt>
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<IfStmt> toIfStmt() {
-        return Optional.of(this);
+    public IfStmt toIfStmt() {
+        return this;
     }
 }

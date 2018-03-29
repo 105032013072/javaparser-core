@@ -28,6 +28,8 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.javaparser.Predicate;
+import com.github.javaparser.ast.type.ArrayType;
+import com.github.javaparser.ast.type.Type;
 
 import static java.util.Arrays.*;
 
@@ -257,6 +259,53 @@ public class Utils {
             line = line.substring(0, line.length() - 1);
         }
         return line;
+    }
+    
+    public static Type calculateMaximumCommonType(List<Type> types) {
+        // we use a local class because we cannot use an helper static method in an interface
+        class Helper {
+          
+            private Type toArrayLevel(Type type, int level) {
+                if (level > type.getArrayLevel()) {
+                    return null;
+                }
+                for (int i = type.getArrayLevel(); i > level; i--) {
+                    if (!(type instanceof ArrayType)) {
+                        return null;
+                    }
+                    type = ((ArrayType) type).getComponentType();
+                }
+                return type;
+            }
+        }
+
+        Helper helper = new Helper();
+        int level = 0;
+        boolean keepGoing = true;
+      
+        while (keepGoing) {
+            final int currentLevel = level;
+            
+            /*Object[] values = types.stream().map(v -> {
+                Optional<Type> t = helper.toArrayLevel(v, currentLevel);
+                return t.map(Node::toString).orElse(null);
+            }).distinct().toArray();*/
+            Set<String> set=new HashSet();
+            for (Type type : types) {
+            	Type t = helper.toArrayLevel(type, currentLevel);
+                if(t!=null) set.add(t.asString());
+			}
+            Object[] values=new Object[set.size()];
+            set.toArray(values);
+            
+            
+            if (values.length == 1 && values[0] != null) {
+                level++;
+            } else {
+                keepGoing = false;
+            }
+        }
+        return helper.toArrayLevel(types.get(0), --level);
     }
 
 }

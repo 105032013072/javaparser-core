@@ -22,12 +22,16 @@ package com.github.javaparser.ast.body;
 
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.nodeTypes.NodeWithBlockStmt;
 import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.javadoc.Javadoc;
+
 import java.util.Arrays;
 import java.util.List;
 import static com.github.javaparser.utils.Utils.assertNotNull;
@@ -36,9 +40,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.InitializerDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A (possibly static) initializer body. "static { a=3; }" in this example: <code>class X { static { a=3; }  } </code>
@@ -168,7 +173,72 @@ public final class InitializerDeclaration extends BodyDeclaration<InitializerDec
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<InitializerDeclaration> toInitializerDeclaration() {
-        return Optional.of(this);
+    public InitializerDeclaration toInitializerDeclaration() {
+        return this;
+    }
+    
+    
+   //for  NodeWithJavadoc
+ public  JavadocComment getJavadocComment() {
+    	
+    	Comment comment= getCommentOptional();
+    	if(comment instanceof JavadocComment){
+    		return (JavadocComment) comment;
+    	}else return null;
+    }
+
+    /**
+     * Gets the Javadoc for this node. You can set the Javadoc by calling setJavadocComment passing a Javadoc.
+     *
+     * @return The Javadoc for this node wrapped in an optional as it may be absent.
+     */
+    public   Javadoc getOptionalJavadoc() {
+    	JavadocComment javadocComment=getJavadocComment();
+    	if(javadocComment!=null){
+    		return javadocComment.parse();
+    	}else return null;
+    	
+    	//return getJavadocComment().map(JavadocComment::parse);
+    }
+    
+    public  Javadoc getJavadoc() {
+    	Javadoc oj=getOptionalJavadoc();
+    	if(oj!=null) return oj;
+    	else return null;
+    }
+
+    /**
+     * Use this to store additional information to this node.
+     *
+     * @param comment to be set
+     */
+    @SuppressWarnings("unchecked")
+    public  InitializerDeclaration setJavadocComment(String comment) {
+        return setJavadocComment(new JavadocComment(comment));
+    }
+
+    public  InitializerDeclaration setJavadocComment(JavadocComment comment) {
+        setComment(comment);
+        return (InitializerDeclaration) this;
+    }
+
+    public  InitializerDeclaration setJavadocComment(String indentation, Javadoc javadoc) {
+        JavadocComment comment = javadoc.toComment(indentation);
+        return setJavadocComment(comment);
+    }
+
+    public  boolean removeJavaDocComment() {
+        return hasJavaDocComment() && getCommentOptional().remove();
+    }
+
+    public  boolean hasJavaDocComment() {
+        return getCommentOptional()!=null && getCommentOptional() instanceof JavadocComment;
+    }
+    
+    //for NodeWithBlockStmt
+    public  BlockStmt createBody() {
+        BlockStmt block = new BlockStmt();
+        setBody(block);
+        return block;
     }
 }

@@ -34,9 +34,13 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.InstanceOfExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+import static com.github.javaparser.JavaParser.parseExpression;
+
 
 /**
  * Usage of the instanceof operator.
@@ -175,7 +179,26 @@ public final class InstanceOfExpr extends Expression implements NodeWithType<Ins
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<InstanceOfExpr> toInstanceOfExpr() {
-        return Optional.of(this);
+    public InstanceOfExpr toInstanceOfExpr() {
+        return this;
     }
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public InstanceOfExpr setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((ReferenceType) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public InstanceOfExpr setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((ReferenceType) parseType(typeString));
+    }
+    
+    //for NodeWithExpression
+    public  InstanceOfExpr setExpression(String expression) {
+        return setExpression(parseExpression(expression));
+    }
+    
 }

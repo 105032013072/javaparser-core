@@ -23,6 +23,11 @@ package com.github.javaparser.ast.type;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
@@ -30,18 +35,26 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.Arrays;
 import java.util.List;
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import static java.util.stream.Collectors.joining;
+
+
+import java.lang.annotation.Annotation;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.NonEmptyProperty;
 import com.github.javaparser.metamodel.UnionTypeMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedUnionType;
-import java.util.function.Consumer;
-import java.util.Optional;
+
+import static com.github.javaparser.JavaParser.parseExpression;
+import static com.github.javaparser.JavaParser.parseName;
 
 /**
  * <h1>The union type</h1>
@@ -66,7 +79,7 @@ public final class UnionType extends Type implements NodeWithAnnotations<UnionTy
     private NodeList<ReferenceType> elements;
 
     public UnionType() {
-        this(null, new NodeList<>());
+        this(null, new NodeList<ReferenceType>());
     }
 
     /**
@@ -136,7 +149,12 @@ public final class UnionType extends Type implements NodeWithAnnotations<UnionTy
 
     @Override
     public String asString() {
-        return elements.stream().map(Type::asString).collect(joining("|"));
+    	String[] array=new String[elements.size()];
+    	for (int i=0;i<elements.size();i++) {
+			array[i]=elements.get(i).asString();
+		}
+    	return StringUtils.join(array,"|");
+       // return elements.stream().map(Type::asString).collect(joining("|"));
     }
 
     @Override
@@ -189,7 +207,197 @@ public final class UnionType extends Type implements NodeWithAnnotations<UnionTy
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnionType> toUnionType() {
-        return Optional.of(this);
+    public UnionType toUnionType() {
+        return this;
+    }
+    //for NodeWithAnnotations
+    public AnnotationExpr getAnnotation(int i) {
+        return getAnnotations().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public UnionType setAnnotation(int i, AnnotationExpr element) {
+        getAnnotations().set(i, element);
+        return (UnionType) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public UnionType addAnnotation(AnnotationExpr element) {
+        getAnnotations().add(element);
+        return (UnionType) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public UnionType addAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return (UnionType) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    @SuppressWarnings("unchecked")
+    public NormalAnnotationExpr addAndGetAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return annotation;
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public UnionType addAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    public NormalAnnotationExpr addAndGetAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAndGetAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a marker annotation
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public UnionType addMarkerAnnotation(String name) {
+        MarkerAnnotationExpr markerAnnotationExpr = new MarkerAnnotationExpr(
+                parseName(name));
+        getAnnotations().add(markerAnnotationExpr);
+        return (UnionType) this;
+    }
+
+    /**
+     * Annotates this with a marker annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public UnionType addMarkerAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addMarkerAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param expression the part between ()
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public UnionType addSingleMemberAnnotation(String name, Expression expression) {
+        SingleMemberAnnotationExpr singleMemberAnnotationExpr = new SingleMemberAnnotationExpr(
+                parseName(name), expression);
+        getAnnotations().add(singleMemberAnnotationExpr);
+        return (UnionType) this;
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public UnionType addSingleMemberAnnotation(String name, String value) {
+        return addSingleMemberAnnotation(name, parseExpression(value));
+    }
+
+    /**
+     * Annotates this with a single member annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public UnionType addSingleMemberAnnotation(Class<? extends Annotation> clazz,
+                                        String value) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addSingleMemberAnnotation(clazz.getSimpleName(), value);
+    }
+
+    /**
+     * Check whether an annotation with this name is present on this element
+     *
+     * @param annotationName the name of the annotation
+     * @return true if found, false if not
+     */
+    public boolean isAnnotationPresent(String annotationName) {
+       // return getAnnotations().stream().anyMatch(a -> a.getName().getIdentifier().equals(annotationName));
+    	for (AnnotationExpr a : getAnnotations()) {
+			if(a.getName().getIdentifier().equals(annotationName)) return true;
+		}
+    	return false;
+    }
+
+    /**
+     * Check whether an annotation with this class is present on this element
+     *
+     * @param annotationClass the class of the annotation
+     * @return true if found, false if not
+     */
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return isAnnotationPresent(annotationClass.getSimpleName());
+    }
+
+    /**
+     * Try to find an annotation by its name
+     *
+     * @param annotationName the name of the annotation
+     */
+    public AnnotationExpr getOptionalAnnotationByName(String annotationName) {
+       // return getAnnotations().stream().filter(a -> a.getName().getIdentifier().equals(annotationName)).findFirst();
+    	for (AnnotationExpr a : getAnnotations()) {
+		   if(a.getName().getIdentifier().equals(annotationName))	return a;
+		}
+    	return null;
+    }
+    
+    public AnnotationExpr getAnnotationByName(String annotationName){
+    	NodeList<AnnotationExpr> annotationList =getAnnotations();
+    	for (AnnotationExpr annotationExpr : annotationList) {
+			if(annotationExpr.getName().getIdentifier().equals(annotationName)) return annotationExpr;
+		}
+    	return null;
+    }
+
+    /**
+     * Try to find an annotation by its class
+     *
+     * @param annotationClass the class of the annotation
+     */
+    public  AnnotationExpr getOptionalAnnotationByClass(Class<? extends Annotation> annotationClass) {
+        return getOptionalAnnotationByName(annotationClass.getSimpleName());
+    }
+    
+    public AnnotationExpr getAnnotationByClass(Class<? extends Annotation> annotationClass) {
+    	AnnotationExpr optional=getOptionalAnnotationByName(annotationClass.getSimpleName());
+    	if(optional!=null) return optional;
+    	else return null;
     }
 }

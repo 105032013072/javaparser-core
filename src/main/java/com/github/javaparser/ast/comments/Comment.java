@@ -23,15 +23,17 @@ package com.github.javaparser.ast.comments;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.observer.ObservableProperty;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.CommentMetaModel;
 import com.github.javaparser.metamodel.InternalProperty;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+
 import static com.github.javaparser.utils.CodeGenerationUtils.f;
 
 /**
@@ -100,8 +102,8 @@ public abstract class Comment extends Node {
         throw new IllegalStateException(f("%s is not an LineComment", this));
     }
 
-    public Optional<Node> getCommentedNode() {
-        return Optional.ofNullable(this.commentedNode);
+    public  Node getCommentedNode() {
+        return this.commentedNode;
     }
 
     /**
@@ -136,8 +138,8 @@ public abstract class Comment extends Node {
         if (this.commentedNode != null) {
             this.commentedNode.setComment(null);
             return true;
-        } else if (this.getOptionalParentNode().isPresent()) {
-            return this.getOptionalParentNode().get().removeOrphanComment(this);
+        } else if (this.getOptionalParentNode()!=null) {
+            return this.getOptionalParentNode().removeOrphanComment(this);
         } else {
             return false;
         }
@@ -204,17 +206,17 @@ public abstract class Comment extends Node {
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BlockComment> toBlockComment() {
-        return Optional.empty();
+    public BlockComment toBlockComment() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<JavadocComment> toJavadocComment() {
-        return Optional.empty();
+    public JavadocComment toJavadocComment() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LineComment> toLineComment() {
-        return Optional.empty();
+    public LineComment toLineComment() {
+        return null;
     }
 }

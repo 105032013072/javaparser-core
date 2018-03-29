@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.expr;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.observer.ObservableProperty;
@@ -34,14 +35,14 @@ import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.NonEmptyProperty;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.JavaParser.parseType;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+
 
 /**
  * <code>new int[5][4][][]</code> or <code>new int[][]{{1},{2,3}}</code>.
@@ -62,7 +63,7 @@ public final class ArrayCreationExpr extends Expression {
     private ArrayInitializerExpr initializer;
 
     public ArrayCreationExpr() {
-        this(null, new ClassOrInterfaceType(), new NodeList<>(), new ArrayInitializerExpr());
+        this(null, new ClassOrInterfaceType(), new NodeList<ArrayCreationLevel>(), new ArrayInitializerExpr());
     }
 
     @AllFieldsConstructor
@@ -71,7 +72,7 @@ public final class ArrayCreationExpr extends Expression {
     }
 
     public ArrayCreationExpr(Type elementType) {
-        this(null, elementType, new NodeList<>(), new ArrayInitializerExpr());
+        this(null, elementType, new NodeList<ArrayCreationLevel>(), new ArrayInitializerExpr());
     }
 
     /**
@@ -79,7 +80,7 @@ public final class ArrayCreationExpr extends Expression {
      */
     @Deprecated
     public ArrayCreationExpr(Range range, Type elementType) {
-        this(null, elementType, new NodeList<>(), new ArrayInitializerExpr());
+        this(null, elementType, new NodeList<ArrayCreationLevel>(), new ArrayInitializerExpr());
         setRange(range);
     }
 
@@ -108,8 +109,8 @@ public final class ArrayCreationExpr extends Expression {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<ArrayInitializerExpr> getInitializer() {
-        return Optional.ofNullable(initializer);
+    public ArrayInitializerExpr getInitializer() {
+        return initializer;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -175,7 +176,7 @@ public final class ArrayCreationExpr extends Expression {
     public Type createdType() {
         Type result = elementType;
         for (int i = 0; i < levels.size(); i++) {
-            result = new ArrayType(result, ArrayType.Origin.TYPE, new NodeList<>());
+            result = new ArrayType(result, ArrayType.Origin.TYPE, new NodeList<AnnotationExpr>());
         }
         return result;
     }
@@ -275,7 +276,7 @@ public final class ArrayCreationExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ArrayCreationExpr> toArrayCreationExpr() {
-        return Optional.of(this);
+    public ArrayCreationExpr toArrayCreationExpr() {
+        return this;
     }
 }

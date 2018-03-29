@@ -26,12 +26,14 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.MarkerAnnotationExprMetaModel;
+import com.github.javaparser.utils.Utils;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import static com.github.javaparser.JavaParser.parseName;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * An annotation that uses only the annotation type name.
@@ -122,7 +124,18 @@ public final class MarkerAnnotationExpr extends AnnotationExpr {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<MarkerAnnotationExpr> toMarkerAnnotationExpr() {
-        return Optional.of(this);
+    public MarkerAnnotationExpr toMarkerAnnotationExpr() {
+        return this;
     }
+    
+    //for NodeWithName
+    @SuppressWarnings("unchecked")
+    public  AnnotationExpr setName(String name){
+    	Utils.assertNonEmpty(name);
+        return setName(parseName(name));
+    	}
+
+    public  String getNameAsString(){
+    	return getName().asString();
+    	}
 }

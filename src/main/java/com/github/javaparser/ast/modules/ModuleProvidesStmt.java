@@ -16,9 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
 
 public final class ModuleProvidesStmt extends ModuleStmt implements NodeWithType<ModuleProvidesStmt, Type> {
 
@@ -27,7 +30,7 @@ public final class ModuleProvidesStmt extends ModuleStmt implements NodeWithType
     private NodeList<Type> withTypes;
 
     public ModuleProvidesStmt() {
-        this(null, new ClassOrInterfaceType(), new NodeList<>());
+        this(null, new ClassOrInterfaceType(), new NodeList<Type>());
     }
 
     @AllFieldsConstructor
@@ -159,7 +162,20 @@ public final class ModuleProvidesStmt extends ModuleStmt implements NodeWithType
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ModuleProvidesStmt> toModuleProvidesStmt() {
-        return Optional.of(this);
+    public ModuleProvidesStmt toModuleProvidesStmt() {
+        return this;
+    }
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+    public ModuleProvidesStmt setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public ModuleProvidesStmt setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
     }
 }

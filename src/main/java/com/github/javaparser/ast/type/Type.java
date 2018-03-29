@@ -31,14 +31,15 @@ import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.TypeMetaModel;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.SymbolResolver;
 import com.github.javaparser.resolution.types.ResolvedType;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+
 import static com.github.javaparser.utils.CodeGenerationUtils.f;
-import java.util.Optional;
+
 
 /**
  * Base class for types.
@@ -54,7 +55,7 @@ public abstract class Type extends Node implements Resolvable<Object> {
      * This is a support constructor for them.
      */
     protected Type(TokenRange range) {
-        this(range, new NodeList<>());
+        this(range, new NodeList<AnnotationExpr>());
     }
 
     @AllFieldsConstructor
@@ -301,52 +302,52 @@ public abstract class Type extends Node implements Resolvable<Object> {
     public abstract ResolvedType resolve();
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ArrayType> toArrayType() {
-        return Optional.empty();
+    public ArrayType toArrayType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ClassOrInterfaceType> toClassOrInterfaceType() {
-        return Optional.empty();
+    public ClassOrInterfaceType toClassOrInterfaceType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<IntersectionType> toIntersectionType() {
-        return Optional.empty();
+    public IntersectionType toIntersectionType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<PrimitiveType> toPrimitiveType() {
-        return Optional.empty();
+    public PrimitiveType toPrimitiveType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ReferenceType> toReferenceType() {
-        return Optional.empty();
+    public ReferenceType toReferenceType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<TypeParameter> toTypeParameter() {
-        return Optional.empty();
+    public TypeParameter toTypeParameter() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnionType> toUnionType() {
-        return Optional.empty();
+    public UnionType toUnionType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnknownType> toUnknownType() {
-        return Optional.empty();
+    public UnknownType toUnknownType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<VoidType> toVoidType() {
-        return Optional.empty();
+    public VoidType toVoidType() {
+        return null;
     }
 
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<WildcardType> toWildcardType() {
-        return Optional.empty();
+    public WildcardType toWildcardType() {
+        return null;
     }
 }

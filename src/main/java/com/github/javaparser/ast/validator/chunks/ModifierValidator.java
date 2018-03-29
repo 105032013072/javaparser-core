@@ -90,7 +90,10 @@ public class ModifierValidator extends VisitorValidator {
     @Override
     public void visit(ConstructorDeclaration n, ProblemReporter reporter) {
         validateModifiers(n, reporter, PUBLIC, PROTECTED, PRIVATE);
-        n.getParameters().forEach(p -> validateModifiers(p, reporter, FINAL));
+        //n.getParameters().forEach(p -> validateModifiers(p, reporter, FINAL));
+        for (Parameter p : n.getParameters()) {
+        	validateModifiers(p, reporter, FINAL);
+		}
         super.visit(n, reporter);
     }
 
@@ -113,9 +116,9 @@ public class ModifierValidator extends VisitorValidator {
                 reporter.report(n, builder.toString());
             }
         }
-        if (n.getOptionalParentNode().isPresent()) {
-            if (n.getOptionalParentNode().get() instanceof ClassOrInterfaceDeclaration) {
-                if (((ClassOrInterfaceDeclaration) n.getOptionalParentNode().get()).isInterface()) {
+        if (n.getOptionalParentNode()!=null) {
+            if (n.getOptionalParentNode() instanceof ClassOrInterfaceDeclaration) {
+                if (((ClassOrInterfaceDeclaration) n.getOptionalParentNode()).isInterface()) {
                     if (hasDefaultAndStaticInterfaceMethods) {
                         if (hasPrivateInterfaceMethods) {
                             validateModifiers(n, reporter, interfaceWithStaticAndDefaultAndPrivate);
@@ -130,16 +133,22 @@ public class ModifierValidator extends VisitorValidator {
                 }
             }
         }
-        n.getParameters().forEach(p -> validateModifiers(p, reporter, FINAL));
+       // n.getParameters().forEach(p -> validateModifiers(p, reporter, FINAL));
+        for (Parameter p : n.getParameters()) {
+        	validateModifiers(p, reporter, FINAL);
+		}
         super.visit(n, reporter);
     }
 
     @Override
     public void visit(LambdaExpr n, ProblemReporter reporter) {
-        n.getParameters().forEach(p -> {
-            // Final is not allowed on inferred parameters, but those get caught by the parser.
+        /*n.getParameters().forEach(p -> {
+    
             validateModifiers(p, reporter, FINAL);
-        });
+       });*/
+    	for (Parameter p : n.getParameters()) {
+    		 validateModifiers(p, reporter, FINAL);
+		}
         super.visit(n, reporter);
     }
 

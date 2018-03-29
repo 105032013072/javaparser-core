@@ -1,5 +1,6 @@
 package com.github.javaparser.ast.stmt;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.visitor.GenericVisitor;
@@ -10,8 +11,7 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.UnparsableStmtMetaModel;
 import static com.github.javaparser.ast.Node.Parsedness.*;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A statement that had parse errors.
@@ -97,7 +97,7 @@ public final class UnparsableStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnparsableStmt> toUnparsableStmt() {
-        return Optional.of(this);
+    public UnparsableStmt toUnparsableStmt() {
+        return this;
     }
 }

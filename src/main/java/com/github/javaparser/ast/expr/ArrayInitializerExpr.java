@@ -33,9 +33,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ArrayInitializerExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * The initialization of an array. In the following sample, the outer { } is an ArrayInitializerExpr.
@@ -50,7 +51,7 @@ public final class ArrayInitializerExpr extends Expression {
     private NodeList<Expression> values;
 
     public ArrayInitializerExpr() {
-        this(null, new NodeList<>());
+        this(null, new NodeList<Expression>());
     }
 
     @AllFieldsConstructor
@@ -158,7 +159,7 @@ public final class ArrayInitializerExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ArrayInitializerExpr> toArrayInitializerExpr() {
-        return Optional.of(this);
+    public ArrayInitializerExpr toArrayInitializerExpr() {
+        return this;
     }
 }

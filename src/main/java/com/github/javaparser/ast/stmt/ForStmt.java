@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.stmt;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
@@ -35,8 +36,7 @@ import com.github.javaparser.metamodel.ForStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.OptionalProperty;
 import javax.annotation.Generated;
-import java.util.Optional;
-import java.util.function.Consumer;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 
 /**
@@ -78,7 +78,7 @@ public final class ForStmt extends Statement implements NodeWithBody<ForStmt> {
     private Statement body;
 
     public ForStmt() {
-        this(null, new NodeList<>(), new BooleanLiteralExpr(), new NodeList<>(), new ReturnStmt());
+        this(null, new NodeList<Expression>(), new BooleanLiteralExpr(), new NodeList<Expression>(), new ReturnStmt());
     }
 
     @AllFieldsConstructor
@@ -117,8 +117,8 @@ public final class ForStmt extends Statement implements NodeWithBody<ForStmt> {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getCompare() {
-        return Optional.ofNullable(compare);
+    public Expression getCompare() {
+        return compare;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -284,7 +284,14 @@ public final class ForStmt extends Statement implements NodeWithBody<ForStmt> {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ForStmt> toForStmt() {
-        return Optional.of(this);
+    public ForStmt toForStmt() {
+        return this;
+    }
+    
+    //for NodeWithBody
+    public BlockStmt createBlockStatementAsBody() {
+        BlockStmt b = new BlockStmt();
+        setBody(b);
+        return b;
     }
 }

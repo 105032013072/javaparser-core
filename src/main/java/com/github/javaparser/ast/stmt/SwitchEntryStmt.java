@@ -23,13 +23,14 @@ package com.github.javaparser.ast.stmt;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithStatements;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.*;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
@@ -37,8 +38,10 @@ import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.metamodel.SwitchEntryStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+
 
 /**
  * One case in a switch statement.
@@ -68,7 +71,7 @@ public final class SwitchEntryStmt extends Statement implements NodeWithStatemen
     private NodeList<Statement> statements;
 
     public SwitchEntryStmt() {
-        this(null, null, new NodeList<>());
+        this(null, null, new NodeList<Statement>());
     }
 
     @AllFieldsConstructor
@@ -218,7 +221,83 @@ public final class SwitchEntryStmt extends Statement implements NodeWithStatemen
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SwitchEntryStmt> toSwitchEntryStmt() {
-        return Optional.of(this);
+    public SwitchEntryStmt toSwitchEntryStmt() {
+        return this;
+    }
+    
+    //for NodeWithStatements
+    public Statement getStatement(int i) {
+        return getStatements().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public SwitchEntryStmt setStatement(int i, Statement statement) {
+        getStatements().set(i, statement);
+        return (SwitchEntryStmt) this;
+    }
+
+   
+
+    @SuppressWarnings("unchecked")
+    public SwitchEntryStmt addStatement(Statement statement) {
+        getStatements().add(statement);
+        return (SwitchEntryStmt) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public SwitchEntryStmt addStatement(int index, final Statement statement) {
+        getStatements().add(index, statement);
+        return (SwitchEntryStmt) this;
+    }
+
+    public SwitchEntryStmt addStatement(Expression expr) {
+        return addStatement(new ExpressionStmt(expr));
+    }
+
+    /**
+     * It will use {@link JavaParser#parseStatement(String)} inside, so it should end with a semi column
+     */
+    public SwitchEntryStmt addStatement(String statement) {
+        return addStatement(parseStatement(statement));
+    }
+
+    public SwitchEntryStmt addStatement(int index, final Expression expr) {
+        Statement stmt = new ExpressionStmt(expr);
+        return addStatement(index, stmt);
+    }
+
+    public <A extends Statement> A addAndGetStatement(A statement) {
+        getStatements().add(statement);
+        return statement;
+    }
+
+    public Statement addAndGetStatement(int index, final Statement statement) {
+        getStatements().add(index, statement);
+        return statement;
+    }
+
+    public ExpressionStmt addAndGetStatement(Expression expr) {
+        ExpressionStmt statement = new ExpressionStmt(expr);
+        return addAndGetStatement(statement);
+    }
+
+    public ExpressionStmt addAndGetStatement(String statement) {
+        return addAndGetStatement(new NameExpr(statement));
+    }
+
+    public boolean isEmpty() {
+        return getStatements().isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public SwitchEntryStmt copyStatements(NodeList<Statement> nodeList) {
+        for (Statement n : nodeList) {
+            addStatement(n.clone());
+        }
+        return (SwitchEntryStmt) this;
+    }
+
+    public SwitchEntryStmt copyStatements(NodeWithStatements<?> other) {
+        return copyStatements(other.getStatements());
     }
 }

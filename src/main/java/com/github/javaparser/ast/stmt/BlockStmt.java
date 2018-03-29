@@ -22,6 +22,8 @@ package com.github.javaparser.ast.stmt;
 
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithStatements;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
@@ -34,9 +36,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.BlockStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.*;
 
 /**
  * Statements in between { and }.
@@ -48,7 +51,7 @@ public final class BlockStmt extends Statement implements NodeWithStatements<Blo
     private NodeList<Statement> statements;
 
     public BlockStmt() {
-        this(null, new NodeList<>());
+        this(null, new NodeList<Statement>());
     }
 
     @AllFieldsConstructor
@@ -156,7 +159,83 @@ public final class BlockStmt extends Statement implements NodeWithStatements<Blo
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<BlockStmt> toBlockStmt() {
-        return Optional.of(this);
+    public BlockStmt toBlockStmt() {
+        return this;
+    }
+    
+    //for NodeWithStatements
+    public Statement getStatement(int i) {
+        return getStatements().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public BlockStmt setStatement(int i, Statement statement) {
+        getStatements().set(i, statement);
+        return (BlockStmt) this;
+    }
+
+   
+
+    @SuppressWarnings("unchecked")
+    public BlockStmt addStatement(Statement statement) {
+        getStatements().add(statement);
+        return (BlockStmt) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public BlockStmt addStatement(int index, final Statement statement) {
+        getStatements().add(index, statement);
+        return (BlockStmt) this;
+    }
+
+    public BlockStmt addStatement(Expression expr) {
+        return addStatement(new ExpressionStmt(expr));
+    }
+
+    /**
+     * It will use {@link JavaParser#parseStatement(String)} inside, so it should end with a semi column
+     */
+    public BlockStmt addStatement(String statement) {
+        return addStatement(parseStatement(statement));
+    }
+
+    public BlockStmt addStatement(int index, final Expression expr) {
+        Statement stmt = new ExpressionStmt(expr);
+        return addStatement(index, stmt);
+    }
+
+    public <A extends Statement> A addAndGetStatement(A statement) {
+        getStatements().add(statement);
+        return statement;
+    }
+
+    public Statement addAndGetStatement(int index, final Statement statement) {
+        getStatements().add(index, statement);
+        return statement;
+    }
+
+    public ExpressionStmt addAndGetStatement(Expression expr) {
+        ExpressionStmt statement = new ExpressionStmt(expr);
+        return addAndGetStatement(statement);
+    }
+
+    public ExpressionStmt addAndGetStatement(String statement) {
+        return addAndGetStatement(new NameExpr(statement));
+    }
+
+    public boolean isEmpty() {
+        return getStatements().isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    public BlockStmt copyStatements(NodeList<Statement> nodeList) {
+        for (Statement n : nodeList) {
+            addStatement(n.clone());
+        }
+        return (BlockStmt) this;
+    }
+
+    public BlockStmt copyStatements(NodeWithStatements<?> other) {
+        return copyStatements(other.getStatements());
     }
 }

@@ -31,9 +31,10 @@ import com.github.javaparser.metamodel.AssignExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.printer.Printable;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * An assignment expression. It supports the operators that are found the the AssignExpr.Operator enum.
@@ -75,8 +76,8 @@ public final class AssignExpr extends Expression {
             return codeRepresentation;
         }
 
-        public Optional<BinaryExpr.Operator> toBinaryOperator() {
-            return Optional.ofNullable(binaryOperatorEquivalent);
+        public BinaryExpr.Operator toBinaryOperator() {
+            return binaryOperatorEquivalent;
         }
     }
 
@@ -228,7 +229,7 @@ public final class AssignExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<AssignExpr> toAssignExpr() {
-        return Optional.of(this);
+    public AssignExpr toAssignExpr() {
+        return this;
     }
 }

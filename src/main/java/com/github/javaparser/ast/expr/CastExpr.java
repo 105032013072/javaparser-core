@@ -34,9 +34,13 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.CastExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+import static com.github.javaparser.JavaParser.parseExpression;
+
 
 /**
  * A typecast. The (long) in <code>(long)15</code>
@@ -174,7 +178,27 @@ public final class CastExpr extends Expression implements NodeWithType<CastExpr,
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<CastExpr> toCastExpr() {
-        return Optional.of(this);
+    public CastExpr toCastExpr() {
+        return this;
     }
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public CastExpr setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public CastExpr setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
+    }
+    
+    //for NodeWithExpression
+    public CastExpr setExpression(String expression) {
+        return setExpression(parseExpression(expression));
+    }
+    
+
 }

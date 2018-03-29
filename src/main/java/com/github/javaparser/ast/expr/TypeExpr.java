@@ -33,9 +33,12 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.TypeExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+
 
 /**
  * This class is just instantiated as scopes for MethodReferenceExpr nodes to encapsulate Types.
@@ -149,7 +152,19 @@ public final class TypeExpr extends Expression implements NodeWithType<TypeExpr,
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<TypeExpr> toTypeExpr() {
-        return Optional.of(this);
+    public TypeExpr toTypeExpr() {
+        return this;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public TypeExpr setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public TypeExpr setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
     }
 }

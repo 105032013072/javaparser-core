@@ -34,9 +34,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.WhileStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A while statement.
@@ -175,7 +176,17 @@ public final class WhileStmt extends Statement implements NodeWithBody<WhileStmt
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<WhileStmt> toWhileStmt() {
-        return Optional.of(this);
+    public WhileStmt toWhileStmt() {
+        return this;
+    }
+    
+    //for NodeWithBody
+    public BlockStmt createBlockStatementAsBody() {
+        BlockStmt b = new BlockStmt();
+        setBody(b);
+        return b;
+        
     }
 }
+    
+    

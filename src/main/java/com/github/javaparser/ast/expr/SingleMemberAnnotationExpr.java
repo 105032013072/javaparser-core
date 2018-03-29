@@ -28,11 +28,13 @@ import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.SingleMemberAnnotationExprMetaModel;
+import com.github.javaparser.utils.Utils;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseName;
 
 /**
  * An annotation that has a single value. <br/><code>@Count(15)</code>
@@ -144,7 +146,17 @@ public final class SingleMemberAnnotationExpr extends AnnotationExpr {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SingleMemberAnnotationExpr> toSingleMemberAnnotationExpr() {
-        return Optional.of(this);
+    public SingleMemberAnnotationExpr toSingleMemberAnnotationExpr() {
+        return this;
     }
+    //for NodeWithName
+    @SuppressWarnings("unchecked")
+    public  AnnotationExpr setName(String name){
+    	Utils.assertNonEmpty(name);
+        return setName(parseName(name));
+    	}
+
+    public  String getNameAsString(){
+    	return getName().asString();
+    	}
 }

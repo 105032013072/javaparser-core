@@ -31,9 +31,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.LocalClassDeclarationStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * <h1>A class declaration inside a method.</h1>
@@ -151,7 +152,7 @@ public final class LocalClassDeclarationStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LocalClassDeclarationStmt> toLocalClassDeclarationStmt() {
-        return Optional.of(this);
+    public LocalClassDeclarationStmt toLocalClassDeclarationStmt() {
+        return this;
     }
 }

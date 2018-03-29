@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.comments;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.visitor.GenericVisitor;
@@ -31,8 +32,7 @@ import com.github.javaparser.metamodel.JavadocCommentMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A Javadoc comment. <code>/&#42;&#42; a comment &#42;/</code>
@@ -122,7 +122,7 @@ public final class JavadocComment extends Comment {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<JavadocComment> toJavadocComment() {
-        return Optional.of(this);
+    public JavadocComment toJavadocComment() {
+        return this;
     }
 }

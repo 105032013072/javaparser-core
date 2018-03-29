@@ -28,9 +28,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.LineCommentMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * <p>
@@ -119,7 +120,7 @@ public final class LineComment extends Comment {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LineComment> toLineComment() {
-        return Optional.of(this);
+    public LineComment toLineComment() {
+        return this;
     }
 }

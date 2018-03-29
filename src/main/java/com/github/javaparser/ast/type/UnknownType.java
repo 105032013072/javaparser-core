@@ -32,12 +32,12 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.UnknownTypeMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.resolution.types.ResolvedUnionType;
-import java.util.function.Consumer;
-import java.util.Optional;
 
 /**
  * An unknown parameter type object. It plays the role of a null object for
@@ -141,7 +141,7 @@ public final class UnknownType extends Type {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<UnknownType> toUnknownType() {
-        return Optional.of(this);
+    public UnknownType toUnknownType() {
+        return this;
     }
 }

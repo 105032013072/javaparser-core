@@ -15,9 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
+import static com.github.javaparser.JavaParser.parseName;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+
 
 public final class ModuleExportsStmt extends ModuleStmt implements NodeWithName<ModuleExportsStmt> {
 
@@ -26,7 +30,7 @@ public final class ModuleExportsStmt extends ModuleStmt implements NodeWithName<
     private NodeList<Name> moduleNames;
 
     public ModuleExportsStmt() {
-        this(null, new Name(), new NodeList<>());
+        this(null, new Name(), new NodeList<Name>());
     }
 
     @AllFieldsConstructor
@@ -158,7 +162,18 @@ public final class ModuleExportsStmt extends ModuleStmt implements NodeWithName<
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ModuleExportsStmt> toModuleExportsStmt() {
-        return Optional.of(this);
+    public ModuleExportsStmt toModuleExportsStmt() {
+        return this;
     }
+    
+    // for NodeWithName
+    @SuppressWarnings("unchecked")
+    public  ModuleExportsStmt setName(String name){
+    	assertNonEmpty(name);
+        return setName(parseName(name));
+    	}
+
+    public  String getNameAsString(){
+    	return getName().asString();
+    	}
 }

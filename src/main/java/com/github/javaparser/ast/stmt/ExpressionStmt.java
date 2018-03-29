@@ -33,9 +33,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ExpressionStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseExpression;
 
 /**
  * Used to wrap an expression so that it can take the place of a statement.
@@ -147,7 +148,12 @@ public final class ExpressionStmt extends Statement implements NodeWithExpressio
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ExpressionStmt> toExpressionStmt() {
-        return Optional.of(this);
+    public ExpressionStmt toExpressionStmt() {
+        return this;
+    }
+    
+    //for NodeWithExpression
+    public ExpressionStmt setExpression(String expression) {
+        return setExpression(parseExpression(expression));
     }
 }

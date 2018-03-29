@@ -37,7 +37,7 @@ import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.EnumSet;
-import java.util.Optional;
+
 import static com.github.javaparser.ast.Modifier.*;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
@@ -45,11 +45,14 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.MethodDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import java.util.function.Consumer;
+import com.github.javaparser.utils.Utils;
+import static com.github.javaparser.JavaParser.parseType;
 
 /**
  * A method declaration. "public int abc() {return 1;}" in this example: <code>class X { public int abc() {return 1;}
@@ -68,15 +71,15 @@ public final class MethodDeclaration extends CallableDeclaration<MethodDeclarati
     private BlockStmt body;
 
     public MethodDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new NodeList<>(), new ClassOrInterfaceType(), new SimpleName(), new NodeList<>(), new NodeList<>(), new BlockStmt(), null);
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), new ClassOrInterfaceType(), new SimpleName(), new NodeList<Parameter>(), new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public MethodDeclaration(final EnumSet<Modifier> modifiers, final Type type, final String name) {
-        this(null, modifiers, new NodeList<>(), new NodeList<>(), type, new SimpleName(name), new NodeList<>(), new NodeList<>(), new BlockStmt(), null);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), type, new SimpleName(name), new NodeList<Parameter>(), new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public MethodDeclaration(final EnumSet<Modifier> modifiers, final String name, final Type type, final NodeList<Parameter> parameters) {
-        this(null, modifiers, new NodeList<>(), new NodeList<>(), type, new SimpleName(name), parameters, new NodeList<>(), new BlockStmt(), null);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), new NodeList<TypeParameter>(), type, new SimpleName(name), parameters, new NodeList<ReferenceType>(), new BlockStmt(), null);
     }
 
     public MethodDeclaration(final EnumSet<Modifier> modifiers, final NodeList<AnnotationExpr> annotations, final NodeList<TypeParameter> typeParameters, final Type type, final SimpleName name, final NodeList<Parameter> parameters, final NodeList<ReferenceType> thrownExceptions, final BlockStmt body) {
@@ -347,7 +350,28 @@ public final class MethodDeclaration extends CallableDeclaration<MethodDeclarati
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<MethodDeclaration> toMethodDeclaration() {
-        return Optional.of(this);
+    public MethodDeclaration toMethodDeclaration() {
+        return this;
+    }
+    
+    
+    //for NodeWithOptionalBlockStmt
+    public  BlockStmt createBody() {
+        BlockStmt block = new BlockStmt();
+        setBody(block);
+        return block;
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+	public MethodDeclaration setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public MethodDeclaration setType(final String typeString) {
+        Utils.assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
     }
 }

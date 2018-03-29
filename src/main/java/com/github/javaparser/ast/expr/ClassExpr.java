@@ -33,9 +33,12 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ClassExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+
 
 /**
  * Defines an expression that accesses the class of a type.
@@ -148,7 +151,21 @@ public final class ClassExpr extends Expression implements NodeWithType<ClassExp
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ClassExpr> toClassExpr() {
-        return Optional.of(this);
+    public ClassExpr toClassExpr() {
+        return this;
     }
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public ClassExpr setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public ClassExpr setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
+    }
+    
 }

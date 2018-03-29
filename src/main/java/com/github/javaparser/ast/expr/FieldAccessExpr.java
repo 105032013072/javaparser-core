@@ -29,16 +29,20 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.FieldAccessExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-import java.util.function.Consumer;
+import static com.github.javaparser.ast.NodeList.nodeList;
+
 
 /**
  * Access of a field of an object.
@@ -56,11 +60,11 @@ public final class FieldAccessExpr extends Expression implements NodeWithSimpleN
     private SimpleName name;
 
     public FieldAccessExpr() {
-        this(null, new ThisExpr(), new NodeList<>(), new SimpleName());
+        this(null, new ThisExpr(), new NodeList<Type>(), new SimpleName());
     }
 
     public FieldAccessExpr(final Expression scope, final String name) {
-        this(null, scope, new NodeList<>(), new SimpleName(name));
+        this(null, scope, new NodeList<Type>(), new SimpleName(name));
     }
 
     @AllFieldsConstructor
@@ -162,8 +166,8 @@ public final class FieldAccessExpr extends Expression implements NodeWithSimpleN
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -256,7 +260,50 @@ public final class FieldAccessExpr extends Expression implements NodeWithSimpleN
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<FieldAccessExpr> toFieldAccessExpr() {
-        return Optional.of(this);
+    public FieldAccessExpr toFieldAccessExpr() {
+        return this;
     }
+    
+   // for NodeWithSimpleName
+    public  FieldAccessExpr setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+   
+   //for NodeWithTypeArguments
+   @DerivedProperty
+public boolean isUsingDiamondOperator() {
+       return getTypeArguments()!=null && getTypeArguments().isEmpty();
+   }
+
+   /**
+    * Sets the type arguments to &lt>.
+    */
+   @SuppressWarnings("unchecked")
+public FieldAccessExpr setDiamondOperator() {
+       return setTypeArguments(new NodeList<Type>());
+   }
+
+   /**
+    * Removes all type arguments, including the surrounding &lt;>.
+    */
+   @SuppressWarnings("unchecked")
+public FieldAccessExpr removeTypeArguments() {
+       return setTypeArguments((NodeList<Type>) null);
+   }
+
+   @SuppressWarnings("unchecked")
+public FieldAccessExpr setTypeArguments(Type... typeArguments) {
+       return setTypeArguments(nodeList(typeArguments));
+   }
+   
+   //for NodeWithScope
+   public Expression traverseScope() {
+       return getScope();
+   }
 }

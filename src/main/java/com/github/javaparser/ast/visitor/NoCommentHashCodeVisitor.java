@@ -46,7 +46,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final AnnotationMemberDeclaration n, final Void arg) {
-        return (n.getDefaultValue().isPresent() ? n.getDefaultValue().get().accept(this, arg) : 0) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
+        return (n.getDefaultValue()!=null ? n.getDefaultValue().accept(this, arg) : 0) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -56,12 +56,12 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ArrayCreationExpr n, final Void arg) {
-        return (n.getElementType().accept(this, arg)) * 31 + (n.getInitializer().isPresent() ? n.getInitializer().get().accept(this, arg) : 0) * 31 + (n.getLevels().accept(this, arg));
+        return (n.getElementType().accept(this, arg)) * 31 + (n.getInitializer()!=null ? n.getInitializer().accept(this, arg) : 0) * 31 + (n.getLevels().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ArrayCreationLevel n, final Void arg) {
-        return (n.getAnnotations().accept(this, arg)) * 31 + (n.getDimension().isPresent() ? n.getDimension().get().accept(this, arg) : 0);
+        return (n.getAnnotations().accept(this, arg)) * 31 + (n.getDimension()!=null ? n.getDimension().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -76,7 +76,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final AssertStmt n, final Void arg) {
-        return (n.getCheck().accept(this, arg)) * 31 + (n.getMessage().isPresent() ? n.getMessage().get().accept(this, arg) : 0);
+        return (n.getCheck().accept(this, arg)) * 31 + (n.getMessage()!=null ? n.getMessage().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -106,7 +106,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final BreakStmt n, final Void arg) {
-        return (n.getLabel().isPresent() ? n.getLabel().get().accept(this, arg) : 0);
+        return (n.getLabel()!=null ? n.getLabel().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -136,12 +136,12 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ClassOrInterfaceType n, final Void arg) {
-        return (n.getName().accept(this, arg)) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0) * 31 + (n.getAnnotations().accept(this, arg));
+        return (n.getName().accept(this, arg)) * 31 + (n.getScope()!=null ? n.getScope().accept(this, arg) : 0) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0) * 31 + (n.getAnnotations().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final CompilationUnit n, final Void arg) {
-        return (n.getImports().accept(this, arg)) * 31 + (n.getModule().isPresent() ? n.getModule().get().accept(this, arg) : 0) * 31 + (n.getPackageDeclarationOptional().isPresent() ? n.getPackageDeclarationOptional().get().accept(this, arg) : 0) * 31 + (n.getTypes().accept(this, arg));
+        return (n.getImports().accept(this, arg)) * 31 + (n.getModule()!=null ? n.getModule().accept(this, arg) : 0) * 31 + (n.getPackageDeclarationOptional()!=null ? n.getPackageDeclarationOptional().accept(this, arg) : 0) * 31 + (n.getTypes().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -151,12 +151,12 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ConstructorDeclaration n, final Void arg) {
-        return (n.getBody().accept(this, arg)) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getParameters().accept(this, arg)) * 31 + (n.getReceiverParameter().isPresent() ? n.getReceiverParameter().get().accept(this, arg) : 0) * 31 + (n.getThrownExceptions().accept(this, arg)) * 31 + (n.getTypeParameters().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
+        return (n.getBody().accept(this, arg)) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getParameters().accept(this, arg)) * 31 + (n.getReceiverParameter()!=null ? n.getReceiverParameter().accept(this, arg) : 0) * 31 + (n.getThrownExceptions().accept(this, arg)) * 31 + (n.getTypeParameters().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ContinueStmt n, final Void arg) {
-        return (n.getLabel().isPresent() ? n.getLabel().get().accept(this, arg) : 0);
+        return (n.getLabel()!=null ? n.getLabel().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -191,7 +191,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ExplicitConstructorInvocationStmt n, final Void arg) {
-        return (n.getArguments().accept(this, arg)) * 31 + (n.getExpression().isPresent() ? n.getExpression().get().accept(this, arg) : 0) * 31 + (n.isThis() ? 1 : 0) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0);
+        return (n.getArguments().accept(this, arg)) * 31 + (n.getExpression()!=null ? n.getExpression().accept(this, arg) : 0) * 31 + (n.isThis() ? 1 : 0) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -201,7 +201,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final FieldAccessExpr n, final Void arg) {
-        return (n.getName().accept(this, arg)) * 31 + (n.getScope().accept(this, arg)) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0);
+        return (n.getName().accept(this, arg)) * 31 + (n.getScope().accept(this, arg)) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -211,7 +211,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ForStmt n, final Void arg) {
-        return (n.getBody().accept(this, arg)) * 31 + (n.getCompare().isPresent() ? n.getCompare().get().accept(this, arg) : 0) * 31 + (n.getInitialization().accept(this, arg)) * 31 + (n.getUpdate().accept(this, arg));
+        return (n.getBody().accept(this, arg)) * 31 + (n.getCompare()!=null ? n.getCompare().accept(this, arg) : 0) * 31 + (n.getInitialization().accept(this, arg)) * 31 + (n.getUpdate().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -221,7 +221,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final IfStmt n, final Void arg) {
-        return (n.getCondition().accept(this, arg)) * 31 + (n.getElseStmt().isPresent() ? n.getElseStmt().get().accept(this, arg) : 0) * 31 + (n.getThenStmt().accept(this, arg));
+        return (n.getCondition().accept(this, arg)) * 31 + (n.getElseStmt()!=null ? n.getElseStmt().accept(this, arg) : 0) * 31 + (n.getThenStmt().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -291,17 +291,17 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final MethodCallExpr n, final Void arg) {
-        return (n.getArguments().accept(this, arg)) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0);
+        return (n.getArguments().accept(this, arg)) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getScope()!=null ? n.getScope().accept(this, arg) : 0) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final MethodDeclaration n, final Void arg) {
-        return (n.getOptionalBody().isPresent() ? n.getOptionalBody().get().accept(this, arg) : 0) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getParameters().accept(this, arg)) * 31 + (n.getReceiverParameter().isPresent() ? n.getReceiverParameter().get().accept(this, arg) : 0) * 31 + (n.getThrownExceptions().accept(this, arg)) * 31 + (n.getTypeParameters().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
+        return (n.getOptionalBody()!=null ? n.getOptionalBody().accept(this, arg) : 0) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getModifiers().hashCode()) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getParameters().accept(this, arg)) * 31 + (n.getReceiverParameter()!=null ? n.getReceiverParameter().accept(this, arg) : 0) * 31 + (n.getThrownExceptions().accept(this, arg)) * 31 + (n.getTypeParameters().accept(this, arg)) * 31 + (n.getAnnotations().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final MethodReferenceExpr n, final Void arg) {
-        return (n.getIdentifier().hashCode()) * 31 + (n.getScope().accept(this, arg)) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0);
+        return (n.getIdentifier().hashCode()) * 31 + (n.getScope().accept(this, arg)) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -311,7 +311,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final Name n, final Void arg) {
-        return (n.getAnnotations().accept(this, arg)) * 31 + (n.getIdentifier().hashCode()) * 31 + (n.getQualifier().isPresent() ? n.getQualifier().get().accept(this, arg) : 0);
+        return (n.getAnnotations().accept(this, arg)) * 31 + (n.getIdentifier().hashCode()) * 31 + (n.getQualifier()!=null ? n.getQualifier().accept(this, arg) : 0);
     }
 
     public Integer visit(NodeList n, Void arg) {
@@ -334,7 +334,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ObjectCreationExpr n, final Void arg) {
-        return (n.getAnonymousClassBody().isPresent() ? n.getAnonymousClassBody().get().accept(this, arg) : 0) * 31 + (n.getArguments().accept(this, arg)) * 31 + (n.getScope().isPresent() ? n.getScope().get().accept(this, arg) : 0) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getTypeArguments().isPresent() ? n.getTypeArguments().get().accept(this, arg) : 0);
+        return (n.getAnonymousClassBody()!=null ? n.getAnonymousClassBody().accept(this, arg) : 0) * 31 + (n.getArguments().accept(this, arg)) * 31 + (n.getScope()!=null ? n.getScope().accept(this, arg) : 0) * 31 + (n.getType().accept(this, arg)) * 31 + (n.getTypeArguments()!=null ? n.getTypeArguments().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -354,7 +354,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ReturnStmt n, final Void arg) {
-        return (n.getExpression().isPresent() ? n.getExpression().get().accept(this, arg) : 0);
+        return (n.getExpression()!=null ? n.getExpression().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -374,12 +374,12 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final SuperExpr n, final Void arg) {
-        return (n.getClassExpr().isPresent() ? n.getClassExpr().get().accept(this, arg) : 0);
+        return (n.getClassExpr()!=null ? n.getClassExpr().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final SwitchEntryStmt n, final Void arg) {
-        return (n.getLabel().isPresent() ? n.getLabel().get().accept(this, arg) : 0) * 31 + (n.getStatements().accept(this, arg));
+        return (n.getLabel()!=null ? n.getLabel().accept(this, arg) : 0) * 31 + (n.getStatements().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -394,7 +394,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final ThisExpr n, final Void arg) {
-        return (n.getClassExpr().isPresent() ? n.getClassExpr().get().accept(this, arg) : 0);
+        return (n.getClassExpr()!=null ? n.getClassExpr().accept(this, arg) : 0);
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -404,7 +404,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final TryStmt n, final Void arg) {
-        return (n.getCatchClauses().accept(this, arg)) * 31 + (n.getFinallyBlock().isPresent() ? n.getFinallyBlock().get().accept(this, arg) : 0) * 31 + (n.getResources().accept(this, arg)) * 31 + (n.getTryBlock().accept(this, arg));
+        return (n.getCatchClauses().accept(this, arg)) * 31 + (n.getFinallyBlock()!=null ? n.getFinallyBlock().accept(this, arg) : 0) * 31 + (n.getResources().accept(this, arg)) * 31 + (n.getTryBlock().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -439,7 +439,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final VariableDeclarator n, final Void arg) {
-        return (n.getInitializer().isPresent() ? n.getInitializer().get().accept(this, arg) : 0) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getType().accept(this, arg));
+        return (n.getInitializer()!=null ? n.getInitializer().accept(this, arg) : 0) * 31 + (n.getName().accept(this, arg)) * 31 + (n.getType().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
@@ -454,7 +454,7 @@ public class NoCommentHashCodeVisitor implements GenericVisitor<Integer, Void> {
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")
     public Integer visit(final WildcardType n, final Void arg) {
-        return (n.getExtendedType().isPresent() ? n.getExtendedType().get().accept(this, arg) : 0) * 31 + (n.getSuperType().isPresent() ? n.getSuperType().get().accept(this, arg) : 0) * 31 + (n.getAnnotations().accept(this, arg));
+        return (n.getExtendedType()!=null ? n.getExtendedType().accept(this, arg) : 0) * 31 + (n.getSuperType()!=null ? n.getSuperType().accept(this, arg) : 0) * 31 + (n.getAnnotations().accept(this, arg));
     }
 
     @Generated("com.github.javaparser.generator.core.visitor.NoCommentHashCodeVisitorGenerator")

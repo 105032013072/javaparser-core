@@ -20,11 +20,17 @@
  */
 package com.github.javaparser.ast.type;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.CloneVisitor;
@@ -35,12 +41,15 @@ import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.utils.Pair;
 import javax.annotation.Generated;
+
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.ast.NodeList.nodeList;
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import java.util.function.Consumer;
+import static com.github.javaparser.JavaParser.parseExpression;
+import static com.github.javaparser.JavaParser.parseName;
 
 /**
  * To indicate that a type is an array, it gets wrapped in an ArrayType for every array level it has.
@@ -61,7 +70,7 @@ public final class ArrayType extends ReferenceType implements NodeWithAnnotation
         /**
          * The [] were found on the name, like "int a[]" or "String abc()[][]"
          */
-        NAME, /**
+        NAME, /** 
          * The [] were found on the type, like "int[] a" or "String[][] abc()"
          */
         TYPE
@@ -135,12 +144,12 @@ public final class ArrayType extends ReferenceType implements NodeWithAnnotation
                 for (int j = arrayBracketPairList.size() - 1; j >= 0; j--) {
                     ArrayBracketPair pair = arrayBracketPairList.get(j);
                     TokenRange tokenRange = null;
-                    if (type.getTokenRange().isPresent() && pair.getTokenRange().isPresent()) {
-                        tokenRange = new TokenRange(type.getTokenRange().get().getBegin(), pair.getTokenRange().get().getEnd());
+                    if (type.getTokenRange()!=null && pair.getTokenRange()!=null) {
+                        tokenRange = new TokenRange(type.getTokenRange().getBegin(), pair.getTokenRange().getEnd());
                     }
                     type = new ArrayType(tokenRange, type, pair.getOrigin(), pair.getAnnotations());
                     if (tokenRange != null) {
-                        type.setRange(tokenRange.toRange().get());
+                        type.setRange(tokenRange.toRange());
                     }
                 }
             }
@@ -157,7 +166,7 @@ public final class ArrayType extends ReferenceType implements NodeWithAnnotation
         final List<ArrayBracketPair> arrayBracketPairs = new ArrayList<>(0);
         while (type instanceof ArrayType) {
             ArrayType arrayType = (ArrayType) type;
-            arrayBracketPairs.add(new ArrayBracketPair(type.getTokenRange().orElse(null), arrayType.getOrigin(), arrayType.getAnnotations()));
+            arrayBracketPairs.add(new ArrayBracketPair(type.getTokenRange()!=null?type.getTokenRange():null, arrayType.getOrigin(), arrayType.getAnnotations()));
             type = arrayType.getComponentType();
         }
         return new Pair<>(type, arrayBracketPairs);
@@ -195,8 +204,8 @@ public final class ArrayType extends ReferenceType implements NodeWithAnnotation
             return this;
         }
 
-        public Optional<TokenRange> getTokenRange() {
-            return Optional.ofNullable(tokenRange);
+        public TokenRange getTokenRange() {
+            return tokenRange;
         }
 
         public Origin getOrigin() {
@@ -286,7 +295,198 @@ public final class ArrayType extends ReferenceType implements NodeWithAnnotation
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ArrayType> toArrayType() {
-        return Optional.of(this);
+    public ArrayType toArrayType() {
+        return this;
+    }
+    
+    // for NodeWithAnnotations
+    public AnnotationExpr getAnnotation(int i) {
+        return getAnnotations().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayType setAnnotation(int i, AnnotationExpr element) {
+        getAnnotations().set(i, element);
+        return (ArrayType) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayType addAnnotation(AnnotationExpr element) {
+        getAnnotations().add(element);
+        return (ArrayType) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public ArrayType addAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return (ArrayType) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    @SuppressWarnings("unchecked")
+    public NormalAnnotationExpr addAndGetAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return annotation;
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public ArrayType addAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    public NormalAnnotationExpr addAndGetAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAndGetAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a marker annotation
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public ArrayType addMarkerAnnotation(String name) {
+        MarkerAnnotationExpr markerAnnotationExpr = new MarkerAnnotationExpr(
+                parseName(name));
+        getAnnotations().add(markerAnnotationExpr);
+        return (ArrayType) this;
+    }
+
+    /**
+     * Annotates this with a marker annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public ArrayType addMarkerAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addMarkerAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param expression the part between ()
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+    public ArrayType addSingleMemberAnnotation(String name, Expression expression) {
+        SingleMemberAnnotationExpr singleMemberAnnotationExpr = new SingleMemberAnnotationExpr(
+                parseName(name), expression);
+        getAnnotations().add(singleMemberAnnotationExpr);
+        return (ArrayType) this;
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public ArrayType addSingleMemberAnnotation(String name, String value) {
+        return addSingleMemberAnnotation(name, parseExpression(value));
+    }
+
+    /**
+     * Annotates this with a single member annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public ArrayType addSingleMemberAnnotation(Class<? extends Annotation> clazz,
+                                        String value) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addSingleMemberAnnotation(clazz.getSimpleName(), value);
+    }
+
+    /**
+     * Check whether an annotation with this name is present on this element
+     *
+     * @param annotationName the name of the annotation
+     * @return true if found, false if not
+     */
+    public boolean isAnnotationPresent(String annotationName) {
+       // return getAnnotations().stream().anyMatch(a -> a.getName().getIdentifier().equals(annotationName));
+    	for (AnnotationExpr a : getAnnotations()) {
+			if(a.getName().getIdentifier().equals(annotationName)) return true;
+		}
+    	return false;
+    }
+
+    /**
+     * Check whether an annotation with this class is present on this element
+     *
+     * @param annotationClass the class of the annotation
+     * @return true if found, false if not
+     */
+    public  boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return isAnnotationPresent(annotationClass.getSimpleName());
+    }
+
+    /**
+     * Try to find an annotation by its name
+     *
+     * @param annotationName the name of the annotation
+     */
+    public AnnotationExpr getOptionalAnnotationByName(String annotationName) {
+       // return getAnnotations().stream().filter(a -> a.getName().getIdentifier().equals(annotationName)).findFirst();
+    	for (AnnotationExpr a : getAnnotations()) {
+		   if(a.getName().getIdentifier().equals(annotationName))	return a;
+		}
+    	return null;
+    }
+    
+    public AnnotationExpr getAnnotationByName(String annotationName){
+    	NodeList<AnnotationExpr> annotationList =getAnnotations();
+    	for (AnnotationExpr annotationExpr : annotationList) {
+			if(annotationExpr.getName().getIdentifier().equals(annotationName)) return annotationExpr;
+		}
+    	return null;
+    }
+
+    /**
+     * Try to find an annotation by its class
+     *
+     * @param annotationClass the class of the annotation
+     */
+    public AnnotationExpr getOptionalAnnotationByClass(Class<? extends Annotation> annotationClass) {
+        return getOptionalAnnotationByName(annotationClass.getSimpleName());
+    }
+    
+    public AnnotationExpr getAnnotationByClass(Class<? extends Annotation> annotationClass) {
+    	AnnotationExpr optional=getOptionalAnnotationByName(annotationClass.getSimpleName());
+    	if(optional!=null) return optional;
+    	else return null;
     }
 }

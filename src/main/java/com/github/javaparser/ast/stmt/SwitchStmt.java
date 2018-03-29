@@ -35,9 +35,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.SwitchStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A switch statement.
@@ -54,7 +55,7 @@ public final class SwitchStmt extends Statement {
     private NodeList<SwitchEntryStmt> entries;
 
     public SwitchStmt() {
-        this(null, new NameExpr(), new NodeList<>());
+        this(null, new NameExpr(), new NodeList<SwitchEntryStmt>());
     }
 
     @AllFieldsConstructor
@@ -208,7 +209,7 @@ public final class SwitchStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<SwitchStmt> toSwitchStmt() {
-        return Optional.of(this);
+    public SwitchStmt toSwitchStmt() {
+        return this;
     }
 }

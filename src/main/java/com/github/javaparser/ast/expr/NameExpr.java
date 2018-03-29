@@ -31,12 +31,13 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.NameExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedUnionType;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * Whenever a SimpleName is used in an expression, it is wrapped in NameExpr.
@@ -58,8 +59,8 @@ public final class NameExpr extends Expression implements NodeWithSimpleName<Nam
 
     @AllFieldsConstructor
     public NameExpr(final SimpleName name) {
-        this(name.getTokenRange().orElse(null), name);
-        setRange(name.getRange().orElse(null));
+        this(name.getTokenRange()!=null?name.getTokenRange():null, name);
+        setRange(name.getRange()!=null?name.getRange():null);
     }
 
     /**
@@ -159,7 +160,19 @@ public final class NameExpr extends Expression implements NodeWithSimpleName<Nam
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<NameExpr> toNameExpr() {
-        return Optional.of(this);
+    public NameExpr toNameExpr() {
+        return this;
     }
+    
+    //for NodeWithSimpleName
+    public  NameExpr setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+	
 }

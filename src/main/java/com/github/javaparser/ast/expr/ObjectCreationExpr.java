@@ -34,18 +34,24 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ObjectCreationExprMetaModel;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import java.util.function.Consumer;
+import static com.github.javaparser.ast.NodeList.nodeList;
+import static com.github.javaparser.JavaParser.parseType;
+import static com.github.javaparser.utils.Utils.assertNonEmpty;
+import static com.github.javaparser.JavaParser.parseExpression;
 
 /**
  * A constructor call.
@@ -73,7 +79,7 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
     private NodeList<BodyDeclaration<?>> anonymousClassBody;
 
     public ObjectCreationExpr() {
-        this(null, null, new ClassOrInterfaceType(), new NodeList<>(), new NodeList<>(), null);
+        this(null, null, new ClassOrInterfaceType(), new NodeList<Type>(), new NodeList<Expression>(), null);
     }
 
     /**
@@ -84,7 +90,7 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
      * @param arguments Any arguments to pass to the constructor
      */
     public ObjectCreationExpr(final Expression scope, final ClassOrInterfaceType type, final NodeList<Expression> arguments) {
-        this(null, scope, type, new NodeList<>(), arguments, null);
+        this(null, scope, type, new NodeList<Type>(), arguments, null);
     }
 
     @AllFieldsConstructor
@@ -119,8 +125,8 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<BodyDeclaration<?>>> getAnonymousClassBody() {
-        return Optional.ofNullable(anonymousClassBody);
+    public NodeList<BodyDeclaration<?>> getAnonymousClassBody() {
+        return anonymousClassBody;
     }
 
     public void addAnonymousClassBody(BodyDeclaration<?> body) {
@@ -135,8 +141,8 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getScope() {
-        return Optional.ofNullable(scope);
+    public Expression getScope() {
+        return scope;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -213,8 +219,8 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -352,7 +358,73 @@ public final class ObjectCreationExpr extends Expression implements NodeWithType
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ObjectCreationExpr> toObjectCreationExpr() {
-        return Optional.of(this);
+    public ObjectCreationExpr toObjectCreationExpr() {
+        return this;
+    }
+    
+    //for NodeWithTypeArguments
+    @DerivedProperty
+    public boolean isUsingDiamondOperator() {
+        return getTypeArguments()!=null && getTypeArguments().isEmpty();
+    }
+
+    /**
+     * Sets the type arguments to &lt>.
+     */
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr setDiamondOperator() {
+        return setTypeArguments(new NodeList<Type>());
+    }
+
+    /**
+     * Removes all type arguments, including the surrounding &lt;>.
+     */
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr removeTypeArguments() {
+        return setTypeArguments((NodeList<Type>) null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr setTypeArguments(Type... typeArguments) {
+        return setTypeArguments(nodeList(typeArguments));
+    }
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public ObjectCreationExpr setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((ClassOrInterfaceType) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((ClassOrInterfaceType) parseType(typeString));
+    }
+
+    //for NodeWithArguments
+    public Expression getArgument(int i) {
+        return getArguments().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr addArgument(String arg) {
+        return addArgument(parseExpression(arg));
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr addArgument(Expression arg) {
+        getArguments().add(arg);
+        return (ObjectCreationExpr) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectCreationExpr setArgument(int i, Expression arg) {
+        getArguments().set(i, arg);
+        return (ObjectCreationExpr) this;
+    }
+    
+    //for NodeWithOptionalScope
+    public Expression traverseScope() {
+        return getScope();
     }
 }

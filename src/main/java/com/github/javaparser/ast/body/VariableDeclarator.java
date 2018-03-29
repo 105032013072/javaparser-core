@@ -41,13 +41,16 @@ import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.metamodel.VariableDeclaratorMetaModel;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNonEmpty;
 import static com.github.javaparser.utils.Utils.assertNotNull;
+import static com.github.javaparser.JavaParser.parseType;
+
 import javax.annotation.Generated;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.utils.Utils;
 
 /**
  * The declaration of a variable.<br/>In <code>int x = 14, y = 3;</code> "x = 14"  and " y = 3"  are
@@ -115,10 +118,10 @@ public final class VariableDeclarator extends Node implements NodeWithType<Varia
             public void propertyChange(Node observedNode, ObservableProperty property, Object oldValue, Object newValue) {
                 if (property == ObservableProperty.TYPE) {
                     VariableDeclarator vd = VariableDeclarator.this;
-                    if (vd.getOptionalParentNode().isPresent() && vd.getOptionalParentNode().get() instanceof NodeWithVariables) {
-                        NodeWithVariables nodeWithVariables = (NodeWithVariables) vd.getOptionalParentNode().get();
+                    if (vd.getOptionalParentNode()!=null && vd.getOptionalParentNode() instanceof NodeWithVariables) {
+                        NodeWithVariables nodeWithVariables = (NodeWithVariables) vd.getOptionalParentNode();
                         // We calculate the value the property will assume after the change will be completed
-                        Optional<Type> currentMaxCommonType = nodeWithVariables.getMaximumCommonType();
+                        Type currentMaxCommonType = nodeWithVariables.getMaximumCommonType();
                         List<Type> types = new LinkedList<>();
                         int index = nodeWithVariables.getVariables().indexOf(vd);
                         for (int i = 0; i < nodeWithVariables.getVariables().size(); i++) {
@@ -128,8 +131,8 @@ public final class VariableDeclarator extends Node implements NodeWithType<Varia
                                 types.add(nodeWithVariables.getVariable(i).getType());
                             }
                         }
-                        Optional<Type> newMaxCommonType = NodeWithVariables.calculateMaximumCommonType(types);
-                        ((Node) nodeWithVariables).notifyPropertyChange(ObservableProperty.MAXIMUM_COMMON_TYPE, currentMaxCommonType.orElse(null), newMaxCommonType.orElse(null));
+                        Type newMaxCommonType = Utils.calculateMaximumCommonType(types);
+                        ((Node) nodeWithVariables).notifyPropertyChange(ObservableProperty.MAXIMUM_COMMON_TYPE, currentMaxCommonType!=null?currentMaxCommonType:null, newMaxCommonType!=null?newMaxCommonType:null);
                     }
                 }
             }
@@ -149,8 +152,8 @@ public final class VariableDeclarator extends Node implements NodeWithType<Varia
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getInitializer() {
-        return Optional.ofNullable(initializer);
+    public Expression getInitializer() {
+        return initializer;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -277,4 +280,31 @@ public final class VariableDeclarator extends Node implements NodeWithType<Varia
     public ResolvedFieldDeclaration resolve() {
         return getSymbolResolver().resolveDeclaration(this, ResolvedFieldDeclaration.class);
     }
+    
+    //for NodeWithType
+    @SuppressWarnings("unchecked")
+	public VariableDeclarator setType(Class<?> typeClass) {
+        tryAddImportToParentCompilationUnit(typeClass);
+        return setType((Type) parseType(typeClass.getSimpleName()));
+    }
+
+    @SuppressWarnings("unchecked")
+	public VariableDeclarator setType(final String typeString) {
+        assertNonEmpty(typeString);
+        return setType((Type) parseType(typeString));
+    }
+    
+    //for NodeWithSimpleName
+    public  VariableDeclarator setName(String name) {
+		 if(name!=null && "".equals(name)){
+			 return setName(new SimpleName(name));
+		 }else return null;
+	}
+
+   public String getNameAsString() {
+   	return getName().getIdentifier();
+	}
+    
+   
+   
 }

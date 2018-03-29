@@ -33,9 +33,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ThrowStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+import static com.github.javaparser.JavaParser.parseExpression;
 
 /**
  * Usage of the throw statement.
@@ -148,7 +149,12 @@ public final class ThrowStmt extends Statement implements NodeWithExpression<Thr
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ThrowStmt> toThrowStmt() {
-        return Optional.of(this);
+    public ThrowStmt toThrowStmt() {
+        return this;
+    }
+    
+    //for NodeWithExpression
+    public ThrowStmt setExpression(String expression) {
+        return setExpression(parseExpression(expression));
     }
 }

@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.stmt;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
@@ -35,9 +36,9 @@ import com.github.javaparser.metamodel.TryStmtMetaModel;
 import javax.annotation.Generated;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import java.util.function.Consumer;
+
 
 /**
  * <h1>The try statement</h1>
@@ -106,11 +107,11 @@ public final class TryStmt extends Statement {
     private BlockStmt finallyBlock;
 
     public TryStmt() {
-        this(null, new NodeList<>(), new BlockStmt(), new NodeList<>(), null);
+        this(null, new NodeList<Expression>(), new BlockStmt(), new NodeList<CatchClause>(), null);
     }
 
     public TryStmt(final BlockStmt tryBlock, final NodeList<CatchClause> catchClauses, final BlockStmt finallyBlock) {
-        this(null, new NodeList<>(), tryBlock, catchClauses, finallyBlock);
+        this(null, new NodeList<Expression>(), tryBlock, catchClauses, finallyBlock);
     }
 
     @AllFieldsConstructor
@@ -315,7 +316,7 @@ public final class TryStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<TryStmt> toTryStmt() {
-        return Optional.of(this);
+    public TryStmt toTryStmt() {
+        return this;
     }
 }

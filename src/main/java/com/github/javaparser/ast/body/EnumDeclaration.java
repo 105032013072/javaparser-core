@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.body;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Modifier;
@@ -39,12 +40,16 @@ import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedEnumDeclaration;
 import javax.annotation.Generated;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
+
 import static com.github.javaparser.utils.Utils.assertNonEmpty;
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import java.util.function.Consumer;
-import java.util.Optional;
-
+import static com.github.javaparser.JavaParser.parseClassOrInterfaceType;
+import static java.util.Collections.unmodifiableList;
 /**
  * The declaration of an enum.<br/><code>enum X { ... }</code>
  *
@@ -57,11 +62,11 @@ public final class EnumDeclaration extends TypeDeclaration<EnumDeclaration> impl
     private NodeList<EnumConstantDeclaration> entries;
 
     public EnumDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new SimpleName(), new NodeList<>(), new NodeList<>(), new NodeList<>());
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new SimpleName(), new NodeList<ClassOrInterfaceType>(), new NodeList<EnumConstantDeclaration>(), new NodeList<BodyDeclaration<?>>());
     }
 
     public EnumDeclaration(EnumSet<Modifier> modifiers, String name) {
-        this(null, modifiers, new NodeList<>(), new SimpleName(name), new NodeList<>(), new NodeList<>(), new NodeList<>());
+        this(null, modifiers, new NodeList<AnnotationExpr>(), new SimpleName(name), new NodeList<ClassOrInterfaceType>(), new NodeList<EnumConstantDeclaration>(), new NodeList<BodyDeclaration<?>>());
     }
 
     @AllFieldsConstructor
@@ -227,7 +232,142 @@ public final class EnumDeclaration extends TypeDeclaration<EnumDeclaration> impl
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<EnumDeclaration> toEnumDeclaration() {
-        return Optional.of(this);
+    public EnumDeclaration toEnumDeclaration() {
+        return this;
     }
+    
+    //for NodeWithImplements
+    public  ClassOrInterfaceType getImplementedTypes(int i) {
+        return getImplementedTypes().get(i);
+    }
+
+  
+    @SuppressWarnings("unchecked")
+	public EnumDeclaration setImplementedType(int i, ClassOrInterfaceType implement) {
+        getImplementedTypes().set(i, implement);
+        return (EnumDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public EnumDeclaration addImplementedType(ClassOrInterfaceType implement) {
+        getImplementedTypes().add(implement);
+        return (EnumDeclaration) this;
+    }
+
+    /** @deprecated use addImplementedType instead */
+    public EnumDeclaration addImplements(String name) {
+        return addImplementedType(name);
+    }
+
+    /** @deprecated use addImplementedType instead */
+    public EnumDeclaration addImplements(Class<?> clazz) {
+        return addImplementedType(clazz);
+    }
+
+    /**
+     * Add an implements to this
+     *
+     * @param name the name of the type to extends from
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public EnumDeclaration addImplementedType(String name) {
+        getImplementedTypes().add(parseClassOrInterfaceType(name));
+        return (EnumDeclaration) this;
+    }
+
+    /**
+     * Add an implements to this and automatically add the import
+     *
+     * @param clazz the type to implements from
+     * @return this
+     */
+    public EnumDeclaration addImplementedType(Class<?> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addImplementedType(clazz.getSimpleName());
+    }
+    
+    //for NodeWithConstructors
+    public  ConstructorDeclaration getDefaultConstructor() {
+        
+     	NodeList<BodyDeclaration<?>> list= getMembers();
+     	
+     	for (BodyDeclaration<?> bd : list) {
+ 			if(bd instanceof ConstructorDeclaration){
+ 				ConstructorDeclaration cd=(ConstructorDeclaration) bd;
+ 				if(cd.getParameters().isEmpty()) return cd;
+ 			}
+ 		}
+     	return null;
+     }
+
+     /**
+      * Adds a constructor to this
+      *
+      * @param modifiers the modifiers like {@link Modifier#PUBLIC}
+      * @return the created constructor
+      */
+     public  ConstructorDeclaration addConstructor(Modifier... modifiers) {
+         ConstructorDeclaration constructorDeclaration = new ConstructorDeclaration();
+        /* constructorDeclaration.setModifiers(Arrays.stream(modifiers).collect(toCollection(() -> EnumSet.noneOf(Modifier.class))));*/
+        
+         List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+         EnumSet enumSet=EnumSet.noneOf(Modifier.class);
+         enumSet.addAll(list);
+         constructorDeclaration.setModifiers(enumSet);
+         constructorDeclaration.setName(getName());
+         getMembers().add(constructorDeclaration);
+         return constructorDeclaration;
+     }
+
+     /**
+      * Find all constructors for this class.
+      *
+      * @return the constructors found. This list is immutable.
+      */
+     public  List<ConstructorDeclaration> getConstructors() {
+         /*return unmodifiableList(getMembers().stream()
+         		.filter(m -> m instanceof ConstructorDeclaration)
+         		.map(m -> (ConstructorDeclaration) m)
+         		.collect(toList()));*/
+     	
+     	List<ConstructorDeclaration> result=new ArrayList<>();
+     	NodeList<BodyDeclaration<?>> members=getMembers();
+     	for (BodyDeclaration<?> m : members) {
+ 			if(m instanceof ConstructorDeclaration){
+ 				result.add((ConstructorDeclaration) m);
+ 			}
+ 		}
+      return	unmodifiableList(result);
+     }
+
+     /**
+      * Try to find a {@link ConstructorDeclaration} by its parameters types
+      *
+      * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+      * foo(Map&lt;Integer,String&gt; myMap,int number)
+      * @return the constructor found (multiple in case of overloading)
+      */
+     public  ConstructorDeclaration getConstructorByParameterTypes(String... paramTypes) {
+         //return getConstructors().stream().filter(m -> m.hasParametersOfType(paramTypes)).findFirst();
+     	for (ConstructorDeclaration m : getConstructors()) {
+ 		  if(m.hasParametersOfType(paramTypes))	 return m;
+ 		}
+     	return null;
+     }
+
+     /**
+      * Try to find a {@link ConstructorDeclaration} by its parameters types
+      *
+      * @param paramTypes the types of parameters like "Map&lt;Integer,String&gt;","int" to match<br> void
+      * foo(Map&lt;Integer,String&gt; myMap,int number)
+      * @return the constructors found (multiple in case of overloading)
+      */
+     public  ConstructorDeclaration getConstructorByParameterTypes(Class<?>... paramTypes) {
+        // return getConstructors().stream().filter(m -> m.hasParametersOfType(paramTypes)).findFirst();
+     	for (ConstructorDeclaration m : getConstructors()) {
+ 			if(m.hasParametersOfType(paramTypes)) return m;
+ 		}
+     	return null;
+     }
 }

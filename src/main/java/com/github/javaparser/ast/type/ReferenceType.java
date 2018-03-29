@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.type;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Node;
@@ -29,8 +30,7 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.ReferenceTypeMetaModel;
 import javax.annotation.Generated;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * Base class for reference types.
@@ -40,7 +40,7 @@ import java.util.Optional;
 public abstract class ReferenceType extends Type {
 
     public ReferenceType() {
-        this(null, new NodeList<>());
+        this(null, new NodeList<AnnotationExpr>());
     }
 
     @AllFieldsConstructor
@@ -104,7 +104,7 @@ public abstract class ReferenceType extends Type {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ReferenceType> toReferenceType() {
-        return Optional.of(this);
+    public ReferenceType toReferenceType() {
+        return this;
     }
 }

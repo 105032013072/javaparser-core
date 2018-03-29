@@ -26,15 +26,17 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.metamodel.ReturnStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
+
 
 /**
  * The return statement, with an optional expression to return.
@@ -85,8 +87,8 @@ public final class ReturnStmt extends Statement {
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getExpression() {
-        return Optional.ofNullable(expression);
+    public Expression getExpression() {
+        return expression;
     }
 
     /**
@@ -172,7 +174,7 @@ public final class ReturnStmt extends Statement {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ReturnStmt> toReturnStmt() {
-        return Optional.of(this);
+    public ReturnStmt toReturnStmt() {
+        return this;
     }
 }

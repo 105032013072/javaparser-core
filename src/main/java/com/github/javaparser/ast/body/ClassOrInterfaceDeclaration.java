@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast.body;
 
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Modifier;
@@ -74,11 +75,11 @@ public final class ClassOrInterfaceDeclaration extends TypeDeclaration<ClassOrIn
     private NodeList<ClassOrInterfaceType> implementedTypes;
 
     public ClassOrInterfaceDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), false, new SimpleName(), new NodeList<>(), new NodeList<>(), new NodeList<>(), new NodeList<>());
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), false, new SimpleName(), new NodeList<TypeParameter>(), new NodeList<ClassOrInterfaceType>(), new NodeList<ClassOrInterfaceType>(), new NodeList<BodyDeclaration<?>>());
     }
 
     public ClassOrInterfaceDeclaration(final EnumSet<Modifier> modifiers, final boolean isInterface, final String name) {
-        this(null, modifiers, new NodeList<>(), isInterface, new SimpleName(name), new NodeList<>(), new NodeList<>(), new NodeList<>(), new NodeList<>());
+        this(null, modifiers, new NodeList<AnnotationExpr>(), isInterface, new SimpleName(name), new NodeList<TypeParameter>(), new NodeList<ClassOrInterfaceType>(), new NodeList<ClassOrInterfaceType>(), new NodeList<BodyDeclaration<?>>());
     }
 
     @AllFieldsConstructor
@@ -213,7 +214,11 @@ public final class ClassOrInterfaceDeclaration extends TypeDeclaration<ClassOrIn
      * @return is this class's parent a LocalClassDeclarationStmt ?
      */
     public boolean isLocalClassDeclaration() {
-        return getOptionalParentNode().map(p -> p instanceof LocalClassDeclarationStmt).orElse(false);
+        //return getOptionalParentNode().map(p -> p instanceof LocalClassDeclarationStmt).orElse(false);
+    	if(getOptionalParentNode()!=null){
+    		return (getOptionalParentNode() instanceof LocalClassDeclarationStmt); 
+    	}
+    	return false;
     }
 
     /**
@@ -286,8 +291,8 @@ public final class ClassOrInterfaceDeclaration extends TypeDeclaration<ClassOrIn
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ClassOrInterfaceDeclaration> toClassOrInterfaceDeclaration() {
-        return Optional.of(this);
+    public ClassOrInterfaceDeclaration toClassOrInterfaceDeclaration() {
+        return this;
     }
     
     

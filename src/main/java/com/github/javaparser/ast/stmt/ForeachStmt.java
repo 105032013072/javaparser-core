@@ -34,9 +34,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.ForeachStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A for-each statement.
@@ -205,7 +206,14 @@ public final class ForeachStmt extends Statement implements NodeWithBody<Foreach
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ForeachStmt> toForeachStmt() {
-        return Optional.of(this);
+    public ForeachStmt toForeachStmt() {
+        return this;
+    }
+    
+    //for NodeWithBody
+    public BlockStmt createBlockStatementAsBody() {
+        BlockStmt b = new BlockStmt();
+        setBody(b);
+        return b;
     }
 }

@@ -26,9 +26,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.LiteralExprMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A base class for all literal expressions.
@@ -98,7 +99,7 @@ public abstract class LiteralExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<LiteralExpr> toLiteralExpr() {
-        return Optional.of(this);
+    public LiteralExpr toLiteralExpr() {
+        return this;
     }
 }

@@ -33,15 +33,19 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.NameMetaModel;
 import com.github.javaparser.metamodel.NonEmptyProperty;
+
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
 import static com.github.javaparser.utils.Utils.assertNonEmpty;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
-
+import com.github.javaparser.utils.Utils;
+import static com.github.javaparser.JavaParser.parseName;
+import static com.github.javaparser.JavaParser.parseExpression;
 /**
  * A name that may consist of multiple identifiers.
  * In other words: it.may.contain.dots.
@@ -65,15 +69,15 @@ public final class Name extends Node implements NodeWithIdentifier<Name>, NodeWi
     private NodeList<AnnotationExpr> annotations;
 
     public Name() {
-        this(null, null, "empty", new NodeList<>());
+        this(null, null, "empty", new NodeList<AnnotationExpr>());
     }
 
     public Name(final String identifier) {
-        this(null, null, identifier, new NodeList<>());
+        this(null, null, identifier, new NodeList<AnnotationExpr>());
     }
 
     public Name(Name qualifier, final String identifier) {
-        this(null, qualifier, identifier, new NodeList<>());
+        this(null, qualifier, identifier, new NodeList<AnnotationExpr>());
     }
 
     @AllFieldsConstructor
@@ -146,8 +150,8 @@ public final class Name extends Node implements NodeWithIdentifier<Name>, NodeWi
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Name> getQualifier() {
-        return Optional.ofNullable(qualifier);
+    public Name getQualifier() {
+        return qualifier;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -238,4 +242,206 @@ public final class Name extends Node implements NodeWithIdentifier<Name>, NodeWi
         }
         return super.replace(node, replacementNode);
     }
+    
+    // for NodeWithIdentifier
+    public  String getId() {
+        return getIdentifier();
+    }
+
+    public  Name setId(String identifier) {
+        Utils.assertNonEmpty(identifier);
+        return setIdentifier(identifier);
+    }
+    //for NodeWithAnnotations
+    public  AnnotationExpr getAnnotation(int i) {
+        return getAnnotations().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+	public Name setAnnotation(int i, AnnotationExpr element) {
+        getAnnotations().set(i, element);
+        return (Name) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public Name addAnnotation(AnnotationExpr element) {
+        getAnnotations().add(element);
+        return (Name) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public Name addAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return (Name) this;
+    }
+
+    /**
+     * Annotates this
+     *
+     * @param name the name of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    @SuppressWarnings("unchecked")
+	public NormalAnnotationExpr addAndGetAnnotation(String name) {
+        NormalAnnotationExpr annotation = new NormalAnnotationExpr(
+                parseName(name), new NodeList<MemberValuePair>());
+        getAnnotations().add(annotation);
+        return annotation;
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public  Name addAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this node and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return the {@link NormalAnnotationExpr} added
+     */
+    public  NormalAnnotationExpr addAndGetAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addAndGetAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a marker annotation
+     *
+     * @param name the name of the annotation
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public Name addMarkerAnnotation(String name) {
+        MarkerAnnotationExpr markerAnnotationExpr = new MarkerAnnotationExpr(
+                parseName(name));
+        getAnnotations().add(markerAnnotationExpr);
+        return (Name) this;
+    }
+
+    /**
+     * Annotates this with a marker annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @return this
+     */
+    public  Name addMarkerAnnotation(Class<? extends Annotation> clazz) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addMarkerAnnotation(clazz.getSimpleName());
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param expression the part between ()
+     * @return this
+     */
+    @SuppressWarnings("unchecked")
+	public Name addSingleMemberAnnotation(String name, Expression expression) {
+        SingleMemberAnnotationExpr singleMemberAnnotationExpr = new SingleMemberAnnotationExpr(
+                parseName(name), expression);
+        getAnnotations().add(singleMemberAnnotationExpr);
+        return (Name) this;
+    }
+
+    /**
+     * Annotates this with a single member annotation
+     *
+     * @param name the name of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public  Name addSingleMemberAnnotation(String name, String value) {
+        return addSingleMemberAnnotation(name, parseExpression(value));
+    }
+
+    /**
+     * Annotates this with a single member annotation and automatically add the import
+     *
+     * @param clazz the class of the annotation
+     * @param value the value, don't forget to add \"\" for a string value
+     * @return this
+     */
+    public  Name addSingleMemberAnnotation(Class<? extends Annotation> clazz,
+                                        String value) {
+        tryAddImportToParentCompilationUnit(clazz);
+        return addSingleMemberAnnotation(clazz.getSimpleName(), value);
+    }
+
+    /**
+     * Check whether an annotation with this name is present on this element
+     *
+     * @param annotationName the name of the annotation
+     * @return true if found, false if not
+     */
+    public  boolean isAnnotationPresent(String annotationName) {
+       // return getAnnotations().stream().anyMatch(a -> a.getName().getIdentifier().equals(annotationName));
+    	for (AnnotationExpr a : getAnnotations()) {
+			if(a.getName().getIdentifier().equals(annotationName)) return true;
+		}
+    	return false;
+    }
+
+    /**
+     * Check whether an annotation with this class is present on this element
+     *
+     * @param annotationClass the class of the annotation
+     * @return true if found, false if not
+     */
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+        return isAnnotationPresent(annotationClass.getSimpleName());
+    }
+
+    /**
+     * Try to find an annotation by its name
+     *
+     * @param annotationName the name of the annotation
+     */
+    public AnnotationExpr getOptionalAnnotationByName(String annotationName) {
+       // return getAnnotations().stream().filter(a -> a.getName().getIdentifier().equals(annotationName)).findFirst();
+    	for (AnnotationExpr a : getAnnotations()) {
+		   if(a.getName().getIdentifier().equals(annotationName))	return a;
+		}
+    	return null;
+    }
+    
+    public AnnotationExpr getAnnotationByName(String annotationName){
+    	NodeList<AnnotationExpr> annotationList =getAnnotations();
+    	for (AnnotationExpr annotationExpr : annotationList) {
+			if(annotationExpr.getName().getIdentifier().equals(annotationName)) return annotationExpr;
+		}
+    	return null;
+    }
+
+    /**
+     * Try to find an annotation by its class
+     *
+     * @param annotationClass the class of the annotation
+     */
+    public AnnotationExpr getOptionalAnnotationByClass(Class<? extends Annotation> annotationClass) {
+        return getOptionalAnnotationByName(annotationClass.getSimpleName());
+    }
+    
+    public AnnotationExpr getAnnotationByClass(Class<? extends Annotation> annotationClass) {
+    	AnnotationExpr optional=getOptionalAnnotationByName(annotationClass.getSimpleName());
+    	if(optional!=null) return optional;
+    	else return null;
+    }
+    
+  
 }

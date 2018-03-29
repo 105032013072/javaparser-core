@@ -24,6 +24,8 @@ import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.AssignExpr.Operator;
@@ -36,27 +38,36 @@ import com.github.javaparser.ast.nodeTypes.modifiers.NodeWithStaticModifier;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.javadoc.Javadoc;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.FieldDeclarationMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.metamodel.NonEmptyProperty;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+
+import java.util.Set;
+
 import static com.github.javaparser.ast.Modifier.*;
 import static com.github.javaparser.ast.NodeList.nodeList;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
-import java.util.function.Consumer;
 
 /**
  * The declaration of a field in a class. "private static int a=15*15;" in this example: <code>class X { private static
@@ -75,15 +86,15 @@ public final class FieldDeclaration extends BodyDeclaration<FieldDeclaration> im
     private NodeList<VariableDeclarator> variables;
 
     public FieldDeclaration() {
-        this(null, EnumSet.noneOf(Modifier.class), new NodeList<>(), new NodeList<>());
+        this(null, EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new NodeList<VariableDeclarator>());
     }
 
     public FieldDeclaration(EnumSet<Modifier> modifiers, VariableDeclarator variable) {
-        this(null, modifiers, new NodeList<>(), nodeList(variable));
+        this(null, modifiers, new NodeList<AnnotationExpr>(), nodeList(variable));
     }
 
     public FieldDeclaration(EnumSet<Modifier> modifiers, NodeList<VariableDeclarator> variables) {
-        this(null, modifiers, new NodeList<>(), variables);
+        this(null, modifiers, new NodeList<AnnotationExpr>(), variables);
     }
 
     @AllFieldsConstructor
@@ -177,15 +188,20 @@ public final class FieldDeclaration extends BodyDeclaration<FieldDeclaration> im
     public MethodDeclaration createGetter() {
         if (getVariables().size() != 1)
             throw new IllegalStateException("You can use this only when the field declares only 1 variable name");
-        Optional<ClassOrInterfaceDeclaration> parentClass = getAncestorOfType(ClassOrInterfaceDeclaration.class);
-        Optional<EnumDeclaration> parentEnum = getAncestorOfType(EnumDeclaration.class);
-        if (!(parentClass.isPresent() || parentEnum.isPresent()) || (parentClass.isPresent() && parentClass.get().isInterface()))
+        ClassOrInterfaceDeclaration parentClass = getAncestorOfType(ClassOrInterfaceDeclaration.class);
+        EnumDeclaration parentEnum = getAncestorOfType(EnumDeclaration.class);
+        if (!(parentClass!=null || parentEnum!=null) || (parentClass!=null && parentClass.isInterface()))
             throw new IllegalStateException("You can use this only when the field is attached to a class or an enum");
         VariableDeclarator variable = getVariable(0);
         String fieldName = variable.getNameAsString();
         String fieldNameUpper = fieldName.toUpperCase().substring(0, 1) + fieldName.substring(1, fieldName.length());
         final MethodDeclaration getter;
-        getter = parentClass.map(clazz -> clazz.addMethod("get" + fieldNameUpper, PUBLIC)).orElseGet(() -> parentEnum.get().addMethod("get" + fieldNameUpper, PUBLIC));
+        //getter = parentClass.map(clazz -> clazz.addMethod("get" + fieldNameUpper, PUBLIC)).orElseGet(() -> parentEnum.get().addMethod("get" + fieldNameUpper, PUBLIC));
+        if(parentClass!=null){
+        	getter=parentClass.addMethod("get" + fieldNameUpper, PUBLIC);
+        }else{
+        	getter=parentEnum.addMethod("get" + fieldNameUpper, PUBLIC);
+        }
         getter.setType(variable.getType());
         BlockStmt blockStmt = new BlockStmt();
         getter.setBody(blockStmt);
@@ -204,15 +220,21 @@ public final class FieldDeclaration extends BodyDeclaration<FieldDeclaration> im
     public MethodDeclaration createSetter() {
         if (getVariables().size() != 1)
             throw new IllegalStateException("You can use this only when the field declares only 1 variable name");
-        Optional<ClassOrInterfaceDeclaration> parentClass = getAncestorOfType(ClassOrInterfaceDeclaration.class);
-        Optional<EnumDeclaration> parentEnum = getAncestorOfType(EnumDeclaration.class);
-        if (!(parentClass.isPresent() || parentEnum.isPresent()) || (parentClass.isPresent() && parentClass.get().isInterface()))
+        ClassOrInterfaceDeclaration parentClass = getAncestorOfType(ClassOrInterfaceDeclaration.class);
+        EnumDeclaration parentEnum = getAncestorOfType(EnumDeclaration.class);
+        if (!(parentClass!=null || parentEnum!=null) || (parentClass!=null && parentClass.isInterface()))
             throw new IllegalStateException("You can use this only when the field is attached to a class or an enum");
         VariableDeclarator variable = getVariable(0);
         String fieldName = variable.getNameAsString();
         String fieldNameUpper = fieldName.toUpperCase().substring(0, 1) + fieldName.substring(1, fieldName.length());
         final MethodDeclaration setter;
-        setter = parentClass.map(clazz -> clazz.addMethod("set" + fieldNameUpper, PUBLIC)).orElseGet(() -> parentEnum.get().addMethod("set" + fieldNameUpper, PUBLIC));
+       // setter = parentClass.map(clazz -> clazz.addMethod("set" + fieldNameUpper, PUBLIC)).orElseGet(() -> parentEnum.get().addMethod("set" + fieldNameUpper, PUBLIC));
+       if(parentClass!=null){
+    	   setter=parentClass.addMethod("set" + fieldNameUpper, PUBLIC);
+       }else{
+    	   setter= parentEnum.addMethod("set" + fieldNameUpper, PUBLIC);
+       }
+        
         setter.setType(new VoidType());
         setter.getParameters().add(new Parameter(variable.getType(), fieldName));
         BlockStmt blockStmt2 = new BlockStmt();
@@ -301,7 +323,278 @@ public final class FieldDeclaration extends BodyDeclaration<FieldDeclaration> im
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<FieldDeclaration> toFieldDeclaration() {
-        return Optional.of(this);
+    public FieldDeclaration toFieldDeclaration() {
+        return this;
     }
+    
+    
+    //for NodeWithJavadoc
+  public  JavadocComment getJavadocComment() {
+    	Comment comment= getCommentOptional();
+    	if(comment instanceof JavadocComment){
+    		return (JavadocComment) comment;
+    	}else return null;
+    }
+
+    /**
+     * Gets the Javadoc for this node. You can set the Javadoc by calling setJavadocComment passing a Javadoc.
+     *
+     * @return The Javadoc for this node wrapped in an optional as it may be absent.
+     */
+    public   Javadoc getOptionalJavadoc() {
+    	JavadocComment javadocComment=getJavadocComment();
+    	if(javadocComment!=null){
+    		return javadocComment.parse();
+    	}else return null;
+    	
+    	//return getJavadocComment().map(JavadocComment::parse);
+    }
+    
+    public  Javadoc getJavadoc() {
+    	Javadoc oj=getOptionalJavadoc();
+    	if(oj!=null) return oj;
+    	else return null;
+    }
+
+    /**
+     * Use this to store additional information to this node.
+     *
+     * @param comment to be set
+     */
+    @SuppressWarnings("unchecked")
+    public  FieldDeclaration setJavadocComment(String comment) {
+        return setJavadocComment(new JavadocComment(comment));
+    }
+
+    public  FieldDeclaration setJavadocComment(JavadocComment comment) {
+        setComment(comment);
+        return (FieldDeclaration) this;
+    }
+
+    public  FieldDeclaration setJavadocComment(String indentation, Javadoc javadoc) {
+        JavadocComment comment = javadoc.toComment(indentation);
+        return setJavadocComment(comment);
+    }
+
+    public  boolean removeJavaDocComment() {
+        return hasJavaDocComment() && getCommentOptional().remove();
+    }
+
+    public  boolean hasJavaDocComment() {
+        return getCommentOptional()!=null && getCommentOptional() instanceof JavadocComment;
+    }
+    
+    //for NodeWithVariables
+   
+    public  VariableDeclarator getVariable(int i) {
+        return getVariables().get(i);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setVariable(int i, VariableDeclarator variableDeclarator) {
+        getVariables().set(i, variableDeclarator);
+        return (FieldDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration addVariable(VariableDeclarator variableDeclarator) {
+        getVariables().add(variableDeclarator);
+        return (FieldDeclaration) this;
+    }
+
+    /**
+     * Returns the type that is shared between all variables.
+     * This is a shortcut for when you are certain that all variables share one type.
+     * What makes this difficult is arrays, and being able to set the type.
+     * <br/>For <code>int a;</code> this is int.
+     * <br/>For <code>int a,b,c,d;</code> this is also int.
+     * <br/>For <code>int a,b[],c;</code> this is an assertion error since b is an int[], not an int.
+     * <br/>For <code>int a,b;</code>, then doing setType(String) on b, this is an assertion error. It is also a situation that you don't really want.
+     */
+    public Type getCommonType() {
+        NodeList<VariableDeclarator> variables = getVariables();
+        if (variables.isEmpty()) {
+            throw new AssertionError("There is no common type since there are no variables.");
+        }
+        Type type = variables.get(0).getType();
+        for (int i = 1; i < variables.size(); i++) {
+            if (!variables.get(i).getType().equals(type)) {
+                throw new AssertionError("The variables do not have a common type.");
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Returns the element type.
+     * <br/>For <code>int a;</code> this is int.
+     * <br/>For <code>int a,b,c,d;</code> this is also int.
+     * <br/>For <code>int a,b[],c;</code> this is also int. Note: no mention of b being an array.
+     * <br/>For <code>int a,b;</code>, then doing setType(String) on b, then calling getElementType(). This is an assertion error. It is also a situation that you don't really want.
+     */
+    public Type getElementType() {
+        NodeList<VariableDeclarator> variables = getVariables();
+        if (variables.isEmpty()) {
+            throw new AssertionError("There is no element type since there are no variables.");
+        }
+        Type type = variables.get(0).getType().getElementType();
+        for (int i = 1; i < variables.size(); i++) {
+            if (!variables.get(i).getType().getElementType().equals(type)) {
+                throw new AssertionError("The variables do not have a common type.");
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Returns the type that maximum shared type between all variables.
+     * The minimum common type does never include annotations on the array level.
+     * <p>
+     * <br/>For <code>int a;</code> this is int.
+     * <br/>For <code>int a,b,c,d;</code> this is also int.
+     * <br/>For <code>int a,b[],c;</code> this is also int.
+     * <br/>For <code>int[] a[][],b[],c[][];</code> this is int[][].
+     */
+    @DerivedProperty
+	public Type getMaximumCommonType() {
+       // return calculateMaximumCommonType(getVariables().stream().map(v -> v.getType()).collect(Collectors.toList()));
+    	List<Type> list=new ArrayList<>();
+    	for (VariableDeclarator v : getVariables()) {
+			list.add(v.getType());
+		}
+    	return calculateMaximumCommonType(list);
+    	
+    }
+
+    static Type calculateMaximumCommonType(List<Type> types) {
+        // we use a local class because we cannot use an helper static method in an interface
+        class Helper {
+          
+            private Type toArrayLevel(Type type, int level) {
+                if (level > type.getArrayLevel()) {
+                    return null;
+                }
+                for (int i = type.getArrayLevel(); i > level; i--) {
+                    if (!(type instanceof ArrayType)) {
+                        return null;
+                    }
+                    type = ((ArrayType) type).getComponentType();
+                }
+                return type;
+            }
+        }
+
+        Helper helper = new Helper();
+        int level = 0;
+        boolean keepGoing = true;
+      
+        while (keepGoing) {
+            final int currentLevel = level;
+            
+            /*Object[] values = types.stream().map(v -> {
+                Optional<Type> t = helper.toArrayLevel(v, currentLevel);
+                return t.map(Node::toString).orElse(null);
+            }).distinct().toArray();*/
+            Set<String> set=new HashSet();
+            for (Type type : types) {
+            	Type t = helper.toArrayLevel(type, currentLevel);
+                if(t!=null) set.add(t.asString());
+			}
+            Object[] values=new Object[set.size()];
+            set.toArray(values);
+            
+            
+            if (values.length == 1 && values[0] != null) {
+                level++;
+            } else {
+                keepGoing = false;
+            }
+        }
+        return helper.toArrayLevel(types.get(0), --level);
+    }
+    
+    //for NodeWithStaticModifier
+    
+    public  boolean isStatic() {
+        return getModifiers().contains(STATIC);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setStatic(boolean set) {
+        return setModifier(STATIC, set);
+    }
+
+    //for NodeWithFinalModifier
+    public boolean isFinal() {
+        return getModifiers().contains(FINAL);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setFinal(boolean set) {
+        return setModifier(FINAL, set);
+    }
+
+    //for NodeWithPublicModifier
+    public  boolean isPublic() {
+        return getModifiers().contains(PUBLIC);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setPublic(boolean set) {
+        return setModifier(PUBLIC, set);
+    }
+    
+    //for NodeWithPrivateModifier
+    public  boolean isPrivate() {
+        return getModifiers().contains(PRIVATE);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setPrivate(boolean set) {
+        return setModifier(PRIVATE, set);
+    }
+    //for NodeWithProtectedModifier
+    public  boolean isProtected() {
+        return getModifiers().contains(PROTECTED);
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration setProtected(boolean set) {
+        return setModifier(PROTECTED, set);
+    }
+    
+    //for NodeWithModifiers
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration addModifier(Modifier... modifiers) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+       
+        List<Modifier> list=new ArrayList<>(Arrays.asList(modifiers));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.addAll(enm);
+        setModifiers(newModifiers);
+        return (FieldDeclaration) this;
+    }
+
+    @SuppressWarnings("unchecked")
+	public FieldDeclaration removeModifier(Modifier... m) {
+        EnumSet<Modifier> newModifiers = getModifiers().clone();
+      
+        List<Modifier> list=new ArrayList<>(Arrays.asList(m));
+        EnumSet<Modifier> enm=EnumSet.noneOf(Modifier.class);
+        enm.addAll(list);
+        newModifiers.removeAll(enm);
+        
+        setModifiers(newModifiers);
+        return (FieldDeclaration) this;
+    }
+    public  FieldDeclaration setModifier(Modifier m, boolean set) {
+        if (set) {
+            return addModifier(m);
+        } else {
+            return removeModifier(m);
+        }
+    }
+
+    
 }

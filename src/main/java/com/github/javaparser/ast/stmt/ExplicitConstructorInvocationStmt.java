@@ -30,17 +30,21 @@ import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+
+import static com.github.javaparser.ast.NodeList.nodeList;
 import static com.github.javaparser.utils.Utils.assertNotNull;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
+import com.github.javaparser.metamodel.DerivedProperty;
 import com.github.javaparser.metamodel.ExplicitConstructorInvocationStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
-import java.util.function.Consumer;
+
 
 /**
  * A call to super or this in a constructor or initializer.
@@ -64,11 +68,11 @@ public final class ExplicitConstructorInvocationStmt extends Statement implement
     private NodeList<Expression> arguments;
 
     public ExplicitConstructorInvocationStmt() {
-        this(null, new NodeList<>(), true, null, new NodeList<>());
+        this(null, new NodeList<Type>(), true, null, new NodeList<Expression>());
     }
 
     public ExplicitConstructorInvocationStmt(final boolean isThis, final Expression expression, final NodeList<Expression> arguments) {
-        this(null, new NodeList<>(), isThis, expression, arguments);
+        this(null, new NodeList<Type>(), isThis, expression, arguments);
     }
 
     @AllFieldsConstructor
@@ -121,8 +125,8 @@ public final class ExplicitConstructorInvocationStmt extends Statement implement
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getExpression() {
-        return Optional.ofNullable(expression);
+    public Expression getExpression() {
+        return expression;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -174,8 +178,8 @@ public final class ExplicitConstructorInvocationStmt extends Statement implement
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<NodeList<Type>> getTypeArguments() {
-        return Optional.ofNullable(typeArguments);
+    public NodeList<Type> getTypeArguments() {
+        return typeArguments;
     }
 
     /**
@@ -293,7 +297,35 @@ public final class ExplicitConstructorInvocationStmt extends Statement implement
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ExplicitConstructorInvocationStmt> toExplicitConstructorInvocationStmt() {
-        return Optional.of(this);
+    public ExplicitConstructorInvocationStmt toExplicitConstructorInvocationStmt() {
+        return this;
+    }
+    
+    
+    //for NodeWithTypeArguments
+    @DerivedProperty
+    public boolean isUsingDiamondOperator() {
+        return getTypeArguments()!=null && getTypeArguments().isEmpty();
+    }
+
+    /**
+     * Sets the type arguments to &lt>.
+     */
+    @SuppressWarnings("unchecked")
+    public ExplicitConstructorInvocationStmt setDiamondOperator() {
+        return setTypeArguments(new NodeList<Type>());
+    }
+
+    /**
+     * Removes all type arguments, including the surrounding &lt;>.
+     */
+    @SuppressWarnings("unchecked")
+    public ExplicitConstructorInvocationStmt removeTypeArguments() {
+        return setTypeArguments((NodeList<Type>) null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ExplicitConstructorInvocationStmt setTypeArguments(Type... typeArguments) {
+        return setTypeArguments(nodeList(typeArguments));
     }
 }

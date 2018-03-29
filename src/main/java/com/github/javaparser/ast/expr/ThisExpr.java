@@ -25,18 +25,20 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.OptionalProperty;
 import com.github.javaparser.metamodel.ThisExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
-import java.util.function.Consumer;
+
 
 /**
  * An occurrence of the "this" keyword. <br/><code>World.this.greet()</code> is a MethodCallExpr of method name greet,
@@ -84,8 +86,8 @@ public final class ThisExpr extends Expression implements Resolvable<ResolvedTyp
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
-    public Optional<Expression> getClassExpr() {
-        return Optional.ofNullable(classExpr);
+    public Expression getClassExpr() {
+        return classExpr;
     }
 
     @Generated("com.github.javaparser.generator.core.node.PropertyGenerator")
@@ -170,7 +172,7 @@ public final class ThisExpr extends Expression implements Resolvable<ResolvedTyp
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<ThisExpr> toThisExpr() {
-        return Optional.of(this);
+    public ThisExpr toThisExpr() {
+        return this;
     }
 }

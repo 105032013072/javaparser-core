@@ -28,9 +28,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.NullLiteralExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A literal "null".
@@ -113,7 +114,7 @@ public final class NullLiteralExpr extends LiteralExpr {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<NullLiteralExpr> toNullLiteralExpr() {
-        return Optional.of(this);
+    public NullLiteralExpr toNullLiteralExpr() {
+        return this;
     }
 }

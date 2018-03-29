@@ -34,9 +34,10 @@ import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.DoStmtMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
-import java.util.function.Consumer;
-import java.util.Optional;
+
 
 /**
  * A do-while.
@@ -175,7 +176,16 @@ public final class DoStmt extends Statement implements NodeWithBody<DoStmt>, Nod
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<DoStmt> toDoStmt() {
-        return Optional.of(this);
+    public DoStmt toDoStmt() {
+        return this;
     }
+    
+    //for NodeWithBody
+    public BlockStmt createBlockStatementAsBody() {
+        BlockStmt b = new BlockStmt();
+        setBody(b);
+        return b;
+    }
+    
+  
 }

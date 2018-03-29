@@ -24,15 +24,17 @@ import com.github.javaparser.ast.AllFieldsConstructor;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-import java.util.Optional;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.CloneVisitor;
 import com.github.javaparser.metamodel.EnclosedExprMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import javax.annotation.Generated;
+
+import com.github.javaparser.Consumer;
 import com.github.javaparser.TokenRange;
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import java.util.function.Consumer;
+
 
 /**
  * An expression between ( ).
@@ -156,7 +158,7 @@ public final class EnclosedExpr extends Expression {
 
     @Override
     @Generated("com.github.javaparser.generator.core.node.TypeCastingGenerator")
-    public Optional<EnclosedExpr> toEnclosedExpr() {
-        return Optional.of(this);
+    public EnclosedExpr toEnclosedExpr() {
+        return this;
     }
 }
