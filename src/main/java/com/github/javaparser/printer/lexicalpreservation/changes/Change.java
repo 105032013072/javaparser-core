@@ -8,9 +8,9 @@ import com.github.javaparser.utils.Utils;
 /**
  * This represent a change happened to a specific Node.
  */
-public interface Change {
+public abstract class Change {
 
-    default boolean evaluate(CsmConditional csmConditional, Node node) {
+    public boolean evaluate(CsmConditional csmConditional, Node node) {
         switch (csmConditional.getCondition()) {
             case FLAG:
                 return (Boolean) getValue(csmConditional.getProperty(), node);
@@ -25,5 +25,5 @@ public interface Change {
         }
     }
 
-    Object getValue(ObservableProperty property, Node node);
+   public abstract Object getValue(ObservableProperty property, Node node);
 }

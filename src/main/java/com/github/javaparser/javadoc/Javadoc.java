@@ -73,10 +73,15 @@ public class Javadoc {
         if (!blockTags.isEmpty()) {
             sb.append(EOL);
         }
-        blockTags.forEach(bt -> {
+       /* blockTags.forEach(bt -> {
             sb.append(bt.toText());
             sb.append(EOL);
-        });
+        });*/
+        
+        for (JavadocBlockTag bt : blockTags) {
+        	 sb.append(bt.toText());
+             sb.append(EOL);
+		}
         return sb.toString();
     }
 

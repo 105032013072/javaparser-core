@@ -26,7 +26,7 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * This is a common interface for MethodDeclaration and ConstructorDeclaration.
@@ -38,49 +38,29 @@ public interface ResolvedMethodLikeDeclaration extends ResolvedDeclaration,
     /**
      * The package name of the declaring type.
      */
-    default String getPackageName() {
-        return declaringType().getPackageName();
-    }
+	public String getPackageName();
 
     /**
      * The class(es) wrapping the declaring type.
      */
-    default String getClassName() {
-        return declaringType().getClassName();
-    }
+	public String getClassName();
 
     /**
      * The qualified name of the method composed by the qualfied name of the declaring type
      * followed by a dot and the name of the method.
      */
-    default String getQualifiedName() {
-        return declaringType().getQualifiedName() + "." + this.getName();
-    }
+	public String getQualifiedName();
 
     /**
      * The signature of the method.
      */
-    default String getSignature() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getName());
-        sb.append("(");
-        for (int i = 0; i < getNumberOfParams(); i++) {
-            if (i != 0) {
-                sb.append(", ");
-            }
-            sb.append(getParam(i).describeType());
-        }
-        sb.append(")");
-        return sb.toString();
-    }
+	public String getSignature();
 
     /**
      * The qualified signature of the method. It is composed by the qualified name of the declaring type
      * followed by the signature of the method.
      */
-    default String getQualifiedSignature() {
-        return declaringType().getId() + "." + this.getSignature();
-    }
+	public String getQualifiedSignature();
 
     /**
      * The type in which the method is declared.
@@ -102,34 +82,16 @@ public interface ResolvedMethodLikeDeclaration extends ResolvedDeclaration,
      * has no parameters.
      * The last parameter can be variadic and sometimes it needs to be handled in a special way.
      */
-    default ResolvedParameterDeclaration getLastParam() {
-        if (getNumberOfParams() == 0) {
-            throw new UnsupportedOperationException("This method has no typeParametersValues, therefore it has no a last parameter");
-        }
-        return getParam(getNumberOfParams() - 1);
-    }
+    public ResolvedParameterDeclaration getLastParam();
 
     /**
      * Has the method or construcor a variadic parameter?
      * Note that when a method has a variadic parameter it should have an array type.
      */
-    default boolean hasVariadicParameter() {
-        if (getNumberOfParams() == 0) {
-            return false;
-        } else {
-            return getParam(getNumberOfParams() - 1).isVariadic();
-        }
-    }
+    public boolean hasVariadicParameter();
 
     @Override
-    default Optional<ResolvedTypeParameterDeclaration> findTypeParameter(String name) {
-        for (ResolvedTypeParameterDeclaration tp : this.getTypeParameters()) {
-            if (tp.getName().equals(name)) {
-                return Optional.of(tp);
-            }
-        }
-        return declaringType().findTypeParameter(name);
-    }
+    public ResolvedTypeParameterDeclaration findTypeParameter(String name);
 
     /**
      * Number of exceptions listed in the throws clause.
@@ -145,15 +107,5 @@ public interface ResolvedMethodLikeDeclaration extends ResolvedDeclaration,
      */
     ResolvedType getSpecifiedException(int index);
 
-    default List<ResolvedType> getSpecifiedExceptions() {
-        if (getNumberOfSpecifiedExceptions() == 0) {
-            return Collections.emptyList();
-        } else {
-            List<ResolvedType> exceptions = new LinkedList<>();
-            for (int i=0;i<getNumberOfSpecifiedExceptions();i++) {
-                exceptions.add(getSpecifiedException(i));
-            }
-            return exceptions;
-        }
-    }
+    public List<ResolvedType> getSpecifiedExceptions();
 }

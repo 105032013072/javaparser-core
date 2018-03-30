@@ -24,14 +24,16 @@ package com.github.javaparser.resolution.types;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 
 /**
  * An intersection type is defined in java as list of types separates by ampersands.
  *
  * @author Federico Tomassetti
  */
-public class ResolvedIntersectionType implements ResolvedType {
+public class ResolvedIntersectionType extends ResolvedType {
     private List<ResolvedType> elements;
 
     public ResolvedIntersectionType(Collection<ResolvedType> elements) {
@@ -58,19 +60,33 @@ public class ResolvedIntersectionType implements ResolvedType {
 
     @Override
     public String describe() {
-        return String.join(" & ", elements.stream().map(ResolvedType::describe).collect(Collectors.toList()));
+      //  return String.join(" & ", elements.stream().map(ResolvedType::describe).collect(Collectors.toList()));
+    	List<String> list=new ArrayList<>();
+    	for (ResolvedType type : elements) {
+			list.add(type.describe());
+		}
+    	return StringUtils.join(list," & ");
     }
 
     @Override
     public boolean isAssignableBy(ResolvedType other) {
-        return elements.stream().allMatch(e -> e.isAssignableBy(other));
+       // return elements.stream().allMatch(e -> e.isAssignableBy(other));
+    	for (ResolvedType resolvedType : elements) {
+			if(!resolvedType.isAssignableBy(other)) return false;
+		}
+    	return true;
     }
 
     @Override
     public ResolvedType replaceTypeVariables(ResolvedTypeParameterDeclaration tp, ResolvedType replaced, Map<ResolvedTypeParameterDeclaration, ResolvedType> inferredTypes) {
-        List<ResolvedType> elementsReplaced = elements.stream()
+        /*List<ResolvedType> elementsReplaced = elements.stream()
                 .map(e -> e.replaceTypeVariables(tp, replaced, inferredTypes))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+    	List<ResolvedType> elementsReplaced=new ArrayList<>();
+    	for (ResolvedType e : elements) {
+    		elementsReplaced.add(e.replaceTypeVariables(tp, replaced, inferredTypes));
+		}
+    	
         if (elementsReplaced.equals(elements)) {
             return this;
         } else {

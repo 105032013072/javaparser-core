@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class IfStmtMetaModel extends StatementMetaModel {
 
-    IfStmtMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    IfStmtMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.stmt.IfStmt.class, "IfStmt", "com.github.javaparser.ast.stmt", false, false);
     }
 

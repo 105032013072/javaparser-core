@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author Federico Tomassetti
  */
-public class ResolvedArrayType implements ResolvedType {
+public class ResolvedArrayType extends ResolvedType {
 
     private ResolvedType baseType;
 

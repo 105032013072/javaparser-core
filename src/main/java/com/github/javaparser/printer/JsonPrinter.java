@@ -7,10 +7,11 @@ import com.github.javaparser.metamodel.PropertyMetaModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import static java.util.stream.Collectors.toList;
+
 
 /**
  * Outputs a JSON file containing the AST meant for inspecting it.
@@ -30,10 +31,24 @@ public class JsonPrinter {
         assertNotNull(node);
         NodeMetaModel metaModel = node.getMetaModel();
         List<PropertyMetaModel> allPropertyMetaModels = metaModel.getAllPropertyMetaModels();
-        List<PropertyMetaModel> attributes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isAttribute).filter(PropertyMetaModel::isSingular).collect(toList());
-        List<PropertyMetaModel> subNodes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNode).filter(PropertyMetaModel::isSingular).collect(toList());
-        List<PropertyMetaModel> subLists = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNodeList).collect(toList());
-
+       // List<PropertyMetaModel> attributes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isAttribute).filter(PropertyMetaModel::isSingular).collect(toList());
+        List<PropertyMetaModel> attributes=new ArrayList<>();
+        for (PropertyMetaModel p : allPropertyMetaModels) {
+			if(p.isAttribute() && p.isSingular()) attributes.add(p);
+		}
+        
+       // List<PropertyMetaModel> subNodes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNode).filter(PropertyMetaModel::isSingular).collect(toList());
+        List<PropertyMetaModel> subNodes=new ArrayList<>();
+        for (PropertyMetaModel p : allPropertyMetaModels) {
+			if(p.isNode()&& p.isSingular()) subNodes.add(p);
+		}
+        
+       // List<PropertyMetaModel> subLists = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNodeList).collect(toList());
+        List<PropertyMetaModel> subLists=new ArrayList<>();
+        for (PropertyMetaModel propertyMetaModel : allPropertyMetaModels) {
+			if(propertyMetaModel.isNodeList()) subLists.add(propertyMetaModel);
+		}
+        
         final List<String> content = new ArrayList<>();
 
         if (outputNodeType) {
@@ -58,14 +73,18 @@ public class JsonPrinter {
                 for (Node subListNode : subList) {
                     listContent.add(output(subListNode, null, level + 1));
                 }
-                content.add(listContent.stream().collect(Collectors.joining(",", q(subListMetaModel.getName()) + ":[", "]")));
+               // content.add(listContent.stream().collect(Collectors.joining(",", q(subListMetaModel.getName()) + ":[", "]")));
+                String str=q(subListMetaModel.getName())+ ":["+StringUtils.join(listContent,",")+"]";
+                content.add(str);
             }
         }
 
         if (name == null) {
-            return content.stream().collect(Collectors.joining(",", "{", "}"));
+           // return content.stream().collect(Collectors.joining(",", "{", "}"));
+        	return "{"+StringUtils.join(content,",")+"}";
         }
-        return content.stream().collect(Collectors.joining(",", q(name) + ":{", "}"));
+       // return content.stream().collect(Collectors.joining(",", q(name) + ":{", "}"));
+        return q(name) + ":{"+StringUtils.join(content,",")+"}";
     }
 
     private static String q(String value) {

@@ -23,6 +23,7 @@ package com.github.javaparser.printer.lexicalpreservation;
 
 import com.github.javaparser.ast.Node;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ class NodeText {
      * Initialize with an empty list of elements.
      */
     NodeText() {
-        this(new LinkedList<>());
+        this(new LinkedList<TextElement>());
     }
 
     //
@@ -140,7 +141,12 @@ class NodeText {
     //
 
     void remove(TextElementMatcher matcher) {
-        elements.removeIf(matcher::match);
+      // elements.removeIf(matcher::match);
+    	Iterator<TextElement> it=elements.iterator();
+    	while(it.hasNext()){
+    		TextElement e=it.next();
+    		if(matcher.match(e)) it.remove();    	
+    	}
     }
 
     public void remove(TextElementMatcher matcher, boolean potentiallyFollowingWhitespace) {
@@ -191,7 +197,10 @@ class NodeText {
     String expand() {
         StringBuffer sb = new StringBuffer();
 
-        elements.forEach(e -> sb.append(e.expand()));
+       // elements.forEach(e -> sb.append(e.expand()));
+        for (TextElement textElement : elements) {
+        	sb.append(textElement.expand());
+		}
         return sb.toString();
     }
 

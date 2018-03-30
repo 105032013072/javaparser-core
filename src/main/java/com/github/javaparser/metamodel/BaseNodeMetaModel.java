@@ -4,7 +4,7 @@ import com.github.javaparser.ast.Node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 import static com.github.javaparser.utils.Utils.decapitalize;
 
@@ -12,7 +12,7 @@ import static com.github.javaparser.utils.Utils.decapitalize;
  * Meta-data about all classes in the AST. These are all Nodes, except NodeList.
  */
 public abstract class BaseNodeMetaModel {
-    private final Optional<BaseNodeMetaModel> superNodeMetaModel;
+    private final BaseNodeMetaModel superNodeMetaModel;
     private final List<PropertyMetaModel> declaredPropertyMetaModels = new ArrayList<>();
     private final List<PropertyMetaModel> derivedPropertyMetaModels = new ArrayList<>();
     private final List<PropertyMetaModel> constructorParameters = new ArrayList<>();
@@ -22,7 +22,7 @@ public abstract class BaseNodeMetaModel {
     private final boolean isAbstract;
     private final boolean hasWildcard;
 
-    public BaseNodeMetaModel(Optional<BaseNodeMetaModel> superNodeMetaModel, Class<? extends Node> type, String name, String packageName, boolean isAbstract, boolean hasWildcard) {
+    public BaseNodeMetaModel(BaseNodeMetaModel superNodeMetaModel, Class<? extends Node> type, String name, String packageName, boolean isAbstract, boolean hasWildcard) {
         this.superNodeMetaModel = superNodeMetaModel;
         this.type = type;
         this.name = name;
@@ -49,7 +49,7 @@ public abstract class BaseNodeMetaModel {
      * @return the meta model for the node that this node extends. Note that this is to be used to find properties
      * defined in superclasses of a Node.
      */
-    public Optional<BaseNodeMetaModel> getSuperNodeMetaModel() {
+    public BaseNodeMetaModel getSuperNodeMetaModel() {
         return superNodeMetaModel;
     }
 
@@ -80,8 +80,8 @@ public abstract class BaseNodeMetaModel {
     public List<PropertyMetaModel> getAllPropertyMetaModels() {
         List<PropertyMetaModel> allPropertyMetaModels = new ArrayList<>(getDeclaredPropertyMetaModels());
         BaseNodeMetaModel walkNode = this;
-        while (walkNode.getSuperNodeMetaModel().isPresent()) {
-            walkNode = walkNode.getSuperNodeMetaModel().get();
+        while (walkNode.getSuperNodeMetaModel()!=null) {
+            walkNode = walkNode.getSuperNodeMetaModel();
             allPropertyMetaModels.addAll(walkNode.getDeclaredPropertyMetaModels());
         }
         return allPropertyMetaModels;
@@ -94,7 +94,7 @@ public abstract class BaseNodeMetaModel {
         if (isRootNode()) {
             return false;
         }
-        return getSuperNodeMetaModel().get().isInstanceOfMetaModel(baseMetaModel);
+        return getSuperNodeMetaModel().isInstanceOfMetaModel(baseMetaModel);
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class BaseNodeMetaModel {
      * @return whether this AST node is the root node, meaning that it is the meta model for "Node": "NodeMetaModel".
      */
     public boolean isRootNode() {
-        return !superNodeMetaModel.isPresent();
+        return !(superNodeMetaModel!=null);
     }
 
     @Override

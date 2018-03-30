@@ -30,7 +30,7 @@ import java.util.List;
 
 import static com.github.javaparser.utils.PositionUtils.sortByBeginPosition;
 
-public class CsmOrphanCommentsEnding implements CsmElement {
+public class CsmOrphanCommentsEnding extends CsmElement {
 
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {

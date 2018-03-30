@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author Federico Tomassetti
  */
-public interface ResolvedType {
+public abstract class ResolvedType {
 
     ///
     /// Relation with other types
@@ -46,11 +46,11 @@ public interface ResolvedType {
     /**
      * Does this type represent an array?
      */
-    default boolean isArray() {
+    public boolean isArray() {
         return false;
     }
 
-    default int arrayLevel() {
+    public int arrayLevel() {
         if (isArray()) {
             return 1 + this.asArrayType().getComponentType().arrayLevel();
         } else {
@@ -61,53 +61,53 @@ public interface ResolvedType {
     /**
      * Is this a primitive type?
      */
-    default boolean isPrimitive() {
+    public boolean isPrimitive() {
         return false;
     }
 
     /**
      * Is this the null type?
      */
-    default boolean isNull() {
+    public boolean isNull() {
         return false;
     }
 
     /**
      * Is this a union type (as the ones used in multi catch clauses)?
      */
-    default boolean isUnionType() {
+    public boolean isUnionType() {
         return false;
     }
 
     /**
      * Is this a non primitive value?
      */
-    default boolean isReference() {
+    public boolean isReference() {
         return isReferenceType() || isArray() || isTypeVariable() || isNull() || isWildcard() || isUnionType();
     }
 
     /**
      * Is this a lambda constraint type?
      */
-    default boolean isConstraint() { return false; }
+    public boolean isConstraint() { return false; }
 
     /**
      * Can this be seen as a ReferenceTypeUsage?
      * In other words: is this a reference to a class, an interface or an enum?
      */
-    default boolean isReferenceType() {
+    public boolean isReferenceType() {
         return false;
     }
 
-    default boolean isVoid() {
+    public boolean isVoid() {
         return false;
     }
 
-    default boolean isTypeVariable() {
+    public boolean isTypeVariable() {
         return false;
     }
 
-    default boolean isWildcard() {
+    public boolean isWildcard() {
         return false;
     }
 
@@ -115,35 +115,35 @@ public interface ResolvedType {
     /// Downcasting
     ///
 
-    default ResolvedArrayType asArrayType() {
+    public ResolvedArrayType asArrayType() {
         throw new UnsupportedOperationException(String.format("%s is not an Array", this));
     }
 
-    default ResolvedReferenceType asReferenceType() {
+    public ResolvedReferenceType asReferenceType() {
         throw new UnsupportedOperationException(String.format("%s is not a Reference Type", this));
     }
 
-    default ResolvedTypeParameterDeclaration asTypeParameter() {
+    public ResolvedTypeParameterDeclaration asTypeParameter() {
         throw new UnsupportedOperationException(String.format("%s is not a Type parameter", this));
     }
 
-    default ResolvedTypeVariable asTypeVariable() {
+    public ResolvedTypeVariable asTypeVariable() {
         throw new UnsupportedOperationException(String.format("%s is not a Type variable", this));
     }
 
-    default ResolvedPrimitiveType asPrimitive() {
+    public ResolvedPrimitiveType asPrimitive() {
         throw new UnsupportedOperationException(String.format("%s is not a Primitive type", this));
     }
 
-    default ResolvedWildcard asWildcard() {
+    public ResolvedWildcard asWildcard() {
         throw new UnsupportedOperationException(String.format("%s is not a Wildcard", this));
     }
 
-    default ResolvedLambdaConstraintType asConstraintType() {
+    public ResolvedLambdaConstraintType asConstraintType() {
         throw new UnsupportedOperationException(String.format("%s is not a constraint type", this));
     }
 
-    default ResolvedUnionType asUnionType() {
+    public ResolvedUnionType asUnionType() {
         throw new UnsupportedOperationException(String.format("%s is not a union type", this));
     }
 
@@ -151,7 +151,7 @@ public interface ResolvedType {
     /// Naming
     ///
 
-    String describe();
+    public abstract String describe();
 
     ///
     /// TypeParameters
@@ -162,21 +162,21 @@ public interface ResolvedType {
      * By replacing these values I could also infer some type equivalence.
      * Those would be collected in the given map.
      */
-    default ResolvedType replaceTypeVariables(ResolvedTypeParameterDeclaration tp, ResolvedType replaced, Map<ResolvedTypeParameterDeclaration, ResolvedType> inferredTypes) {
+    public ResolvedType replaceTypeVariables(ResolvedTypeParameterDeclaration tp, ResolvedType replaced, Map<ResolvedTypeParameterDeclaration, ResolvedType> inferredTypes) {
         return this;
     }
 
     /**
      * This is like ({@link #replaceTypeVariables(ResolvedTypeParameterDeclaration, ResolvedType, Map)} but ignores the inferred values.
      */
-    default ResolvedType replaceTypeVariables(ResolvedTypeParameterDeclaration tp, ResolvedType replaced) {
-        return replaceTypeVariables(tp, replaced, new HashMap<>());
+    public ResolvedType replaceTypeVariables(ResolvedTypeParameterDeclaration tp, ResolvedType replaced) {
+        return replaceTypeVariables(tp, replaced, new HashMap<ResolvedTypeParameterDeclaration, ResolvedType>());
     }
 
     /**
      * Does this type mention at all, directly or indirectly, the given type parameters?
      */
-    default boolean mention(List<ResolvedTypeParameterDeclaration> typeParameters) {
+    public boolean mention(List<ResolvedTypeParameterDeclaration> typeParameters) {
         throw new UnsupportedOperationException(this.getClass().getCanonicalName());
     }
 
@@ -187,6 +187,6 @@ public interface ResolvedType {
     /**
      * This method checks if ThisType t = new OtherType() would compile.
      */
-    boolean isAssignableBy(ResolvedType other);
+    public abstract  boolean isAssignableBy(ResolvedType other);
 
 }

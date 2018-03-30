@@ -112,11 +112,11 @@ public class ResolvedTypeParametersMap {
         }
     }
 
-    public Optional<ResolvedType> getValueBySignature(String signature) {
+    public ResolvedType getValueBySignature(String signature) {
         if (nameToValue.containsKey(signature)) {
-            return Optional.of(nameToValue.get(signature));
+            return nameToValue.get(signature);
         } else {
-            return Optional.empty();
+            return null;
         }
     }
 

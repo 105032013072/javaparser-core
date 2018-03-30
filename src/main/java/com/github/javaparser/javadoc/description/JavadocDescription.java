@@ -75,7 +75,10 @@ public class JavadocDescription {
 
     public String toText() {
         StringBuilder sb = new StringBuilder();
-        elements.forEach(e -> sb.append(e.toText()));
+       // elements.forEach(e -> sb.append(e.toText()));
+        for (JavadocDescriptionElement e : elements) {
+        	sb.append(e.toText());
+		}
         return sb.toString();
     }
 

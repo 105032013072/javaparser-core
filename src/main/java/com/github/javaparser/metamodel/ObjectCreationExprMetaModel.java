@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class ObjectCreationExprMetaModel extends ExpressionMetaModel {
 
-    ObjectCreationExprMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    ObjectCreationExprMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.expr.ObjectCreationExpr.class, "ObjectCreationExpr", "com.github.javaparser.ast.expr", false, false);
     }
 

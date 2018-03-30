@@ -6,7 +6,7 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 /**
  * No change. The Node is not mutated.
  */
-public class NoChange implements Change {
+public class NoChange extends Change {
 
     @Override
     public Object getValue(ObservableProperty property, Node node) {

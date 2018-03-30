@@ -21,10 +21,12 @@
 
 package com.github.javaparser.printer;
 
-import java.util.function.Function;
+
 
 import static com.github.javaparser.utils.Utils.EOL;
 import static com.github.javaparser.utils.Utils.assertNotNull;
+
+import com.github.javaparser.Function;
 
 /**
  * Configuration options for the {@link PrettyPrinter}.
@@ -39,7 +41,15 @@ public class PrettyPrinterConfiguration {
     private boolean columnAlignFirstMethodChain = false;
     private String indent = "    ";
     private String endOfLineCharacter = EOL;
-    private Function<PrettyPrinterConfiguration, PrettyPrintVisitor> visitorFactory = PrettyPrintVisitor::new;
+    //private Function<PrettyPrinterConfiguration, PrettyPrintVisitor> visitorFactory = PrettyPrintVisitor::new;
+    private Function<PrettyPrinterConfiguration, PrettyPrintVisitor> visitorFactory =new Function<PrettyPrinterConfiguration, PrettyPrintVisitor>() {
+
+		@Override
+		public PrettyPrintVisitor apply(PrettyPrinterConfiguration t) {
+			
+			return new PrettyPrintVisitor(t);
+		}
+	};
     private int maxEnumConstantsToAlignHorizontally = DEFAULT_MAX_ENUM_CONSTANTS_TO_ALIGN_HORIZONTALLY;
 
     public String getIndent() {

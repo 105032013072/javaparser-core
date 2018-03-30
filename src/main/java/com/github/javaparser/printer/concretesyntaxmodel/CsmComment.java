@@ -28,7 +28,7 @@ import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.printer.SourcePrinter;
 
-public class CsmComment implements CsmElement {
+public class CsmComment extends CsmElement {
 
     static void process(Comment comment, SourcePrinter printer) {
         String content = printer.normalizeEolInTextBlock(comment.getContent());
@@ -51,7 +51,10 @@ public class CsmComment implements CsmElement {
 
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
-        node.getCommentOptional().ifPresent(c -> process(c, printer));
+        //node.getCommentOptional().ifPresent(c -> process(c, printer));
+    	if(node.getCommentOptional()!=null){
+    		process(node.getCommentOptional(), printer);
+    	}
     }
 
 }

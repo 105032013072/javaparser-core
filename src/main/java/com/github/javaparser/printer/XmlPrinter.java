@@ -5,10 +5,11 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.metamodel.NodeMetaModel;
 import com.github.javaparser.metamodel.PropertyMetaModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.javaparser.utils.Utils.assertNotNull;
-import static java.util.stream.Collectors.toList;
+
 
 /**
  * Outputs an XML file containing the AST meant for inspecting it.
@@ -30,10 +31,25 @@ public class XmlPrinter {
         assertNotNull(node);
         NodeMetaModel metaModel = node.getMetaModel();
         List<PropertyMetaModel> allPropertyMetaModels = metaModel.getAllPropertyMetaModels();
-        List<PropertyMetaModel> attributes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isAttribute).filter(PropertyMetaModel::isSingular).collect(toList());
-        List<PropertyMetaModel> subNodes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNode).filter(PropertyMetaModel::isSingular).collect(toList());
-        List<PropertyMetaModel> subLists = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNodeList).collect(toList());
-
+        //List<PropertyMetaModel> attributes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isAttribute).filter(PropertyMetaModel::isSingular).collect(toList());
+        List<PropertyMetaModel> attributes=new ArrayList<>();
+        for (PropertyMetaModel p : allPropertyMetaModels) {
+			if(p.isAttribute() && p.isSingular()) attributes.add(p);
+		}
+        
+        
+        //List<PropertyMetaModel> subNodes = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNode).filter(PropertyMetaModel::isSingular).collect(toList());
+        List<PropertyMetaModel> subNodes=new ArrayList<>();
+        for (PropertyMetaModel p : allPropertyMetaModels) {
+			if(p.isNode()&& p.isSingular()) subNodes.add(p);
+		}
+        
+        //List<PropertyMetaModel> subLists = allPropertyMetaModels.stream().filter(PropertyMetaModel::isNodeList).collect(toList());
+        List<PropertyMetaModel> subLists=new ArrayList<>();
+        for (PropertyMetaModel propertyMetaModel : allPropertyMetaModels) {
+			if(propertyMetaModel.isNodeList()) subLists.add(propertyMetaModel);
+		}
+        
         builder.append("<").append(name);
         if (outputNodeType) {
             builder.append(attribute("type", metaModel.getTypeName()));

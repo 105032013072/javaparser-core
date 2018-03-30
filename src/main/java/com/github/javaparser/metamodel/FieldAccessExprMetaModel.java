@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class FieldAccessExprMetaModel extends ExpressionMetaModel {
 
-    FieldAccessExprMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    FieldAccessExprMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.expr.FieldAccessExpr.class, "FieldAccessExpr", "com.github.javaparser.ast.expr", false, false);
     }
 

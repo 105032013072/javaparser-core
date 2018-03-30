@@ -34,14 +34,10 @@ public interface ResolvedFieldDeclaration extends ResolvedValueDeclaration, HasA
     boolean isStatic();
 
     @Override
-    default boolean isField() {
-        return true;
-    }
+    public boolean isField();
 
     @Override
-    default ResolvedFieldDeclaration asField() {
-        return this;
-    }
+    public ResolvedFieldDeclaration asField();
 
     /**
      * The type on which this field has been declared

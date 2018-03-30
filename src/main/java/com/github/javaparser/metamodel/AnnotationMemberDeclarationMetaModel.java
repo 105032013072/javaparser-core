@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class AnnotationMemberDeclarationMetaModel extends BodyDeclarationMetaModel {
 
-    AnnotationMemberDeclarationMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    AnnotationMemberDeclarationMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.body.AnnotationMemberDeclaration.class, "AnnotationMemberDeclaration", "com.github.javaparser.ast.body", false, false);
     }
 

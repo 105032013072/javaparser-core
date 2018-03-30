@@ -21,7 +21,7 @@
 
 package com.github.javaparser.resolution.types;
 
-public class ResolvedLambdaConstraintType implements ResolvedType {
+public class ResolvedLambdaConstraintType extends ResolvedType {
     private ResolvedType bound;
 
     private ResolvedLambdaConstraintType(ResolvedType bound) {

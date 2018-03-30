@@ -7,7 +7,7 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 /**
  * The removal of an element in a list.
  */
-public class ListRemovalChange implements Change {
+public class ListRemovalChange extends Change {
     private final ObservableProperty observableProperty;
     private final int index;
 

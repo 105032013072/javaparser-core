@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.security.auth.callback.Callback;
+
 import static com.github.javaparser.ParseStart.COMPILATION_UNIT;
 import static com.github.javaparser.Providers.provider;
 import static com.github.javaparser.utils.Utils.assertNotNull;
@@ -84,8 +86,16 @@ public class SourceZip {
      */
     public List<Pair<Path, ParseResult<CompilationUnit>>> parse() throws IOException {
         Log.info("Parsing zip at \"%s\"", zipPath);
-        List<Pair<Path, ParseResult<CompilationUnit>>> results = new ArrayList<>();
-        parse((path, result) -> results.add(new Pair<>(path, result)));
+        final List<Pair<Path, ParseResult<CompilationUnit>>> results = new ArrayList<>();
+       // parse((path, result) -> results.add(new Pair<>(path, result)));
+        parse(new Callback() {
+
+			@Override
+			public void process(Path path, ParseResult<CompilationUnit> result) {
+				results.add(new Pair<>(path, result));
+				
+			}
+		});
         return results;
     }
 
@@ -116,7 +126,7 @@ public class SourceZip {
     /**
      * An interface to define a callback for each file that's parsed.
      */
-    @FunctionalInterface
+  
     public interface Callback {
 
         /**

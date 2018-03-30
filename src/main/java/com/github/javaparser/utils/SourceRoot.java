@@ -1,5 +1,6 @@
 package com.github.javaparser.utils;
 
+import com.github.javaparser.Function;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParseResult;
@@ -19,8 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 import static com.github.javaparser.ParseStart.COMPILATION_UNIT;
 import static com.github.javaparser.Providers.provider;
@@ -39,7 +39,6 @@ import static com.github.javaparser.utils.Utils.assertNotNull;
  * </ul>
  */
 public class SourceRoot {
-    @FunctionalInterface
     public interface Callback {
         enum Result {
             SAVE, DONT_SAVE
@@ -56,7 +55,15 @@ public class SourceRoot {
     private final Path root;
     private final Map<Path, ParseResult<CompilationUnit>> cache = new ConcurrentHashMap<>();
     private ParserConfiguration parserConfiguration = new ParserConfiguration();
-    private Function<CompilationUnit, String> printer = new PrettyPrinter()::print;
+    //private Function<CompilationUnit, String> printer = new PrettyPrinter()::print;
+    private Function<CompilationUnit, String> printer = new Function<CompilationUnit, String>() {
+
+		@Override
+		public String apply(CompilationUnit t) {
+			
+			return new PrettyPrinter().print(t);
+		}
+	};
 
     public SourceRoot(Path root) {
         assertNotNull(root);
@@ -107,7 +114,10 @@ public class SourceRoot {
         Log.trace("Parsing %s", path);
         final ParseResult<CompilationUnit> result = new JavaParser(configuration)
                 .parse(COMPILATION_UNIT, provider(path));
-        result.getResult().ifPresent(cu -> cu.setStorage(path));
+       // result.getResult().ifPresent(cu -> cu.setStorage(path));
+        if(result.getResult()!=null){
+        	result.getResult().setStorage(path);
+        }
         cache.put(relativePath, result);
         return result;
     }

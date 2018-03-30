@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Federico Tomassetti
  */
-public class ResolvedWildcard implements ResolvedType {
+public class ResolvedWildcard extends ResolvedType {
 
     public static ResolvedWildcard UNBOUNDED = new ResolvedWildcard(null, null);
 

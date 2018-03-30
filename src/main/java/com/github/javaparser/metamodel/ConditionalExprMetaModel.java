@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class ConditionalExprMetaModel extends ExpressionMetaModel {
 
-    ConditionalExprMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    ConditionalExprMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.expr.ConditionalExpr.class, "ConditionalExpr", "com.github.javaparser.ast.expr", false, false);
     }
 

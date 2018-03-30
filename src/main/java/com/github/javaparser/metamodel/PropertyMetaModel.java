@@ -3,7 +3,7 @@ package com.github.javaparser.metamodel;
 import com.github.javaparser.ast.Node;
 
 import java.lang.reflect.Field;
-import java.util.Optional;
+
 
 import static com.github.javaparser.utils.CodeGenerationUtils.getterName;
 import static com.github.javaparser.utils.CodeGenerationUtils.setterName;
@@ -15,14 +15,14 @@ public class PropertyMetaModel {
     private final BaseNodeMetaModel containingNodeMetaModel;
     private final String name;
     private final Class<?> type;
-    private final Optional<BaseNodeMetaModel> nodeReference;
+    private final BaseNodeMetaModel nodeReference;
     private final boolean isOptional;
     private final boolean isNonEmpty;
     private final boolean isNodeList;
     private final boolean isEnumSet;
     private final boolean hasWildcard;
 
-    public PropertyMetaModel(BaseNodeMetaModel containingNodeMetaModel, String name, Class<?> type, Optional<BaseNodeMetaModel> nodeReference, boolean isOptional, boolean isNonEmpty, boolean isNodeList, boolean isEnumSet, boolean hasWildcard) {
+    public PropertyMetaModel(BaseNodeMetaModel containingNodeMetaModel, String name, Class<?> type, BaseNodeMetaModel nodeReference, boolean isOptional, boolean isNonEmpty, boolean isNodeList, boolean isEnumSet, boolean hasWildcard) {
         this.containingNodeMetaModel = containingNodeMetaModel;
         this.name = name;
         this.type = type;
@@ -93,7 +93,7 @@ public class PropertyMetaModel {
     /**
      * @return if this property is a Node, this will get the node meta model.
      */
-    public Optional<BaseNodeMetaModel> getNodeReference() {
+    public BaseNodeMetaModel getNodeReference() {
         return nodeReference;
     }
 
@@ -208,7 +208,7 @@ public class PropertyMetaModel {
      * @return is this property an AST Node?
      */
     public boolean isNode() {
-        return getNodeReference().isPresent();
+        return getNodeReference()!=null;
     }
 
     /**

@@ -22,7 +22,7 @@
 package com.github.javaparser.resolution.declarations;
 
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * An entity which has type parameter.
@@ -40,10 +40,8 @@ public interface ResolvedTypeParametrizable {
      * Find the closest TypeParameterDeclaration with the given name.
      * It first look on this element itself and then on the containers.
      */
-    Optional<ResolvedTypeParameterDeclaration> findTypeParameter(String name);
+    ResolvedTypeParameterDeclaration findTypeParameter(String name);
 
-    default boolean isGeneric() {
-        return !getTypeParameters().isEmpty();
-    }
+    public boolean isGeneric();
 
 }

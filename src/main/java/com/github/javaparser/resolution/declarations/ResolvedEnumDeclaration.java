@@ -32,14 +32,10 @@ public interface ResolvedEnumDeclaration extends ResolvedReferenceTypeDeclaratio
         HasAccessSpecifier {
 
     @Override
-    default boolean isEnum() {
-        return true;
-    }
+    public boolean isEnum();
 
     @Override
-    default ResolvedEnumDeclaration asEnum() {
-        return this;
-    }
+    public ResolvedEnumDeclaration asEnum();
 
     List<ResolvedEnumConstantDeclaration> getEnumConstants();
 }

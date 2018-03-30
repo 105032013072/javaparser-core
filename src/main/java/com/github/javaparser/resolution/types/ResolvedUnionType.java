@@ -21,18 +21,21 @@
 
 package com.github.javaparser.resolution.types;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 
 /**
  * A union type is defined in java as list of types separates by pipes.
  *
  * @author Federico Tomassetti
  */
-public class ResolvedUnionType implements ResolvedType {
+public class ResolvedUnionType extends ResolvedType {
     private List<ResolvedType> elements;
 
     public ResolvedUnionType(List<ResolvedType> elements) {
@@ -59,12 +62,21 @@ public class ResolvedUnionType implements ResolvedType {
 
     @Override
     public String describe() {
-        return String.join(" | ", elements.stream().map(ResolvedType::describe).collect(Collectors.toList()));
+    	List<String> list=new ArrayList<>();
+    	for (ResolvedType r : elements) {
+			list.add(r.describe());
+		}
+    	return StringUtils.join(list," | ");
+       // return String.join(" | ", elements.stream().map(ResolvedType::describe).collect(Collectors.toList()));
     }
 
     @Override
     public boolean isAssignableBy(ResolvedType other) {
-        return elements.stream().allMatch(e -> e.isAssignableBy(other));
+       // return elements.stream().allMatch(e -> e.isAssignableBy(other));
+    	for (ResolvedType e : elements) {
+			if( !e.isAssignableBy(other)) return false;
+		}
+    	return true;
     }
 
     @Override

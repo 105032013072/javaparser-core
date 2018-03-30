@@ -32,114 +32,114 @@ import java.util.List;
 import static com.github.javaparser.TokenTypes.*;
 import static com.github.javaparser.utils.Utils.EOL;
 
-public interface CsmElement {
+public abstract class CsmElement {
 
-    void prettyPrint(Node node, SourcePrinter printer);
+  public  abstract void prettyPrint(Node node, SourcePrinter printer);
 
-    static CsmElement child(ObservableProperty property) {
+  public static CsmElement child(ObservableProperty property) {
         return new CsmSingleReference(property);
     }
 
-    static CsmElement attribute(ObservableProperty property) {
+  public  static CsmElement attribute(ObservableProperty property) {
         return new CsmAttribute(property);
     }
 
-    static CsmElement sequence(CsmElement... elements) {
+  public  static CsmElement sequence(CsmElement... elements) {
         return new CsmSequence(Arrays.asList(elements));
     }
 
-    static CsmElement string(int tokenType, String content) {
+  public static CsmElement string(int tokenType, String content) {
         return new CsmToken(tokenType, content);
     }
 
-    static CsmElement string(int tokenType) {
+  public static CsmElement string(int tokenType) {
         return new CsmToken(tokenType);
     }
 
-    static CsmElement stringToken(ObservableProperty property) {
+  public static CsmElement stringToken(ObservableProperty property) {
         return new CsmString(property);
     }
 
-    static CsmElement charToken(ObservableProperty property) {
+  public static CsmElement charToken(ObservableProperty property) {
         return new CsmChar(property);
     }
 
-    static CsmElement token(int tokenType) {
+  public  static CsmElement token(int tokenType) {
         return new CsmToken(tokenType);
     }
 
-    static CsmElement token(int tokenType, CsmToken.TokenContentCalculator tokenContentCalculator) {
+  public  static CsmElement token(int tokenType, CsmToken.TokenContentCalculator tokenContentCalculator) {
         return new CsmToken(tokenType, tokenContentCalculator);
     }
 
-    static CsmElement conditional(ObservableProperty property, CsmConditional.Condition condition, CsmElement thenElement) {
+  public static CsmElement conditional(ObservableProperty property, CsmConditional.Condition condition, CsmElement thenElement) {
         return new CsmConditional(property, condition, thenElement);
     }
 
-    static CsmElement conditional(ObservableProperty property, CsmConditional.Condition condition, CsmElement thenElement, CsmElement elseElement) {
+  public  static CsmElement conditional(ObservableProperty property, CsmConditional.Condition condition, CsmElement thenElement, CsmElement elseElement) {
         return new CsmConditional(property, condition, thenElement, elseElement);
     }
 
-    static CsmElement conditional(List<ObservableProperty> properties, CsmConditional.Condition condition, CsmElement thenElement, CsmElement elseElement) {
+  public  static CsmElement conditional(List<ObservableProperty> properties, CsmConditional.Condition condition, CsmElement thenElement, CsmElement elseElement) {
         return new CsmConditional(properties, condition, thenElement, elseElement);
     }
 
-    static CsmElement space() {
+    public static CsmElement space() {
         return new CsmToken(spaceTokenKind(), " ");
     }
 
-    static CsmElement semicolon() {
+    public  static CsmElement semicolon() {
         return new CsmToken(GeneratedJavaParserConstants.SEMICOLON);
     }
 
-    static CsmElement comment() { return new CsmComment(); }
+    public static CsmElement comment() { return new CsmComment(); }
 
-    static CsmElement newline() {
+    public static CsmElement newline() {
         return new CsmToken(eolTokenKind(), EOL);
     }
 
-    static CsmElement none() {
+    public static CsmElement none() {
         return new CsmNone();
     }
 
-    static CsmElement comma() {
+    public static CsmElement comma() {
         return new CsmToken(GeneratedJavaParserConstants.COMMA);
     }
 
-    static CsmElement list(ObservableProperty property) {
+    public static CsmElement list(ObservableProperty property) {
         return new CsmList(property);
     }
 
-    static CsmElement list(ObservableProperty property, CsmElement separator) {
+    public static CsmElement list(ObservableProperty property, CsmElement separator) {
         return new CsmList(property, CsmElement.none(), separator, new CsmNone(), new CsmNone());
     }
 
-    static CsmElement list(ObservableProperty property, CsmElement separator, CsmElement preceeding, CsmElement following) {
+    public static CsmElement list(ObservableProperty property, CsmElement separator, CsmElement preceeding, CsmElement following) {
         return new CsmList(property, none(), separator, preceeding, following);
     }
 
-    static CsmElement list(ObservableProperty property, CsmElement separatorPre, CsmElement separatorPost, CsmElement preceeding, CsmElement following) {
+    public static CsmElement list(ObservableProperty property, CsmElement separatorPre, CsmElement separatorPost, CsmElement preceeding, CsmElement following) {
         return new CsmList(property, separatorPre, separatorPost, preceeding, following);
     }
 
-    static CsmElement orphanCommentsEnding() {
+    public static CsmElement orphanCommentsEnding() {
         return new CsmOrphanCommentsEnding();
     }
 
-    static CsmElement orphanCommentsBeforeThis() {
+    public static CsmElement orphanCommentsBeforeThis() {
         // FIXME
         return new CsmNone();
     }
 
-    static CsmElement indent() {
+    public  static CsmElement indent() {
         return new CsmIndent();
     }
 
-    static CsmElement unindent() {
+    public static CsmElement unindent() {
         return new CsmUnindent();
     }
 
-    static CsmElement block(CsmElement content) {
+    public static CsmElement block(CsmElement content) {
         return sequence(token(GeneratedJavaParserConstants.LBRACE), indent(), content, unindent(), token(GeneratedJavaParserConstants.RBRACE));
     }
 }

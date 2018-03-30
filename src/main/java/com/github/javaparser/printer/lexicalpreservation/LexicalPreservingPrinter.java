@@ -33,11 +33,13 @@ import com.github.javaparser.ast.observer.AstObserver;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.observer.PropagatingAstObserver;
 import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.TreeVisitor;
 import com.github.javaparser.printer.ConcreteSyntaxModel;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmElement;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmMix;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmToken;
+
 import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.Utils;
 
@@ -48,7 +50,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 import static com.github.javaparser.GeneratedJavaParserConstants.*;
 import static com.github.javaparser.TokenTypes.eolTokenKind;
@@ -85,7 +87,7 @@ public class LexicalPreservingPrinter {
             throw new RuntimeException("Parsing failed, unable to setup the lexical preservation printer: "
                     + parseResult.getProblems());
         }
-        LexicalPreservingPrinter lexicalPreservingPrinter = new LexicalPreservingPrinter(parseResult.getResult().get());
+        LexicalPreservingPrinter lexicalPreservingPrinter = new LexicalPreservingPrinter(parseResult.getResult());
         return new Pair<>(parseResult, lexicalPreservingPrinter);
     }
 
@@ -104,14 +106,22 @@ public class LexicalPreservingPrinter {
     public static <N extends Node> N setup(N node) {
         assertNotNull(node);
 
-        node.getTokenRange().ifPresent(r -> {
+        /*node.getTokenRange().ifPresent(r -> {
             storeInitialText(node);
 
             // Setup observer
             AstObserver observer = createObserver();
 
             node.registerForSubtree(observer);
-        });
+        });*/
+        if(node.getTokenRange()!=null){
+        	storeInitialText(node);
+
+            // Setup observer
+            AstObserver observer = createObserver();
+
+            node.registerForSubtree(observer);
+        }
         return node;
     }
 
@@ -140,10 +150,10 @@ public class LexicalPreservingPrinter {
                     return;
                 }
                 if (property == ObservableProperty.COMMENT) {
-                    if (!observedNode.getOptionalParentNode().isPresent()) {
+                    if (!(observedNode.getOptionalParentNode()!=null)) {
                         throw new IllegalStateException();
                     }
-                    NodeText nodeText = getOrCreateNodeText(observedNode.getOptionalParentNode().get());
+                    NodeText nodeText = getOrCreateNodeText(observedNode.getOptionalParentNode());
                     if (oldValue == null) {
                         // Find the position of the comment node and put in front of it the comment and a newline
                         int index = nodeText.findChild(observedNode);
@@ -152,8 +162,13 @@ public class LexicalPreservingPrinter {
                     } else if (newValue == null) {
                         if (oldValue instanceof JavadocComment) {
                             JavadocComment javadocComment = (JavadocComment) oldValue;
-                            List<TokenTextElement> matchingTokens = nodeText.getElements().stream().filter(e -> e.isToken(JAVADOC_COMMENT)
-                                    && ((TokenTextElement) e).getText().equals("/**" + javadocComment.getContent() + "*/")).map(e -> (TokenTextElement) e).collect(Collectors.toList());
+                            List<TokenTextElement> matchingTokens =new ArrayList<>();
+                            for (TextElement e : nodeText.getElements()) {
+								if(e.isToken(JAVADOC_COMMENT)&& ((TokenTextElement) e).getText().equals("/**" + javadocComment.getContent() + "*/")){
+									matchingTokens.add((TokenTextElement) e);
+								}
+							}
+                            
                             if (matchingTokens.size() != 1) {
                                 throw new IllegalStateException();
                             }
@@ -168,8 +183,13 @@ public class LexicalPreservingPrinter {
                     } else {
                         if (oldValue instanceof JavadocComment) {
                             JavadocComment oldJavadocComment = (JavadocComment) oldValue;
-                            List<TokenTextElement> matchingTokens = nodeText.getElements().stream().filter(e -> e.isToken(JAVADOC_COMMENT)
-                                    && ((TokenTextElement) e).getText().equals("/**" + oldJavadocComment.getContent() + "*/")).map(e -> (TokenTextElement) e).collect(Collectors.toList());
+                            List<TokenTextElement> matchingTokens=new ArrayList<>();
+                            for (TextElement e : nodeText.getElements()) {
+								if(e.isToken(JAVADOC_COMMENT)&& ((TokenTextElement) e).getText().equals("/**" + oldJavadocComment.getContent() + "*/")){
+									matchingTokens.add((TokenTextElement) e);
+								}
+							}
+                            
                             if (matchingTokens.size() != 1) {
                                 throw new IllegalStateException();
                             }
@@ -210,19 +230,21 @@ public class LexicalPreservingPrinter {
     }
 
     private static void storeInitialText(Node root) {
-        Map<Node, List<JavaToken>> tokensByNode = new IdentityHashMap<>();
+        final Map<Node, List<JavaToken>> tokensByNode = new IdentityHashMap<>();
 
         // We go over tokens and find to which nodes they belong. Note that we do not traverse the tokens as they were
         // on a list but as they were organized in a tree. At each time we select only the branch corresponding to the
         // range of interest and ignore all other branches
-        for (JavaToken token : root.getTokenRange().get()) {
-            Range tokenRange = token.getRange().orElseThrow(() -> new RuntimeException("Token without range: " + token));
+        for (JavaToken token : root.getTokenRange()) {
+            //Range tokenRange = token.getRange().orElseThrow(() -> new RuntimeException("Token without range: " + token));
+        	Range tokenRange = token.getRange();
+        	if(tokenRange==null) new RuntimeException("Token without range: " + token);
             Node owner = findNodeForToken(root, tokenRange);
             if (owner == null) {
                 throw new RuntimeException("Token without node owning it: " + token);
             }
             if (!tokensByNode.containsKey(owner)) {
-                tokensByNode.put(owner, new LinkedList<>());
+                tokensByNode.put(owner, new LinkedList<JavaToken>());
             }
             tokensByNode.get(owner).add(token);
         }
@@ -242,7 +264,7 @@ public class LexicalPreservingPrinter {
         if (PhantomNodeLogic.isPhantomNode(node)) {
             return null;
         }
-        if (node.getRange().get().contains(tokenRange)) {
+        if (node.getRange().contains(tokenRange)) {
             for (Node child : node.getChildNodes()) {
                 Node found = findNodeForToken(child, tokenRange);
                 if (found != null) {
@@ -262,17 +284,33 @@ public class LexicalPreservingPrinter {
         List<Pair<Range, TextElement>> elements = new LinkedList<>();
         for (Node child : node.getChildNodes()) {
             if (!PhantomNodeLogic.isPhantomNode(child)) {
-                if (!child.getRange().isPresent()) {
+                if (child.getRange()==null) {
                     throw new RuntimeException("Range not present on node " + child);
                 }
-                elements.add(new Pair<>(child.getRange().get(), new ChildTextElement(child)));
+               // elements.add(new Pair<>(child.getRange(), new ChildTextElement(child)));
+                Pair<Range, TextElement> p=new Pair<>(child.getRange(), (TextElement)new ChildTextElement(child));
+                elements.add(p);
             }
         }
         for (JavaToken token : nodeTokens) {
-            elements.add(new Pair<>(token.getRange().get(), new TokenTextElement(token)));
+            elements.add(new Pair<>(token.getRange(), (TextElement)new TokenTextElement(token)));
         }
-        elements.sort(comparing(e -> e.a.begin));
-        node.setData(NODE_TEXT_DATA, new NodeText(elements.stream().map(p -> p.b).collect(Collectors.toList())));
+        
+        Comparator<Pair<Range, TextElement>> comparator=new Comparator<Pair<Range,TextElement>>() {
+			
+			@Override
+			public int compare(Pair<Range, TextElement> e1, Pair<Range, TextElement> e2) {
+				
+				return e1.a.begin.compareTo(e2.a.begin);
+			}
+		};
+		Collections.sort(elements,comparator);
+        //node.setData(NODE_TEXT_DATA, new NodeText(elements.stream().map(p -> p.b).collect(Collectors.toList())));
+		List<TextElement> list=new ArrayList<>();
+		for (Pair<Range, TextElement> pair : elements) {
+			list.add(pair.b);
+		}
+		node.setData(NODE_TEXT_DATA,new NodeText(list));
     }
 
     //
@@ -280,27 +318,39 @@ public class LexicalPreservingPrinter {
     //
 
     private static Iterator<TokenTextElement> tokensPreceeding(final Node node) {
-        if (!node.getOptionalParentNode().isPresent()) {
+        if (node.getOptionalParentNode()==null) {
             return new TextElementIteratorsFactory.EmptyIterator<>();
         }
         // There is the awfully painful case of the fake types involved in variable declarators and
         // fields or variable declaration that are, of course, an exception...
 
-        NodeText parentNodeText = getOrCreateNodeText(node.getOptionalParentNode().get());
+        NodeText parentNodeText = getOrCreateNodeText(node.getOptionalParentNode());
         int index = parentNodeText.tryToFindChild(node);
         if (index == NodeText.NOT_FOUND) {
-            if (node.getOptionalParentNode().get() instanceof VariableDeclarator) {
-                return tokensPreceeding(node.getOptionalParentNode().get());
+            if (node.getOptionalParentNode()instanceof VariableDeclarator) {
+                return tokensPreceeding(node.getOptionalParentNode());
             } else {
                 throw new IllegalArgumentException(
                         String.format("I could not find child '%s' in parent '%s'. parentNodeText: %s",
-                                node, node.getOptionalParentNode().get(), parentNodeText));
+                                node, node.getOptionalParentNode(), parentNodeText));
             }
         }
 
-        return new TextElementIteratorsFactory.CascadingIterator<>(
+       /* return new TextElementIteratorsFactory.CascadingIterator<>(
                 TextElementIteratorsFactory.partialReverseIterator(parentNodeText, index - 1),
-                () -> tokensPreceeding(node.getOptionalParentNode().get()));
+                () -> tokensPreceeding(node.getOptionalParentNode().get()));*/
+         
+    
+         TextElementIteratorsFactory.CascadingIterator.Provider<TokenTextElement> p=new TextElementIteratorsFactory.CascadingIterator.Provider<TokenTextElement>() {
+
+			@Override
+			public Iterator<TokenTextElement> provide() {
+				
+				return tokensPreceeding(node.getOptionalParentNode());
+			}
+		};
+		
+		return new TextElementIteratorsFactory.CascadingIterator<>(TextElementIteratorsFactory.partialReverseIterator(parentNodeText, index - 1),p);
     }
 
     //
@@ -384,7 +434,10 @@ public class LexicalPreservingPrinter {
         boolean pendingIndentation = false;
         for (CsmElement element : calculatedSyntaxModel.elements) {
             if (pendingIndentation && !(element instanceof CsmToken && ((CsmToken) element).isNewLine())) {
-                indentation.forEach(nodeText::addElement);
+              //  indentation.forEach(nodeText::addElement);
+            	for (TokenTextElement tokenTextElement : indentation) {
+            		nodeText.addElement(tokenTextElement);
+				}
             }
             pendingIndentation = false;
             if (element instanceof LexicalDifferenceCalculator.CsmChild) {
@@ -397,7 +450,10 @@ public class LexicalPreservingPrinter {
                 }
             } else if (element instanceof CsmMix) {
                 CsmMix csmMix = (CsmMix) element;
-                csmMix.getElements().forEach(e -> interpret(node, e, nodeText));
+                //csmMix.getElements().forEach(e -> interpret(node, e, nodeText));
+                for (CsmElement e : csmMix.getElements()) {
+                	interpret(node, e, nodeText);
+				}
             } else {
                 throw new UnsupportedOperationException(element.getClass().getSimpleName());
             }
@@ -406,7 +462,7 @@ public class LexicalPreservingPrinter {
         // so they have to be handled in a special way
         if (node instanceof VariableDeclarator) {
             VariableDeclarator variableDeclarator = (VariableDeclarator) node;
-            variableDeclarator.getOptionalParentNode().ifPresent(parent ->
+           /* variableDeclarator.getOptionalParentNode().ifPresent(parent ->
                     ((NodeWithVariables<?>) parent).getMaximumCommonType().ifPresent(mct -> {
                         int extraArrayLevels = variableDeclarator.getType().getArrayLevel() - mct.getArrayLevel();
                         for (int i = 0; i < extraArrayLevels; i++) {
@@ -414,7 +470,20 @@ public class LexicalPreservingPrinter {
                             nodeText.addElement(new TokenTextElement(RBRACKET));
                         }
                     })
-            );
+            );*/
+            
+            
+            Node parent=  variableDeclarator.getOptionalParentNode();
+            if(parent!=null){
+            	Type mct=((NodeWithVariables<?>) parent).getMaximumCommonType();
+            	if(mct!=null){
+            		int extraArrayLevels = variableDeclarator.getType().getArrayLevel() - mct.getArrayLevel();
+                    for (int i = 0; i < extraArrayLevels; i++) {
+                        nodeText.addElement(new TokenTextElement(LBRACKET));
+                        nodeText.addElement(new TokenTextElement(RBRACKET));
+                    }
+            	}
+            }
         }
         return nodeText;
     }
@@ -456,7 +525,7 @@ public class LexicalPreservingPrinter {
     //
 
     private static boolean isReturningOptionalNodeList(Method m) {
-        if (!m.getReturnType().getCanonicalName().equals(Optional.class.getCanonicalName())) {
+        /*if (!m.getReturnType().getCanonicalName().equals(Optional.class.getCanonicalName())) {
             return false;
         }
         if (!(m.getGenericReturnType() instanceof ParameterizedType)) {
@@ -464,13 +533,14 @@ public class LexicalPreservingPrinter {
         }
         ParameterizedType parameterizedType = (ParameterizedType) m.getGenericReturnType();
         java.lang.reflect.Type optionalArgument = parameterizedType.getActualTypeArguments()[0];
-        return (optionalArgument.getTypeName().startsWith(NodeList.class.getCanonicalName()));
+        return (optionalArgument.getTypeName().startsWith(NodeList.class.getCanonicalName()));*/
+    	return false;
     }
 
     private static ObservableProperty findNodeListName(NodeList nodeList) {
         Node parent = nodeList.getParentNodeForChildren();
         for (Method m : parent.getClass().getMethods()) {
-            if (m.getParameterCount() == 0 && m.getReturnType().getCanonicalName().equals(NodeList.class.getCanonicalName())) {
+            if (m.getParameterTypes().length == 0 && m.getReturnType().getCanonicalName().equals(NodeList.class.getCanonicalName())) {
                 try {
                     Object raw = m.invoke(parent);
                     if (!(raw instanceof NodeList)) {
@@ -487,10 +557,10 @@ public class LexicalPreservingPrinter {
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException(e);
                 }
-            } else if (m.getParameterCount() == 0 && isReturningOptionalNodeList(m)) {
+            } else if (m.getParameterTypes().length == 0 && isReturningOptionalNodeList(m)) {
                 try {
-                    Optional<NodeList<?>> raw = (Optional<NodeList<?>>) m.invoke(parent);
-                    if (raw.isPresent() && raw.get() == nodeList) {
+                    NodeList<?> raw = (NodeList<?>) m.invoke(parent);
+                    if (raw!=null && raw == nodeList) {
                         String name = m.getName();
                         if (name.startsWith("get")) {
                             name = name.substring("get".length());

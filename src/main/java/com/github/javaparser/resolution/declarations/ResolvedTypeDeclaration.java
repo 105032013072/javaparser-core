@@ -23,7 +23,7 @@ package com.github.javaparser.resolution.declarations;
 
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 
-import java.util.Optional;
+
 import java.util.Set;
 
 /**
@@ -42,35 +42,26 @@ public interface ResolvedTypeDeclaration extends ResolvedDeclaration {
     /**
      * Get the list of types defined inside the current type.
      */
-    default Set<ResolvedReferenceTypeDeclaration> internalTypes() {
-        throw new UnsupportedOperationException("InternalTypes not available for " + this.getClass().getCanonicalName());
-    }
+	public Set<ResolvedReferenceTypeDeclaration> internalTypes();
 
     /**
      * Returns a type declaration for the internal type based on name.
      * (Does not include internal types inside internal types).
      */
-    default ResolvedReferenceTypeDeclaration getInternalType(String name) {
-        Optional<ResolvedReferenceTypeDeclaration> type =
-                this.internalTypes().stream().filter(f -> f.getName().equals(name)).findFirst();
-        return type.orElseThrow(() ->
-                new UnsolvedSymbolException("Internal type not found: " + name));
-    }
+	public ResolvedReferenceTypeDeclaration getInternalType(String name);
 
     /**
      * Does this type contain an internal type with the given name?
      * (Does not include internal types inside internal types).
      */
-    default boolean hasInternalType(String name) {
-        return this.internalTypes().stream().anyMatch(f -> f.getName().equals(name));
-    }
+	public boolean hasInternalType(String name);
 
     /**
      * Get the ReferenceTypeDeclaration enclosing this declaration.
      *
      * @return
      */
-    Optional<ResolvedReferenceTypeDeclaration> containerType();
+    ResolvedReferenceTypeDeclaration containerType();
 
     ///
     /// Misc
@@ -80,35 +71,25 @@ public interface ResolvedTypeDeclaration extends ResolvedDeclaration {
      * Is this the declaration of a class?
      * Note that an Enum is not considered a Class in this case.
      */
-    default boolean isClass() {
-        return false;
-    }
+    public boolean isClass();
 
     /**
      * Is this the declaration of an interface?
      */
-    default boolean isInterface() {
-        return false;
-    }
+    public boolean isInterface();
 
     /**
      * Is this the declaration of an enum?
      */
-    default boolean isEnum() {
-        return false;
-    }
+    public boolean isEnum();
 
     /**
      * Is this the declaration of a type parameter?
      */
-    default boolean isTypeParameter() {
-        return false;
-    }
+    public boolean isTypeParameter();
 
     @Override
-    default boolean isType() {
-        return true;
-    }
+    public boolean isType();
 
     /**
      * Is this type declaration corresponding to an anonymous class?
@@ -129,46 +110,32 @@ public interface ResolvedTypeDeclaration extends ResolvedDeclaration {
      * };
      * </pre>
      */
-    default boolean isAnonymousClass() {
-        return false;
-    }
+    public boolean isAnonymousClass();
 
     @Override
-    default ResolvedTypeDeclaration asType() {
-        return this;
-    }
+    public ResolvedTypeDeclaration asType();
 
     /**
      * Return this as a ClassDeclaration or throw UnsupportedOperationException.
      */
-    default ResolvedClassDeclaration asClass() {
-        throw new UnsupportedOperationException(String.format("%s is not a class", this));
-    }
+    public ResolvedClassDeclaration asClass();
 
     /**
      * Return this as a InterfaceDeclaration or throw UnsupportedOperationException.
      */
-    default ResolvedInterfaceDeclaration asInterface() {
-        throw new UnsupportedOperationException(String.format("%s is not an interface", this));
-    }
+    public ResolvedInterfaceDeclaration asInterface();
 
     /**
      * Return this as a EnumDeclaration or throw UnsupportedOperationException.
      */
-    default ResolvedEnumDeclaration asEnum() {
-        throw new UnsupportedOperationException(String.format("%s is not an enum", this));
-    }
+    public ResolvedEnumDeclaration asEnum();
 
     /**
      * Return this as a TypeParameterDeclaration or throw UnsupportedOperationException.
      */
-    default ResolvedTypeParameterDeclaration asTypeParameter() {
-        throw new UnsupportedOperationException(String.format("%s is not a type parameter", this));
-    }
+    public ResolvedTypeParameterDeclaration asTypeParameter();
 
-    default ResolvedReferenceTypeDeclaration asReferenceType() {
-        throw new UnsupportedOperationException(String.format("%s is not a reference type", this));
-    }
+    public ResolvedReferenceTypeDeclaration asReferenceType();
 
     /**
      * The package name of the type.
@@ -189,12 +156,6 @@ public interface ResolvedTypeDeclaration extends ResolvedDeclaration {
      * The ID corresponds most of the type to the qualified name. It differs only for local
      * classes which do not have a qualified name but have an ID.
      */
-    default String getId() {
-        String qname = getQualifiedName();
-        if (qname == null) {
-            return String.format("<localClass>:%s", getName());
-        }
-        return qname;
-    }
+    public String getId();
 
 }

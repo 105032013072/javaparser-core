@@ -38,7 +38,7 @@ class PhantomNodeLogic {
 
     private static final int LEVELS_TO_EXPLORE = 3;
 
-    private static final Map<Node, Boolean> isPhantomNodeCache = synchronizedMap(new IdentityHashMap<>());
+    private static final Map<Node, Boolean> isPhantomNodeCache = synchronizedMap(new IdentityHashMap<Node, Boolean>());
 
     private static final AstObserver cacheCleaner = new AstObserverAdapter() {
         @Override
@@ -54,8 +54,8 @@ class PhantomNodeLogic {
             if (node instanceof UnknownType) {
                 return true;
             }
-            boolean res = (node.getOptionalParentNode().isPresent() &&
-                    !node.getOptionalParentNode().get().getRange().get().contains(node.getRange().get())
+            boolean res = (node.getOptionalParentNode()!=null &&
+                    !node.getOptionalParentNode().getRange().contains(node.getRange())
                     || inPhantomNode(node, LEVELS_TO_EXPLORE));
             isPhantomNodeCache.put(node, res);
             node.register(cacheCleaner);
@@ -67,8 +67,8 @@ class PhantomNodeLogic {
      * A node contained in a phantom node is also a phantom node. We limit how many levels up we check just for performance reasons.
      */
     private static boolean inPhantomNode(Node node, int levels) {
-        return node.getOptionalParentNode().isPresent() &&
-                (isPhantomNode(node.getOptionalParentNode().get())
-                        || inPhantomNode(node.getOptionalParentNode().get(), levels - 1));
+        return node.getOptionalParentNode()!=null &&
+                (isPhantomNode(node.getOptionalParentNode())
+                        || inPhantomNode(node.getOptionalParentNode(), levels - 1));
     }
 }

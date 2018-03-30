@@ -29,14 +29,10 @@ package com.github.javaparser.resolution.declarations;
 public interface ResolvedParameterDeclaration extends ResolvedValueDeclaration {
 
     @Override
-    default boolean isParameter() {
-        return true;
-    }
+    public boolean isParameter();
 
     @Override
-    default ResolvedParameterDeclaration asParameter() {
-        return this;
-    }
+    public ResolvedParameterDeclaration asParameter();
 
     /**
      * Is this parameter declared as variadic?
@@ -47,11 +43,5 @@ public interface ResolvedParameterDeclaration extends ResolvedValueDeclaration {
      * Describe the type of the parameter. In practice add three dots to the type name
      * is the parameter is variadic.
      */
-    default String describeType() {
-        if (isVariadic()) {
-            return getType().asArrayType().getComponentType().describe() + "...";
-        } else {
-            return getType().describe();
-        }
-    }
+    public String describeType();
 }

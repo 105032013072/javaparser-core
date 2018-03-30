@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class TypeExprMetaModel extends ExpressionMetaModel {
 
-    TypeExprMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    TypeExprMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.expr.TypeExpr.class, "TypeExpr", "com.github.javaparser.ast.expr", false, false);
     }
 

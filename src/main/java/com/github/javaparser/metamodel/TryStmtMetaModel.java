@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class TryStmtMetaModel extends StatementMetaModel {
 
-    TryStmtMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    TryStmtMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.stmt.TryStmt.class, "TryStmt", "com.github.javaparser.ast.stmt", false, false);
     }
 

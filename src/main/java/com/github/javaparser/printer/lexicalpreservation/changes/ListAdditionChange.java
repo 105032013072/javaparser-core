@@ -7,7 +7,7 @@ import com.github.javaparser.ast.observer.ObservableProperty;
 /**
  * The Addition of an element to a list.
  */
-public class ListAdditionChange implements Change {
+public class ListAdditionChange extends Change {
     private final ObservableProperty observableProperty;
     private final int index;
     private final Node nodeAdded;

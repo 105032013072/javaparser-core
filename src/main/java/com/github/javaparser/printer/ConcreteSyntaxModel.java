@@ -30,13 +30,15 @@ import com.github.javaparser.ast.modules.*;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
+import com.github.javaparser.metamodel.BaseNodeMetaModel;
 import com.github.javaparser.metamodel.JavaParserMetaModel;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmConditional;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmElement;
 import com.github.javaparser.printer.concretesyntaxmodel.CsmMix;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.javaparser.GeneratedJavaParserConstants.*;
 import static com.github.javaparser.ast.observer.ObservableProperty.*;
@@ -51,7 +53,7 @@ import static com.github.javaparser.utils.Utils.EOL;
 public class ConcreteSyntaxModel {
 
     private static final Map<Class, CsmElement> concreteSyntaxModelByClass = new HashMap<>();
-    private static Optional<String> initializationError;
+    private static String initializationError;
 
     private static CsmElement modifiers() {
         return list(ObservableProperty.MODIFIERS, space(), none(), space());
@@ -912,14 +914,24 @@ public class ConcreteSyntaxModel {
                 CsmElement.newline()
         ));
 
-        List<String> unsupportedNodeClassNames = JavaParserMetaModel.getNodeMetaModels().stream()
+       /* List<String> unsupportedNodeClassNames = JavaParserMetaModel.getNodeMetaModels().stream()
                 .filter(c -> !c.isAbstract() && !Comment.class.isAssignableFrom(c.getType()) && !concreteSyntaxModelByClass.containsKey(c.getType()))
                 .map(nm -> nm.getType().getSimpleName())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        List<String> unsupportedNodeClassNames=new ArrayList<>();
+        for (BaseNodeMetaModel c : JavaParserMetaModel.getNodeMetaModels()) {
+			if(!c.isAbstract() && !Comment.class.isAssignableFrom(c.getType()) && !concreteSyntaxModelByClass.containsKey(c.getType())){
+				unsupportedNodeClassNames.add(c.getType().getSimpleName());
+			}
+		}
+        
+        
         if (unsupportedNodeClassNames.isEmpty()) {
-            initializationError = Optional.empty();
+            initializationError = null;
         } else {
-            initializationError = Optional.of("The CSM should include support for these classes: " + String.join(", ", unsupportedNodeClassNames));
+            //initializationError = Optional.of("The CSM should include support for these classes: " + String.join(", ", unsupportedNodeClassNames));
+        	//initializationError = Optional.of("The CSM should include support for these classes: " + String.join(", ", unsupportedNodeClassNames));
+        	initializationError="The CSM should include support for these classes: "+StringUtils.join(unsupportedNodeClassNames,",");
         }
     }
 
@@ -938,9 +950,12 @@ public class ConcreteSyntaxModel {
     }
 
     public static CsmElement forClass(Class<? extends Node> nodeClazz) {
-        initializationError.ifPresent(s -> {
+        /*initializationError.ifPresent(s -> {
             throw new IllegalStateException(s);
-        });
+        });*/
+    	if(initializationError!=null){
+    		new IllegalStateException(initializationError);
+    	}
         if (!concreteSyntaxModelByClass.containsKey(nodeClazz)) {
             throw new UnsupportedOperationException(nodeClazz.getSimpleName());
         }

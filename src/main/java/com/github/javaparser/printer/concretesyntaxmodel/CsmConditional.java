@@ -29,7 +29,7 @@ import com.github.javaparser.printer.SourcePrinter;
 import java.util.Arrays;
 import java.util.List;
 
-public class CsmConditional implements CsmElement {
+public class CsmConditional extends CsmElement {
     private final Condition condition;
     private final List<ObservableProperty> properties;
     private final CsmElement thenElement;

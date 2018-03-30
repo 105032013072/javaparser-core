@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @author Federico Tomassetti
  */
-public class ResolvedTypeVariable implements ResolvedType {
+public class ResolvedTypeVariable extends ResolvedType {
 
     private ResolvedTypeParameterDeclaration typeParameter;
 

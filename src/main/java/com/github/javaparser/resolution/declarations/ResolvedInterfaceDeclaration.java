@@ -35,9 +35,7 @@ public interface ResolvedInterfaceDeclaration extends ResolvedReferenceTypeDecla
         ResolvedTypeParametrizable, HasAccessSpecifier {
 
     @Override
-    default boolean isInterface() {
-        return true;
-    }
+    public boolean isInterface();
 
     /**
      * Return the list of interfaces extended directly by this one.
@@ -47,12 +45,5 @@ public interface ResolvedInterfaceDeclaration extends ResolvedReferenceTypeDecla
     /**
      * Return the list of interfaces extended directly or indirectly by this one.
      */
-    default List<ResolvedReferenceType> getAllInterfacesExtended() {
-        List<ResolvedReferenceType> interfaces = new ArrayList<>();
-        for (ResolvedReferenceType interfaceDeclaration : getInterfacesExtended()) {
-            interfaces.add(interfaceDeclaration);
-            interfaces.addAll(interfaceDeclaration.getAllInterfacesAncestors());
-        }
-        return interfaces;
-    }
+    public List<ResolvedReferenceType> getAllInterfacesExtended();
 }

@@ -9,7 +9,7 @@ import com.github.javaparser.printer.concretesyntaxmodel.*;
 import com.github.javaparser.printer.lexicalpreservation.LexicalDifferenceCalculator.CsmChild;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 import static com.github.javaparser.GeneratedJavaParserConstants.*;
 
@@ -29,28 +29,28 @@ public class Difference {
         this.elements = elements;
     }
 
-    interface DifferenceElement {
-        static DifferenceElement added(CsmElement element) {
+    public static abstract class DifferenceElement {
+      public  static DifferenceElement added(CsmElement element) {
             return new Added(element);
         }
 
-        static DifferenceElement removed(CsmElement element) {
+      public  static DifferenceElement removed(CsmElement element) {
             return new Removed(element);
         }
 
-        static DifferenceElement kept(CsmElement element) {
+      public   static DifferenceElement kept(CsmElement element) {
             return new Kept(element);
         }
 
         /**
          * Return the CsmElement considered in this DifferenceElement.
          */
-        CsmElement getElement();
+      public abstract  CsmElement getElement();
 
-        boolean isAdded();
+      public abstract boolean isAdded();
     }
 
-    private static class Added implements DifferenceElement {
+    private static class Added extends DifferenceElement {
         final CsmElement element;
 
         public Added(CsmElement element) {
@@ -92,7 +92,7 @@ public class Difference {
      * Elements in a CsmMix have been reshuffled. It could also mean that
      * some new elements have been added or removed to the mix.
      */
-    private static class Reshuffled implements DifferenceElement {
+    private static class Reshuffled extends DifferenceElement {
         final CsmMix previousOrder;
         final CsmMix element;
 
@@ -135,7 +135,7 @@ public class Difference {
         }
     }
 
-    private static class Kept implements DifferenceElement {
+    private static class Kept extends DifferenceElement {
         final CsmElement element;
 
         public Kept(CsmElement element) {
@@ -173,7 +173,7 @@ public class Difference {
         }
     }
 
-    private static class Removed implements DifferenceElement {
+    private static class Removed extends DifferenceElement {
         final CsmElement element;
 
         public Removed(CsmElement element) {
@@ -305,13 +305,20 @@ public class Difference {
         // We would calculate the Difference between "qwerty" and "qwer" then we know the A is kep, and then we
         // would calculate the difference between "uiop" and "uiop"
 
-        Map<Node, Integer> childrenInOriginal = findChildrenPositions(original);
+        final Map<Node, Integer> childrenInOriginal = findChildrenPositions(original);
         Map<Node, Integer> childrenInAfter = findChildrenPositions(after);
 
         List<Node> commonChildren = new LinkedList<>(childrenInOriginal.keySet());
         commonChildren.retainAll(childrenInAfter.keySet());
-        commonChildren.sort(Comparator.comparingInt(childrenInOriginal::get));
+        //commonChildren.sort(Comparator.comparingInt(childrenInOriginal::get));
+        Comparator comparator=new Comparator<Node>() {
 
+			@Override
+			public int compare(Node c1, Node c2) {
+				return Integer.compare(childrenInOriginal.get(c1), childrenInOriginal.get(c2));
+			}
+		};
+		Collections.sort(commonChildren,comparator);
         List<DifferenceElement> elements = new LinkedList<>();
 
         int originalIndex = 0;
@@ -358,7 +365,10 @@ public class Difference {
                 if ((nextOriginal instanceof CsmMix) && (nextAfter instanceof CsmMix)) {
                     if (((CsmMix) nextAfter).getElements().equals(((CsmMix) nextOriginal).getElements())) {
                         // No reason to deal with a reshuffled, we are just going to keep everything as it is
-                        ((CsmMix) nextAfter).getElements().forEach(el -> elements.add(new Kept(el)));
+                       /* ((CsmMix) nextAfter).getElements().forEach(el -> elements.add(new Kept(el)));*/
+                    	for (CsmElement el : ((CsmMix) nextAfter).getElements()) {
+                    		elements.add(new Kept(el));
+						}
                     } else {
                         elements.add(new Reshuffled((CsmMix)nextOriginal, (CsmMix)nextAfter));
                     }
@@ -640,7 +650,7 @@ public class Difference {
                             // We expected to remove a proper node but we found a comment in between.
                             // If the comment is associated to the node we want to remove we remove it as well, otherwise we keep it
                             Comment comment = (Comment)actualChild.getChild();
-                            if (!comment.isOrphan() && comment.getCommentedNode().isPresent() && comment.getCommentedNode().get().equals(csmChild.getChild())) {
+                            if (!comment.isOrphan() && comment.getCommentedNode()!=null && comment.getCommentedNode().equals(csmChild.getChild())) {
                                 nodeText.removeElement(nodeTextIndex);
                             } else {
                                 nodeTextIndex++;
@@ -713,9 +723,14 @@ public class Difference {
                     // We now find out which Node Text elements corresponds to the elements in the original CSM
                     final int startNodeTextIndex = nodeTextIndex;
                     final Set<Integer> usedIndexes = new HashSet<>();
-                    List<Integer> nodeTextIndexOfPreviousElements = elementsFromPreviousOrder.getElements().stream()
+                   /* List<Integer> nodeTextIndexOfPreviousElements = elementsFromPreviousOrder.getElements().stream()
                             .map(it -> findIndexOfCorrespondingNodeTextElement(it, nodeText, startNodeTextIndex, usedIndexes, node))
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toList());*/
+                    List<Integer> nodeTextIndexOfPreviousElements=new ArrayList<>();
+                    for (CsmElement it : elementsFromPreviousOrder.getElements()) {
+                    	nodeTextIndexOfPreviousElements.add(findIndexOfCorrespondingNodeTextElement(it, nodeText, startNodeTextIndex, usedIndexes, node));
+					}
+                    
                     Map<Integer, Integer> nodeTextIndexToPreviousCSMIndex = new HashMap<>();
                     for (int i=0;i<nodeTextIndexOfPreviousElements.size();i++) {
                         int value = nodeTextIndexOfPreviousElements.get(i);
@@ -723,7 +738,11 @@ public class Difference {
                             nodeTextIndexToPreviousCSMIndex.put(value, i);
                         }
                     }
-                    int lastNodeTextIndex = nodeTextIndexOfPreviousElements.stream().max(Integer::compareTo).orElse(-1);
+                    int lastNodeTextIndex=-1;
+                    if(nodeTextIndexOfPreviousElements!=null && nodeTextIndexOfPreviousElements.size()>0){
+                    	lastNodeTextIndex=Collections.max(nodeTextIndexOfPreviousElements);
+                    }
+                   // int lastNodeTextIndex = nodeTextIndexOfPreviousElements.stream().max(Integer::compareTo).orElse(-1);
 
                     // Elements to be added at the end
                     List<CsmElement> elementsToBeAddedAtTheEnd = new LinkedList<>();
@@ -738,7 +757,7 @@ public class Difference {
                                 if (correspondanceBetweenNextOrderAndPreviousOrder.containsKey(nj)) {
                                     originalCsmIndex = correspondanceBetweenNextOrderAndPreviousOrder.get(nj);
                                     if (!elementsToAddBeforeGivenOriginalCSMElement.containsKey(originalCsmIndex)){
-                                        elementsToAddBeforeGivenOriginalCSMElement.put(originalCsmIndex, new LinkedList<>());
+                                        elementsToAddBeforeGivenOriginalCSMElement.put(originalCsmIndex, new LinkedList<CsmElement>());
                                     }
                                     elementsToAddBeforeGivenOriginalCSMElement.get(originalCsmIndex).add(elementsFromNextOrder.getElements().get(ni));
                                 }
@@ -863,7 +882,12 @@ public class Difference {
     }
 
     private long cost() {
-        return elements.stream().filter(e -> !(e instanceof Kept)).count();
+        //return elements.stream().filter(e -> !(e instanceof Kept)).count();
+    	List<DifferenceElement> list=new ArrayList<>();
+    	for (DifferenceElement differenceElement : elements) {
+			if(!(differenceElement instanceof Kept))  list.add(differenceElement);
+		}
+    	return list.size();
     }
 
     @Override
@@ -880,6 +904,13 @@ public class Difference {
      * This is mainly intended for test purposes.
      */
     void removeIndentationElements() {
-        elements.removeIf(el -> el.getElement() instanceof CsmIndent || el.getElement() instanceof CsmUnindent);
+       // elements.removeIf(el -> el.getElement() instanceof CsmIndent || el.getElement() instanceof CsmUnindent);
+    	Iterator<DifferenceElement> it= elements.iterator();
+    	while(it.hasNext()){
+    		DifferenceElement el=it.next();
+    		if(el.getElement() instanceof CsmIndent || el.getElement() instanceof CsmUnindent){
+    			it.remove();
+    		}
+    	}
     }
 }

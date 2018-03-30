@@ -94,6 +94,12 @@ class TextElementIteratorsFactory {
         public E next() {
             throw new IllegalArgumentException();
         }
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException("remove");
+			
+		}
     }
 
     private static class SingleElementIterator<E> implements Iterator<E> {
@@ -156,7 +162,7 @@ class TextElementIteratorsFactory {
         }
     }
 
-    private static Iterator<TokenTextElement> reverseIterator(NodeText nodeText, int index) {
+    private static Iterator<TokenTextElement> reverseIterator(final NodeText nodeText, final int index) {
         TextElement textElement = nodeText.getTextElement(index);
         if (textElement instanceof TokenTextElement) {
             return new SingleElementIterator<TokenTextElement>((TokenTextElement)textElement) {

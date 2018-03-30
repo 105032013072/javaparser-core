@@ -1,10 +1,10 @@
 package com.github.javaparser.metamodel;
 
-import java.util.Optional;
+
 
 public class UnaryExprMetaModel extends ExpressionMetaModel {
 
-    UnaryExprMetaModel(Optional<BaseNodeMetaModel> superBaseNodeMetaModel) {
+    UnaryExprMetaModel(BaseNodeMetaModel superBaseNodeMetaModel) {
         super(superBaseNodeMetaModel, com.github.javaparser.ast.expr.UnaryExpr.class, "UnaryExpr", "com.github.javaparser.ast.expr", false, false);
     }
 

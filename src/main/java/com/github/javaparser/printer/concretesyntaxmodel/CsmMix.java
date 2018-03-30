@@ -3,23 +3,28 @@ package com.github.javaparser.printer.concretesyntaxmodel;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.SourcePrinter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A group of elements that could be in any order.
  */
-public class CsmMix implements CsmElement {
+public class CsmMix extends CsmElement {
     private List<CsmElement> elements;
 
     public CsmMix(List<CsmElement> elements) {
         if (elements == null) {
             throw new NullPointerException();
         }
-        if (elements.stream().anyMatch(Objects::isNull)) {
+        for (CsmElement csmElement : elements) {
+			if(csmElement==null) throw new IllegalArgumentException("Null element in the mix");
+		}
+       /* if (elements.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Null element in the mix");
-        }
+        }*/
         this.elements = elements;
     }
 
@@ -29,7 +34,10 @@ public class CsmMix implements CsmElement {
 
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
-        elements.forEach(e -> e.prettyPrint(node, printer));
+      //  elements.forEach(e -> e.prettyPrint(node, printer));
+    	for (CsmElement csmElement : elements) {
+    		csmElement.prettyPrint(node, printer);
+		}
     }
 
     @Override
@@ -49,6 +57,11 @@ public class CsmMix implements CsmElement {
 
     @Override
     public String toString() {
-        return "CsmMix[" + String.join(", ", elements.stream().map(e -> elements.toString()).collect(Collectors.toList())) + "]";
+    	List<String> list=new ArrayList<>();
+    	for (CsmElement e : elements) {
+    		list.add(e.toString());
+		}
+    	 return "CsmMix[" +StringUtils.join(list,", ")  + "]";
+       // return "CsmMix[" + String.join(", ", elements.stream().map(e -> elements.toString()).collect(Collectors.toList())) + "]";
     }
 }

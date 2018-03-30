@@ -33,6 +33,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.NodeWithType;
 import com.github.javaparser.ast.type.Type;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.lang.Integer.signum;
@@ -52,7 +54,16 @@ public final class PositionUtils {
     }
 
     public static <T extends Node> void sortByBeginPosition(List<T> nodes, final boolean ignoringAnnotations) {
-        nodes.sort((o1, o2) -> PositionUtils.compare(o1, o2, ignoringAnnotations));
+        Comparator<T> comparator=new Comparator<T>() {
+
+			@Override
+			public int compare(T o1, T o2) {
+				// TODO Auto-generated method stub
+				return PositionUtils.compare(o1, o2, ignoringAnnotations);
+			}
+		};
+		Collections.sort(nodes,comparator);
+    	//nodes.sort((o1, o2) -> PositionUtils.compare(o1, o2, ignoringAnnotations));
     }
 
     public static boolean areInOrder(Node a, Node b) {
@@ -64,13 +75,13 @@ public final class PositionUtils {
     }
 
     private static int compare(Node a, Node b, boolean ignoringAnnotations) {
-        if(a.getRange().isPresent() && !b.getRange().isPresent()) {
+        if(a.getRange()!=null && b.getRange()==null) {
             return -1;
         }
-        if(!a.getRange().isPresent() && b.getRange().isPresent()) {
+        if(a.getRange()==null && b.getRange()!=null) {
             return 1;
         }
-        if (!a.getRange().isPresent() && !b.getRange().isPresent()) {
+        if (a.getRange()==null && b.getRange()==null) {
             return 0;
         }
         if (ignoringAnnotations) {
@@ -82,8 +93,8 @@ public final class PositionUtils {
             }
         }
 
-        Position aBegin = a.getBegin().get();
-        Position bBegin = b.getBegin().get();
+        Position aBegin = a.getBegin();
+        Position bBegin = b.getBegin();
 
         int signLine = signum(aBegin.line - bBegin.line);
         if (signLine == 0) {
@@ -107,12 +118,12 @@ public final class PositionUtils {
     }
 
     private static int beginLineWithoutConsideringAnnotation(Node node) {
-        return beginNodeWithoutConsideringAnnotations(node).getRange().get().begin.line;
+        return beginNodeWithoutConsideringAnnotations(node).getRange().begin.line;
     }
 
 
     private static int beginColumnWithoutConsideringAnnotation(Node node) {
-        return beginNodeWithoutConsideringAnnotations(node).getRange().get().begin.column;
+        return beginNodeWithoutConsideringAnnotations(node).getRange().begin.column;
     }
 
     private static Node beginNodeWithoutConsideringAnnotations(Node node) {
@@ -128,8 +139,8 @@ public final class PositionUtils {
     }
 
     public static boolean nodeContains(Node container, Node contained, boolean ignoringAnnotations) {
-        final Range containedRange = contained.getRange().get();
-        final Range containerRange = container.getRange().get();
+        final Range containedRange = contained.getRange();
+        final Range containerRange = container.getRange();
         if (!ignoringAnnotations || PositionUtils.getLastAnnotation(container) == null) {
             return container.containsWithin(contained);
         }

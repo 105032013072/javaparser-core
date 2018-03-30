@@ -27,16 +27,19 @@ import com.github.javaparser.printer.SourcePrinter;
 import java.util.List;
 import java.util.Objects;
 
-public class CsmSequence implements CsmElement {
+public class CsmSequence extends CsmElement {
     private List<CsmElement> elements;
 
     public CsmSequence(List<CsmElement> elements) {
         if (elements == null) {
             throw new NullPointerException();
         }
-        if (elements.stream().anyMatch(Objects::isNull)) {
+       /* if (elements.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Null element in the sequence");
-        }
+        }*/
+        for (CsmElement csmElement : elements) {
+			if(csmElement==null) throw new IllegalArgumentException("Null element in the sequence");
+		}
         this.elements = elements;
     }
 
@@ -46,6 +49,9 @@ public class CsmSequence implements CsmElement {
 
     @Override
     public void prettyPrint(Node node, SourcePrinter printer) {
-        elements.forEach(e -> e.prettyPrint(node, printer));
+       // elements.forEach(e -> e.prettyPrint(node, printer));
+    	for (CsmElement e : elements) {
+    		e.prettyPrint(node, printer);
+		}
     }
 }

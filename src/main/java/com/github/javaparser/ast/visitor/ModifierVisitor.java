@@ -1519,8 +1519,19 @@ public class ModifierVisitor<A> implements GenericVisitor<Visitable, A> {
     @Override
     @Generated("com.github.javaparser.generator.core.visitor.ModifierVisitorGenerator")
     public Visitable visit(final WildcardType n, final A arg) {
-        ReferenceType extendedType = n.getExtendedType().map(s -> (ReferenceType) s.accept(this, arg)).orElse(null);
-        ReferenceType superType = n.getSuperType().map(s -> (ReferenceType) s.accept(this, arg)).orElse(null);
+       // ReferenceType extendedType = n.getExtendedType().map(s -> (ReferenceType) s.accept(this, arg)).orElse(null);
+    	ReferenceType extendedType=null;
+    	ReferenceType r= n.getExtendedType();
+    	if(r!=null){
+    		extendedType=(ReferenceType) r.accept(this, arg);
+    	}
+    	ReferenceType superType=null;
+    	ReferenceType su=n.getSuperType();
+    	if(su!=null){
+    		superType=(ReferenceType) su.accept(this, arg);
+    	}
+    	
+        //ReferenceType superType = n.getSuperType().map(s -> (ReferenceType) s.accept(this, arg)).orElse(null);
         NodeList<AnnotationExpr> annotations = modifyList(n.getAnnotations(), arg);
         Comment comment=null;
         if(n.getCommentOptional()!=null){
@@ -1655,9 +1666,6 @@ public class ModifierVisitor<A> implements GenericVisitor<Visitable, A> {
         return (NodeList<N>) list.accept(this, arg);
     }
 
-    private <N extends Node> NodeList<N> modifyList(Optional<NodeList<N>> list, A arg) {
-        return list.map(ns -> modifyList(ns, arg)).orElse(null);
-    }
 
     @Generated("com.github.javaparser.generator.core.visitor.ModifierVisitorGenerator")
     public Visitable visit(final ModuleDeclaration n, final A arg) {

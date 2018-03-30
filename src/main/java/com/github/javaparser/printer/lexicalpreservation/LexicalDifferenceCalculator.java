@@ -45,11 +45,17 @@ class LexicalDifferenceCalculator {
         }
 
         void removeIndentationElements() {
-            elements.removeIf(el -> el instanceof CsmIndent || el instanceof CsmUnindent);
+           // elements.removeIf(el -> el instanceof CsmIndent || el instanceof CsmUnindent);
+        	Iterator<CsmElement> it=elements.iterator();
+        	while(it.hasNext()){
+        		CsmElement el=it.next();
+        		if( el instanceof CsmIndent || el instanceof CsmUnindent) it.remove();
+        	}
+        	
         }
     }
 
-    static class CsmChild implements CsmElement {
+    static class CsmChild extends CsmElement {
         private final Node child;
 
         public Node getChild() {
@@ -135,7 +141,10 @@ class LexicalDifferenceCalculator {
     private void calculatedSyntaxModelForNode(CsmElement csm, Node node, List<CsmElement> elements, Change change) {
         if (csm instanceof CsmSequence) {
             CsmSequence csmSequence = (CsmSequence) csm;
-            csmSequence.getElements().forEach(e -> calculatedSyntaxModelForNode(e, node, elements, change));
+           /* csmSequence.getElements().forEach(e -> calculatedSyntaxModelForNode(e, node, elements, change));*/
+            for (CsmElement csmElement : csmSequence.getElements()) {
+            	 calculatedSyntaxModelForNode(csmElement, node, elements, change);
+			}
         } else if (csm instanceof CsmComment) {
             // nothing to do
         } else if (csm instanceof CsmSingleReference) {
@@ -160,8 +169,8 @@ class LexicalDifferenceCalculator {
             if (csmList.getProperty().isAboutNodes()) {
                 Object rawValue = change.getValue(csmList.getProperty(), node);
                 NodeList nodeList;
-                if (rawValue instanceof Optional) {
-                    Optional optional = (Optional)rawValue;
+                if (rawValue ==null||rawValue instanceof NodeList) {
+                    /*Optional optional = (Optional)rawValue;
                     if (optional.isPresent()) {
                         if (!(optional.get() instanceof NodeList)) {
                             throw new IllegalStateException("Expected NodeList, found " + optional.get().getClass().getCanonicalName());
@@ -169,7 +178,12 @@ class LexicalDifferenceCalculator {
                         nodeList = (NodeList) optional.get();
                     } else {
                         nodeList = new NodeList();
-                    }
+                    }*/
+                	if(rawValue ==null){
+                		nodeList = new NodeList();
+                	}else{
+                		nodeList=(NodeList)rawValue;
+                	}
                 } else {
                     if (!(rawValue instanceof NodeList)) {
                         throw new IllegalStateException("Expected NodeList, found " + rawValue.getClass().getCanonicalName());
@@ -241,7 +255,10 @@ class LexicalDifferenceCalculator {
         } else if (csm instanceof CsmMix) {
             CsmMix csmMix = (CsmMix)csm;
             List<CsmElement> mixElements = new LinkedList<>();
-            csmMix.getElements().forEach(e -> calculatedSyntaxModelForNode(e, node, mixElements, change));
+           // csmMix.getElements().forEach(e -> calculatedSyntaxModelForNode(e, node, mixElements, change));
+            for (CsmElement csmElement : csmMix.getElements()) {
+            	calculatedSyntaxModelForNode(csmElement, node, mixElements, change);
+			}
             elements.add(new CsmMix(mixElements));
         } else {
             throw new UnsupportedOperationException(csm.getClass().getSimpleName()+ " " + csm);

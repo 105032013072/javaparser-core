@@ -37,9 +37,7 @@ public interface ResolvedClassDeclaration extends ResolvedReferenceTypeDeclarati
      * This method should always return true.
      */
     @Override
-    default boolean isClass() {
-        return true;
-    }
+    public boolean isClass();
 
     /**
      * This is a ReferenceTypeUsage because it could contain type typeParametersValues.

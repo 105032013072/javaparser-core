@@ -31,9 +31,7 @@ public interface ResolvedDeclaration {
     /**
      * Anonymous classes do not have a name, for example.
      */
-    default boolean hasName() {
-        return true;
-    }
+	public boolean hasName();
 
     /**
      * Should return the name or throw a RuntimeException if the name is not available.
@@ -43,56 +41,40 @@ public interface ResolvedDeclaration {
     /**
      * Does this declaration represents a class field?
      */
-    default boolean isField() {
-        return false;
-    }
+    public boolean isField();
 
     /**
      * Does this declaration represents a method parameter?
      */
-    default boolean isParameter() {
-        return false;
-    }
+    public boolean isParameter();
 
     /**
      * Does this declaration represents a type?
      */
-    default boolean isType() {
-        return false;
-    }
+    public boolean isType();
 
     /**
      * Does this declaration represents a method?
      */
-    default boolean isMethod() {
-        return false;
-    }
+    public boolean isMethod();
 
     /**
      * Return this as a FieldDeclaration or throw an UnsupportedOperationException
      */
-    default ResolvedFieldDeclaration asField() {
-        throw new UnsupportedOperationException(String.format("%s is not a FieldDeclaration", this));
-    }
+    public ResolvedFieldDeclaration asField();
 
     /**
      * Return this as a ParameterDeclaration or throw an UnsupportedOperationException
      */
-    default ResolvedParameterDeclaration asParameter() {
-        throw new UnsupportedOperationException(String.format("%s is not a ParameterDeclaration", this));
-    }
+    public ResolvedParameterDeclaration asParameter();
 
     /**
      * Return this as a TypeDeclaration or throw an UnsupportedOperationException
      */
-    default ResolvedTypeDeclaration asType() {
-        throw new UnsupportedOperationException(String.format("%s is not a TypeDeclaration", this));
-    }
+    public ResolvedTypeDeclaration asType();
 
     /**
      * Return this as a MethodDeclaration or throw an UnsupportedOperationException
      */
-    default ResolvedMethodDeclaration asMethod() {
-        throw new UnsupportedOperationException(String.format("%s is not a MethodDeclaration", this));
-    }
+    public ResolvedMethodDeclaration asMethod();
 }

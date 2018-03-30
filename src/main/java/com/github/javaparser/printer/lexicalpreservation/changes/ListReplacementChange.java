@@ -5,12 +5,12 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.observer.ObservableProperty;
 import com.github.javaparser.utils.Pair;
 
-import java.util.Optional;
+
 
 /**
  * The replacement of an element in a list.
  */
-public class ListReplacementChange implements Change {
+public class ListReplacementChange extends Change {
     private final ObservableProperty observableProperty;
     private final int index;
     private final Node newValue;
@@ -26,10 +26,10 @@ public class ListReplacementChange implements Change {
         if (property == observableProperty) {
             NodeList nodeList = new NodeList();
             Object currentRawValue = new NoChange().getValue(property, node);
-            if (currentRawValue instanceof Optional) {
+            /*if (currentRawValue instanceof Optional) {
                 Optional optional = (Optional)currentRawValue;
                 currentRawValue = optional.orElseGet(null);
-            }
+            }*/
             if (!(currentRawValue instanceof NodeList)){
                 throw new IllegalStateException("Expected NodeList, found " + currentRawValue.getClass().getCanonicalName());
             }

@@ -38,7 +38,8 @@ import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import static com.github.javaparser.ast.Node.Parsedness.UNPARSABLE;
 import static com.github.javaparser.utils.PositionUtils.sortByBeginPosition;
@@ -85,7 +86,12 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
 
     private void printModifiers(final EnumSet<Modifier> modifiers) {
         if (modifiers.size() > 0) {
-            printer.print(modifiers.stream().map(Modifier::asString).collect(Collectors.joining(" ")) + " ");
+            //printer.print(modifiers.stream().map(Modifier::asString).collect(Collectors.joining(" ")) + " ");
+        	List<String> list=new ArrayList<>();
+        	for (Modifier m : modifiers) {
+        		list.add(m.asString());
+			}
+        	printer.print(StringUtils.join(list," ")+" ");
         }
     }
 
@@ -122,7 +128,7 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     }
 
     private void printTypeArgs(final NodeWithTypeArguments<?> nodeWithTypeArguments, final Void arg) {
-        NodeList<Type> typeArguments = nodeWithTypeArguments.getTypeArguments().orElse(null);
+        NodeList<Type> typeArguments = nodeWithTypeArguments.getTypeArguments()!=null?nodeWithTypeArguments.getTypeArguments():null;;
         if (!isNullOrEmpty(typeArguments)) {
             printer.print("<");
             for (final Iterator<Type> i = typeArguments.iterator(); i.hasNext(); ) {
@@ -198,8 +204,11 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printer.print(postfix);
     }
 
-    private void printComment(final Optional<Comment> comment, final Void arg) {
-        comment.ifPresent(c -> c.accept(this, arg));
+    private void printComment(final Comment comment, final Void arg) {
+        //comment.ifPresent(c -> c.accept(this, arg));
+    	if(comment!=null){
+    		comment.accept(this, arg);
+    	}
     }
 
     @Override
@@ -210,8 +219,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
             return;
         }
 
-        if (n.getPackageDeclarationOptional().isPresent()) {
-            n.getPackageDeclarationOptional().get().accept(this, arg);
+        if (n.getPackageDeclarationOptional()!=null) {
+            n.getPackageDeclarationOptional().accept(this, arg);
         }
 
         n.getImports().accept(this, arg);
@@ -227,7 +236,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
             }
         }
 
-        n.getModule().ifPresent(m -> m.accept(this, arg));
+       // n.getModule().ifPresent(m -> m.accept(this, arg));
+        if(n.getModule()!=null){
+        	n.getModule().accept(this, arg);
+        }
 
         printOrphanCommentsEnding(n);
     }
@@ -255,8 +267,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final Name n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getQualifier().isPresent()) {
-            n.getQualifier().get().accept(this, arg);
+        if (n.getQualifier()!=null) {
+            n.getQualifier().accept(this, arg);
             printer.print(".");
         }
         printAnnotations(n.getAnnotations(), false, arg);
@@ -354,8 +366,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final ClassOrInterfaceType n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getScope().isPresent()) {
-            n.getScope().get().accept(this, arg);
+        if (n.getScope()!=null) {
+            n.getScope().accept(this, arg);
             printer.print(".");
         }
         for (AnnotationExpr ae : n.getAnnotations()) {
@@ -420,8 +432,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     public void visit(final ArrayCreationLevel n, final Void arg) {
         printAnnotations(n.getAnnotations(), true, arg);
         printer.print("[");
-        if (n.getDimension().isPresent()) {
-            n.getDimension().get().accept(this, arg);
+        if (n.getDimension()!=null) {
+            n.getDimension().accept(this, arg);
         }
         printer.print("]");
     }
@@ -461,13 +473,13 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printComment(n.getCommentOptional(), arg);
         printAnnotations(n.getAnnotations(), false, arg);
         printer.print("?");
-        if (n.getExtendedType().isPresent()) {
+        if (n.getExtendedType()!=null) {
             printer.print(" extends ");
-            n.getExtendedType().get().accept(this, arg);
+            n.getExtendedType().accept(this, arg);
         }
-        if (n.getSuperType().isPresent()) {
+        if (n.getSuperType()!=null) {
             printer.print(" super ");
-            n.getSuperType().get().accept(this, arg);
+            n.getSuperType().accept(this, arg);
         }
     }
 
@@ -484,9 +496,14 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printMemberAnnotations(n.getAnnotations(), arg);
         printModifiers(n.getModifiers());
         if (!n.getVariables().isEmpty()) {
-            Optional<Type> maximumCommonType = n.getMaximumCommonType();
-            maximumCommonType.ifPresent(t -> t.accept(this, arg));
-            if (!maximumCommonType.isPresent()) {
+            Type maximumCommonType = n.getMaximumCommonType();
+            //maximumCommonType.ifPresent(t -> t.accept(this, arg));
+            if(maximumCommonType!=null){
+            	maximumCommonType.accept(this, arg);
+            }
+           
+            
+            if (!(maximumCommonType!=null)) {
                 printer.print("???");
             }
         }
@@ -508,7 +525,7 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printComment(n.getCommentOptional(), arg);
         n.getName().accept(this, arg);
 
-        n.getAncestorOfType(NodeWithVariables.class).ifPresent(ancestor -> {
+        /*n.getAncestorOfType(NodeWithVariables.class).ifPresent(ancestor -> {
             ((NodeWithVariables<?>) ancestor).getMaximumCommonType().ifPresent(commonType -> {
 
                 final Type type = n.getType();
@@ -525,11 +542,31 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
                     printer.print("[]");
                 }
             });
-        });
+        });*/
+        NodeWithVariables ancestor= n .getAncestorOfType(NodeWithVariables.class);
+        if(ancestor!=null){
+        	Type commonType= ((NodeWithVariables<?>) ancestor).getMaximumCommonType();
+        	if(commonType!=null){
+        		 final Type type = n.getType();
 
-        if (n.getInitializer().isPresent()) {
+                 ArrayType arrayType = null;
+
+                 for (int i = commonType.getArrayLevel(); i < type.getArrayLevel(); i++) {
+                     if (arrayType == null) {
+                         arrayType = (ArrayType) type;
+                     } else {
+                         arrayType = (ArrayType) arrayType.getComponentType();
+                     }
+                     printAnnotations(arrayType.getAnnotations(), true, arg);
+                     printer.print("[]");
+                 }
+        	}
+        }
+        
+
+        if (n.getInitializer()!=null) {
             printer.print(" = ");
-            n.getInitializer().get().accept(this, arg);
+            n.getInitializer().accept(this, arg);
         }
     }
 
@@ -575,9 +612,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         for (ArrayCreationLevel level : n.getLevels()) {
             level.accept(this, arg);
         }
-        if (n.getInitializer().isPresent()) {
+        if (n.getInitializer()!=null) {
             printer.print(" ");
-            n.getInitializer().get().accept(this, arg);
+            n.getInitializer().accept(this, arg);
         }
     }
 
@@ -700,8 +737,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final ThisExpr n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getClassExpr().isPresent()) {
-            n.getClassExpr().get().accept(this, arg);
+        if (n.getClassExpr()!=null) {
+            n.getClassExpr().accept(this, arg);
             printer.print(".");
         }
         printer.print("this");
@@ -710,8 +747,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final SuperExpr n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getClassExpr().isPresent()) {
-            n.getClassExpr().get().accept(this, arg);
+        if (n.getClassExpr()!=null) {
+            n.getClassExpr().accept(this, arg);
             printer.print(".");
         }
         printer.print("super");
@@ -720,10 +757,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final MethodCallExpr n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getScope().isPresent()) {
-            n.getScope().get().accept(this, arg);
+        if (n.getScope()!=null) {
+            n.getScope().accept(this, arg);
             if (configuration.isColumnAlignFirstMethodChain()) {
-                if (!(n.getScope().get() instanceof MethodCallExpr) || (!((MethodCallExpr) n.getScope().get()).getScope().isPresent())) {
+                if (!(n.getScope() instanceof MethodCallExpr) || (!(((MethodCallExpr) n.getScope()).getScope()!=null))) {
                     resetMethodChainPosition(printer.getCursor());
                 } else {
                     printer.wrapToColumn(peekMethodChainPosition().column);
@@ -741,15 +778,15 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final ObjectCreationExpr n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getScope().isPresent()) {
-            n.getScope().get().accept(this, arg);
+        if (n.getScope()!=null) {
+            n.getScope().accept(this, arg);
             printer.print(".");
         }
 
         printer.print("new ");
 
         printTypeArgs(n, arg);
-        if (!isNullOrEmpty(n.getTypeArguments().orElse(null))) {
+        if (!isNullOrEmpty(n.getTypeArguments()!=null?n.getTypeArguments():null)) {
             printer.print(" ");
         }
 
@@ -757,10 +794,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
 
         printArguments(n.getArguments(), arg);
 
-        if (n.getAnonymousClassBody().isPresent()) {
+        if (n.getAnonymousClassBody()!=null) {
             printer.println(" {");
             printer.indent();
-            printMembers(n.getAnonymousClassBody().get(), arg);
+            printMembers(n.getAnonymousClassBody(), arg);
             printer.unindent();
             printer.print("}");
         }
@@ -835,10 +872,15 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         n.getName().accept(this, arg);
 
         printer.print("(");
-        n.getReceiverParameter().ifPresent(rp -> {
+        /*n.getReceiverParameter().ifPresent(rp -> {
             rp.accept(this, arg);
             printer.print(", ");
-        });
+        });*/
+        
+        if(n.getReceiverParameter()!=null){
+        	n.getReceiverParameter().accept(this, arg);
+        	printer.print(", ");
+        }
         if (!isNullOrEmpty(n.getParameters())) {
             for (final Iterator<Parameter> i = n.getParameters().iterator(); i.hasNext(); ) {
                 final Parameter p = i.next();
@@ -860,11 +902,11 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
                 }
             }
         }
-        if (!n.getOptionalBody().isPresent()) {
+        if (!(n.getOptionalBody()!=null)) {
             printer.print(";");
         } else {
             printer.print(" ");
-            n.getOptionalBody().get().accept(this, arg);
+            n.getOptionalBody().accept(this, arg);
         }
     }
 
@@ -900,8 +942,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
             printTypeArgs(n, arg);
             printer.print("this");
         } else {
-            if (n.getExpression().isPresent()) {
-                n.getExpression().get().accept(this, arg);
+            if (n.getExpression()!=null) {
+                n.getExpression().accept(this, arg);
                 printer.print(".");
             }
             printTypeArgs(n, arg);
@@ -918,7 +960,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printModifiers(n.getModifiers());
 
         if (!n.getVariables().isEmpty()) {
-            n.getMaximumCommonType().ifPresent(t -> t.accept(this, arg));
+            /*n.getMaximumCommonType().ifPresent(t -> t.accept(this, arg));*/
+        	if(n.getMaximumCommonType()!=null){
+        		n.getMaximumCommonType().accept(this, arg);
+        	}
         }
         printer.print(" ");
 
@@ -942,9 +987,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printComment(n.getCommentOptional(), arg);
         printer.print("assert ");
         n.getCheck().accept(this, arg);
-        if (n.getMessage().isPresent()) {
+        if (n.getMessage()!=null) {
             printer.print(" : ");
-            n.getMessage().get().accept(this, arg);
+            n.getMessage().accept(this, arg);
         }
         printer.print(";");
     }
@@ -1007,9 +1052,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     @Override
     public void visit(final SwitchEntryStmt n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
-        if (n.getLabel().isPresent()) {
+        if (n.getLabel()!=null) {
             printer.print("case ");
-            n.getLabel().get().accept(this, arg);
+            n.getLabel().accept(this, arg);
             printer.print(":");
         } else {
             printer.print("default:");
@@ -1029,7 +1074,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     public void visit(final BreakStmt n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
         printer.print("break");
-        n.getLabel().ifPresent(l -> printer.print(" ").print(l.getIdentifier()));
+        //n.getLabel().ifPresent(l -> printer.print(" ").print(l.getIdentifier()));
+        if(n.getLabel()!=null){
+        	printer.print(" ").print(n.getLabel().getIdentifier());
+        }
         printer.print(";");
     }
 
@@ -1037,9 +1085,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     public void visit(final ReturnStmt n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
         printer.print("return");
-        if (n.getExpression().isPresent()) {
+        if (n.getExpression()!=null) {
             printer.print(" ");
-            n.getExpression().get().accept(this, arg);
+            n.getExpression().accept(this, arg);
         }
         printer.print(";");
     }
@@ -1136,21 +1184,21 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         n.getThenStmt().accept(this, arg);
         if (!thenBlock)
             printer.unindent();
-        if (n.getElseStmt().isPresent()) {
+        if (n.getElseStmt()!=null) {
             if (thenBlock)
                 printer.print(" ");
             else
                 printer.println();
-            final boolean elseIf = n.getElseStmt().orElse(null) instanceof IfStmt;
-            final boolean elseBlock = n.getElseStmt().orElse(null) instanceof BlockStmt;
+            final boolean elseIf = n.getElseStmt() instanceof IfStmt;
+            final boolean elseBlock = n.getElseStmt() instanceof BlockStmt;
             if (elseIf || elseBlock) // put chained if and start of block statement on a same level
                 printer.print("else ");
             else {
                 printer.println("else");
                 printer.indent();
             }
-            if (n.getElseStmt().isPresent())
-                n.getElseStmt().get().accept(this, arg);
+            if (n.getElseStmt()!=null)
+                n.getElseStmt().accept(this, arg);
             if (!(elseIf || elseBlock))
                 printer.unindent();
         }
@@ -1169,7 +1217,10 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
     public void visit(final ContinueStmt n, final Void arg) {
         printComment(n.getCommentOptional(), arg);
         printer.print("continue");
-        n.getLabel().ifPresent(l -> printer.print(" ").print(l.getIdentifier()));
+        //n.getLabel().ifPresent(l -> printer.print(" ").print(l.getIdentifier()));
+        if(n.getLabel()!=null){
+        	printer.print(" ").print(n.getLabel().getIdentifier());
+        }
         printer.print(";");
     }
 
@@ -1208,8 +1259,8 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
             }
         }
         printer.print("; ");
-        if (n.getCompare().isPresent()) {
-            n.getCompare().get().accept(this, arg);
+        if (n.getCompare()!=null) {
+            n.getCompare().accept(this, arg);
         }
         printer.print("; ");
         if (n.getUpdate() != null) {
@@ -1270,9 +1321,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         for (final CatchClause c : n.getCatchClauses()) {
             c.accept(this, arg);
         }
-        if (n.getFinallyBlock().isPresent()) {
+        if (n.getFinallyBlock()!=null) {
             printer.print(" finally ");
-            n.getFinallyBlock().get().accept(this, arg);
+            n.getFinallyBlock().accept(this, arg);
         }
     }
 
@@ -1312,9 +1363,9 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         printer.print(" ");
         n.getName().accept(this, arg);
         printer.print("()");
-        if (n.getDefaultValue().isPresent()) {
+        if (n.getDefaultValue()!=null) {
             printer.print(" default ");
-            n.getDefaultValue().get().accept(this, arg);
+            n.getDefaultValue().accept(this, arg);
         }
         printer.print(";");
     }
@@ -1448,13 +1499,26 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         if (configuration.isOrderImports() && n.size() > 0 && n.get(0) instanceof ImportDeclaration) {
             //noinspection unchecked
             NodeList<ImportDeclaration> modifiableList = new NodeList<>(n);
-            modifiableList.sort((left, right) -> {
+            /*modifiableList.sort((left, right) -> {
                 int sort = Integer.compare(left.isStatic() ? 0 : 1, right.isStatic() ? 0 : 1);
                 if (sort == 0) {
                     sort = left.getNameAsString().compareTo(right.getNameAsString());
                 }
                 return sort;
-            });
+            });*/
+            modifiableList.sort(new Comparator<ImportDeclaration>() {
+
+				@Override
+				public int compare(ImportDeclaration left, ImportDeclaration right) {
+					
+					int sort = Integer.compare(left.isStatic() ? 0 : 1, right.isStatic() ? 0 : 1);
+	                if (sort == 0) {
+	                    sort = left.getNameAsString().compareTo(right.getNameAsString());
+	                }
+	                return sort;
+				}
+			});
+            
             for (Object node : modifiableList) {
                 ((Node) node).accept(this, arg);
             }
@@ -1544,7 +1608,7 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         if (configuration.isIgnoreComments()) return;
         if (node instanceof Comment) return;
 
-        Node parent = node.getOptionalParentNode().orElse(null);
+        Node parent = node.getOptionalParentNode();
         if (parent == null) return;
         List<Node> everything = new LinkedList<>();
         everything.addAll(parent.getChildNodes());

@@ -21,6 +21,7 @@
 
 package com.github.javaparser.resolution.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,24 +29,24 @@ import java.util.List;
 /**
  * @author Federico Tomassetti
  */
-public class ResolvedPrimitiveType implements ResolvedType {
+public class ResolvedPrimitiveType extends ResolvedType {
 
     ///
     /// Constants
     ///
 
     public static final ResolvedPrimitiveType BYTE = new ResolvedPrimitiveType("byte",
-            Byte.class.getCanonicalName(), Collections.emptyList());
+            Byte.class.getCanonicalName(), new ArrayList<ResolvedPrimitiveType>());
     public static final ResolvedPrimitiveType SHORT = new ResolvedPrimitiveType("short",
             Short.class.getCanonicalName(), Collections.singletonList(BYTE));
     public static final ResolvedPrimitiveType CHAR = new ResolvedPrimitiveType("char",
-            Character.class.getCanonicalName(), Collections.emptyList());
+            Character.class.getCanonicalName(), new ArrayList<ResolvedPrimitiveType>());
     public static final ResolvedPrimitiveType INT = new ResolvedPrimitiveType("int",
             Integer.class.getCanonicalName(), Arrays.asList(BYTE, SHORT, CHAR));
     public static final ResolvedPrimitiveType LONG = new ResolvedPrimitiveType("long",
             Long.class.getCanonicalName(), Arrays.asList(BYTE, SHORT, INT, CHAR));
     public static final ResolvedPrimitiveType BOOLEAN = new ResolvedPrimitiveType("boolean",
-            Boolean.class.getCanonicalName(), Collections.emptyList());
+            Boolean.class.getCanonicalName(), new ArrayList<ResolvedPrimitiveType>());
     public static final ResolvedPrimitiveType FLOAT = new ResolvedPrimitiveType("float",
             Float.class.getCanonicalName(), Arrays.asList(LONG, INT, SHORT, BYTE, CHAR));
     public static final ResolvedPrimitiveType DOUBLE = new ResolvedPrimitiveType("double",

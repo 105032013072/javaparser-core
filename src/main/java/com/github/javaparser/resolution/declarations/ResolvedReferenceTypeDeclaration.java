@@ -29,9 +29,9 @@ import com.github.javaparser.resolution.types.ResolvedType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 /**
  * @author Federico Tomassetti
@@ -40,9 +40,7 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
         ResolvedTypeParametrizable {
 
     @Override
-    default ResolvedReferenceTypeDeclaration asReferenceType() {
-        return this;
-    }
+    public ResolvedReferenceTypeDeclaration asReferenceType();
 
     ///
     /// Ancestors
@@ -62,21 +60,7 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
      * The list of all the ancestors of the current declaration, direct and indirect.
      * This list does not contains duplicates with the exacting same type parameters.
      */
-    default List<ResolvedReferenceType> getAllAncestors() {
-        List<ResolvedReferenceType> ancestors = new ArrayList<>();
-        // We want to avoid infinite recursion in case of Object having Object as ancestor
-        if (!(Object.class.getCanonicalName().equals(getQualifiedName()))) {       
-            for (ResolvedReferenceType ancestor : getAncestors()) {
-                ancestors.add(ancestor);    
-                for (ResolvedReferenceType inheritedAncestor : ancestor.getAllAncestors()) {
-                    if (!ancestors.contains(inheritedAncestor)) {
-                        ancestors.add(inheritedAncestor);
-                    }
-                }
-            }
-        }
-        return ancestors;
-    }
+    public List<ResolvedReferenceType> getAllAncestors();
 
     ///
     /// Fields
@@ -93,40 +77,23 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
      * When calling getField("field") on Foo I should get a FieldDeclaration with type E, while calling it on
      * Bar I should get a FieldDeclaration with type String.
      */
-    default ResolvedFieldDeclaration getField(String name) {
-        Optional<ResolvedFieldDeclaration> field = this.getAllFields().stream().filter(f -> f.getName().equals(name)).findFirst();
-        if (field.isPresent()) {
-            return field.get();
-        } else {
-            throw new UnsolvedSymbolException("Field not found: " + name);
-        }
-    }
+    public ResolvedFieldDeclaration getField(String name);
 
     /**
      * Consider only field or inherited field which is not private.
      */
-    default ResolvedFieldDeclaration getVisibleField(String name) {
-        Optional<ResolvedFieldDeclaration> field = getVisibleFields().stream().filter(f -> f.getName().equals(name)).findFirst();
-        if (field.isPresent()) {
-            return field.get();
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
+    public ResolvedFieldDeclaration getVisibleField(String name);
 
     /**
      * Has this type a field with the given name?
      */
-    default boolean hasField(String name) {
-        return this.getAllFields().stream().filter(f -> f.getName().equals(name)).findFirst().isPresent();
-    }
+    public boolean hasField(String name);
+    
 
     /**
      * Either a declared field or inherited field which is not private.
      */
-    default boolean hasVisibleField(String name) {
-        return getVisibleFields().stream().filter(f -> f.getName().equals(name)).findFirst().isPresent();
-    }
+    public boolean hasVisibleField(String name);
 
     /**
      * Return a list of all fields, either declared in this declaration or inherited.
@@ -136,32 +103,22 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
     /**
      * Return a list of all fields declared and the inherited ones which are not private.
      */
-    default List<ResolvedFieldDeclaration> getVisibleFields() {
-        return getAllFields().stream()
-                .filter(f -> f.declaringType().equals(this) || f.accessSpecifier() != AccessSpecifier.PRIVATE)
-                .collect(Collectors.toList());
-    }
+    public List<ResolvedFieldDeclaration> getVisibleFields();
 
     /**
      * Return a list of all the non static fields, either declared or inherited.
      */
-    default List<ResolvedFieldDeclaration> getAllNonStaticFields() {
-        return getAllFields().stream().filter(it -> !it.isStatic()).collect(Collectors.toList());
-    }
+    public List<ResolvedFieldDeclaration> getAllNonStaticFields();
 
     /**
      * Return a list of all the static fields, either declared or inherited.
      */
-    default List<ResolvedFieldDeclaration> getAllStaticFields() {
-        return getAllFields().stream().filter(it -> it.isStatic()).collect(Collectors.toList());
-    }
+    public List<ResolvedFieldDeclaration> getAllStaticFields();
 
     /**
      * Return a list of all the fields declared in this type.
      */
-    default List<ResolvedFieldDeclaration> getDeclaredFields() {
-        return getAllFields().stream().filter(it -> it.declaringType().getQualifiedName().equals(getQualifiedName())).collect(Collectors.toList());
-    }
+    public List<ResolvedFieldDeclaration> getDeclaredFields();
 
     ///
     /// Methods
@@ -192,9 +149,7 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
      * Can we assign instances of the type defined by this declaration to variables having the type defined
      * by the given type?
      */
-    default boolean canBeAssignedTo(ResolvedReferenceTypeDeclaration other) {
-        return other.isAssignableBy(this);
-    }
+    public boolean canBeAssignedTo(ResolvedReferenceTypeDeclaration other);
 
     /**
      * Can we assign instances of the given type to variables having the type defined
@@ -214,12 +169,7 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
     /**
      * Has the type at least one annotation declared or inherited having the specified qualified name?
      */
-    default boolean hasAnnotation(String qualifiedName) {
-        if (hasDirectlyAnnotation(qualifiedName)) {
-            return true;
-        }
-        return getAllAncestors().stream().anyMatch(it -> it.asReferenceType().getTypeDeclaration().hasDirectlyAnnotation(qualifiedName));
-    }
+    public boolean hasAnnotation(String qualifiedName);
 
     /**
      * This means that the type has a functional method. Conceptually, a functional interface has exactly one abstract method.
@@ -232,15 +182,5 @@ public interface ResolvedReferenceTypeDeclaration extends ResolvedTypeDeclaratio
     ///
 
     @Override
-    default Optional<ResolvedTypeParameterDeclaration> findTypeParameter(String name) {
-        for (ResolvedTypeParameterDeclaration tp : this.getTypeParameters()) {
-            if (tp.getName().equals(name)) {
-                return Optional.of(tp);
-            }
-        }
-        if (this.containerType().isPresent()) {
-            return this.containerType().get().findTypeParameter(name);
-        }
-        return Optional.empty();
-    }
+    public ResolvedTypeParameterDeclaration findTypeParameter(String name);
 }

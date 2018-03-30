@@ -23,8 +23,6 @@ package com.github.javaparser.javadoc;
 
 import com.github.javaparser.javadoc.description.JavadocDescription;
 
-import java.util.Optional;
-
 import static com.github.javaparser.utils.Utils.nextWord;
 import static com.github.javaparser.utils.Utils.screamingToCamelCase;
 
@@ -82,15 +80,15 @@ public class JavadocBlockTag {
 
     private Type type;
     private JavadocDescription content;
-    private Optional<String> name = Optional.empty();
+    private String name = null;
     private String tagName;
 
     public JavadocBlockTag(Type type, String content) {
         this.type = type;
         this.tagName = type.keyword;
         if (type.hasName()) {
-            this.name = Optional.of(nextWord(content));
-            content = content.substring(this.name.get().length()).trim();
+            this.name = nextWord(content);
+            content = content.substring(this.name.length()).trim();
         }
         this.content = JavadocDescription.parseText(content);
     }
@@ -112,12 +110,12 @@ public class JavadocBlockTag {
         return content;
     }
 
-    public Optional<String> getOptionalName() {
+    public String getOptionalName() {
         return name;
     }
     
     public String getName(){
-    	return name.get();
+    	return name;
     }
 
     public String getTagName() {
@@ -128,7 +126,10 @@ public class JavadocBlockTag {
         StringBuilder sb = new StringBuilder();
         sb.append("@");
         sb.append(tagName);
-        name.ifPresent(s -> sb.append(" ").append(s));
+       // name.ifPresent(s -> sb.append(" ").append(s));
+        if(name!=null){
+        	sb.append(" ").append(name);
+        }
         if (!content.isEmpty()) {
             sb.append(" ");
             sb.append(content.toText());
