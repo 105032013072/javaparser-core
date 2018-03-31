@@ -27,6 +27,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.javaparser.Function;
 import com.github.javaparser.Predicate;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.Type;
@@ -54,7 +55,7 @@ public class Utils {
      * @deprecated This is no longer in use by JavaParser, please write your own replacement.
      */
     public static <T> List<T> ensureNotNull(List<T> list) {
-        return list == null ? new ArrayList<>() : list;
+        return list == null ? new ArrayList<T>() : list;
     }
 
     public static <E> boolean isNullOrEmpty(Collection<E> collection) {
@@ -185,14 +186,30 @@ public class Utils {
      * Capitalizes the first character in the string.
      */
     public static String capitalize(String s) {
-        return stringTransformer(s, "capitalize", String::toUpperCase);
+      //  return stringTransformer(s, "capitalize", String::toUpperCase);
+    	return stringTransformer(s, "capitalize", new Function<String, String>() {
+
+			@Override
+			public String apply(String t) {
+				
+				return t.toUpperCase();
+			}
+		});
     }
 
     /**
      * Lower-cases the first character in the string.
      */
     public static String decapitalize(String s) {
-        return stringTransformer(s, "decapitalize", String::toLowerCase);
+        //return stringTransformer(s, "decapitalize", String::toLowerCase);
+    	return stringTransformer(s, "decapitalize", new Function<String, String>() {
+
+			@Override
+			public String apply(String t) {
+				
+				return t.toLowerCase();
+			}
+		});
     }
 
     private static String stringTransformer(String s, String operationDescription, Function<String, String> transformation) {
@@ -210,13 +227,13 @@ public class Utils {
         if (value == null) {
             return true;
         }
-        if (value instanceof Optional) {
+        /*if (value instanceof Optional) {
             if (((Optional) value).isPresent()) {
                 value = ((Optional) value).get();
             } else {
                 return true;
             }
-        }
+        }*/
         if (value instanceof Collection) {
             if (((Collection) value).isEmpty()) {
                 return true;

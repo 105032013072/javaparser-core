@@ -20,6 +20,7 @@
  */
 package com.github.javaparser.ast;
 
+import com.github.javaparser.Function;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParseStart;
@@ -719,14 +720,16 @@ public final class CompilationUnit extends Node {
          * Saves the compilation unit to its original location
          */
         public void save() {
-            //save(cu -> new PrettyPrinter().print(cu));
-        	 try {
-                 Files.createDirectories(path.getParent());
-                 final String code = new PrettyPrinter().print(getCompilationUnit());
-                 Files.write(path, code.getBytes(UTF8));
-             } catch (IOException e) {
-                 throw new RuntimeException(e);
-             }
+           // save(cu -> new PrettyPrinter().print(cu));
+        	save(new Function<CompilationUnit, String>() {
+
+				@Override
+				public String apply(CompilationUnit t) {
+					
+					return new PrettyPrinter().print(t);
+				}
+			});
+        	
         }
 
         /**
@@ -735,7 +738,7 @@ public final class CompilationUnit extends Node {
          *
          * @param makeOutput a function that formats the compilation unit
          */
-        /*public void save(Function<CompilationUnit, String> makeOutput) {
+        public void save(Function<CompilationUnit, String> makeOutput) {
             try {
                 Files.createDirectories(path.getParent());
                 final String code = makeOutput.apply(getCompilationUnit());
@@ -743,7 +746,7 @@ public final class CompilationUnit extends Node {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }*/
+        }
        
         
 

@@ -91,7 +91,7 @@ abstract class GeneratedJavaParserBase {
      */
     TokenRange range(Node begin, JavaToken end) {
         if (storeTokens) {
-            return new TokenRange(begin.getTokenRange().get().getBegin(), end);
+            return new TokenRange(begin.getTokenRange().getBegin(), end);
         }
         return null;
     }
@@ -101,7 +101,7 @@ abstract class GeneratedJavaParserBase {
      */
     TokenRange range(JavaToken begin, Node end) {
         if (storeTokens) {
-            return new TokenRange(begin, end.getTokenRange().get().getEnd());
+            return new TokenRange(begin, end.getTokenRange().getEnd());
         }
         return null;
     }
@@ -111,7 +111,7 @@ abstract class GeneratedJavaParserBase {
      */
     TokenRange range(Node begin, Node end) {
         if (storeTokens) {
-            return new TokenRange(begin.getTokenRange().get().getBegin(), end.getTokenRange().get().getEnd());
+            return new TokenRange(begin.getTokenRange().getBegin(), end.getTokenRange().getEnd());
         }
         return null;
     }
@@ -136,7 +136,7 @@ abstract class GeneratedJavaParserBase {
      */
     JavaToken orIfInvalid(JavaToken firstChoice, Node secondChoice) {
         if (storeTokens) {
-            return orIfInvalid(firstChoice, secondChoice.getTokenRange().get().getBegin());
+            return orIfInvalid(firstChoice, secondChoice.getTokenRange().getBegin());
         }
         return null;
     }
@@ -148,7 +148,7 @@ abstract class GeneratedJavaParserBase {
         if (!storeTokens || l.isEmpty()) {
             return JavaToken.INVALID;
         }
-        return l.get(0).getTokenRange().get().getBegin();
+        return l.get(0).getTokenRange().getBegin();
     }
 
     /* Sets the kind of the last matched token to newKind */
@@ -252,12 +252,20 @@ abstract class GeneratedJavaParserBase {
      */
     private void propagateRangeGrowthOnRight(Node node, Node endNode) {
         if (storeTokens) {
-            node.getOptionalParentNode().ifPresent(nodeParent -> {
+            /*node.getOptionalParentNode().ifPresent(nodeParent -> {
                 boolean isChildOnTheRightBorderOfParent = node.getTokenRange().get().getEnd().equals(nodeParent.getTokenRange().get().getEnd());
                 if (isChildOnTheRightBorderOfParent) {
                     propagateRangeGrowthOnRight(nodeParent, endNode);
                 }
-            });
+            });*/
+        	Node nodeParent=	node.getOptionalParentNode();
+        	if(nodeParent!=null){
+        		 boolean isChildOnTheRightBorderOfParent = node.getTokenRange().getEnd().equals(nodeParent.getTokenRange().getEnd());
+                 if (isChildOnTheRightBorderOfParent) {
+                     propagateRangeGrowthOnRight(nodeParent, endNode);
+                 }
+        	}
+        	
             node.setTokenRange(range(node, endNode));
         }
     }
@@ -269,11 +277,11 @@ abstract class GeneratedJavaParserBase {
         if (ret instanceof EnclosedExpr) {
             Expression inner = ((EnclosedExpr) ret).getInner();
             SimpleName id = ((NameExpr) inner).getName();
-            NodeList<Parameter> params = add(new NodeList<>(), new Parameter(ret.getTokenRange().orElse(null), EnumSet.noneOf(Modifier.class), new NodeList<>(), new UnknownType(), false, new NodeList<>(), id));
+            NodeList<Parameter> params = add(new NodeList<Parameter>(), new Parameter(ret.getTokenRange(), EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new UnknownType(), false, new NodeList<AnnotationExpr>(), id));
             ret = new LambdaExpr(range(ret, lambdaBody), params, lambdaBody, true);
         } else if (ret instanceof NameExpr) {
             SimpleName id = ((NameExpr) ret).getName();
-            NodeList<Parameter> params = add(new NodeList<>(), new Parameter(ret.getTokenRange().orElse(null), EnumSet.noneOf(Modifier.class), new NodeList<>(), new UnknownType(), false, new NodeList<>(), id));
+            NodeList<Parameter> params = add(new NodeList<Parameter>(), new Parameter(ret.getTokenRange(), EnumSet.noneOf(Modifier.class), new NodeList<AnnotationExpr>(), new UnknownType(), false, new NodeList<AnnotationExpr>(), id));
             ret = new LambdaExpr(range(ret, lambdaBody), params, lambdaBody, false);
         } else if (ret instanceof LambdaExpr) {
             ((LambdaExpr) ret).setBody(lambdaBody);

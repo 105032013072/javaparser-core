@@ -5,6 +5,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.printer.PrettyPrinter;
 
@@ -184,7 +185,7 @@ public class SourceRoot {
         assertNotNull(startPackage);
         logPackage(startPackage);
         final Path path = packageAbsolutePath(root, startPackage);
-        ParallelParse parse = new ParallelParse(path, (file, attrs) -> {
+      /*  ParallelParse parse = new ParallelParse(path, (file, attrs) -> {
             if (!attrs.isDirectory() && file.toString().endsWith(".java")) {
                 Path relative = root.relativize(file.getParent());
                 try {
@@ -197,7 +198,26 @@ public class SourceRoot {
                 }
             }
             return FileVisitResult.CONTINUE;
-        });
+        });*/
+        ParallelParse parse = new ParallelParse(path,  new SourceRoot.ParallelParse.VisitFileCallback() {
+			
+			@Override
+			public FileVisitResult process(Path file, BasicFileAttributes attrs) {
+				
+				if (!attrs.isDirectory() && file.toString().endsWith(".java")) {
+	                Path relative = root.relativize(file.getParent());
+	                try {
+	                    tryToParse(
+	                            relative.toString(),
+	                            file.getFileName().toString(),
+	                            new JavaParser(parserConfiguration));
+	                } catch (IOException e) {
+	                    Log.error(e);
+	                }
+	            }
+	            return FileVisitResult.CONTINUE;
+			}
+		});
         ForkJoinPool pool = new ForkJoinPool();
         pool.invoke(parse);
         return getCache();
@@ -231,7 +251,7 @@ public class SourceRoot {
         try {
             final ParseResult<CompilationUnit> result = tryToParse(startPackage, filename);
             if (result.isSuccessful()) {
-                return result.getResult().get();
+                return result.getResult();
             }
             throw new ParseProblemException(result.getProblems());
         } catch (IOException e) {
@@ -257,7 +277,7 @@ public class SourceRoot {
      *
      * @param startPackage files in this package and deeper are parsed. Pass "" to parse all files.
      */
-    public SourceRoot parse(String startPackage, ParserConfiguration configuration, Callback callback) throws IOException {
+    public SourceRoot parse(String startPackage, ParserConfiguration configuration, final Callback callback) throws IOException {
         assertNotNull(startPackage);
         assertNotNull(configuration);
         assertNotNull(callback);
@@ -272,10 +292,15 @@ public class SourceRoot {
                     Log.trace("Parsing %s", localPath);
                     final ParseResult<CompilationUnit> result = javaParser.parse(COMPILATION_UNIT,
                             provider(absolutePath));
-                    result.getResult().ifPresent(cu -> cu.setStorage(absolutePath));
+                    //result.getResult().ifPresent(cu -> cu.setStorage(absolutePath));
+                    if(result.getResult()!=null){
+                    	result.getResult().setStorage(absolutePath);
+                    }
+                    
+                    
                     if (callback.process(localPath, absolutePath, result) == SAVE) {
-                        if (result.getResult().isPresent()) {
-                            save(result.getResult().get(), path);
+                        if (result.getResult()!=null) {
+                            save(result.getResult(), path);
                         }
                     }
                 }
@@ -302,14 +327,14 @@ public class SourceRoot {
      *
      * @param startPackage files in this package and deeper are parsed. Pass "" to parse all files.
      */
-    public SourceRoot parseParallelized(String startPackage, ParserConfiguration configuration, Callback callback)
+    public SourceRoot parseParallelized(String startPackage, final ParserConfiguration configuration, final Callback callback)
             throws IOException {
         assertNotNull(startPackage);
         assertNotNull(configuration);
         assertNotNull(callback);
         logPackage(startPackage);
         final Path path = packageAbsolutePath(root, startPackage);
-        ParallelParse parse = new ParallelParse(path, (file, attrs) -> {
+        /*ParallelParse parse = new ParallelParse(path, (file, attrs) -> {
             if (!attrs.isDirectory() && file.toString().endsWith(".java")) {
                 Path localPath = root.relativize(file);
                 Log.trace("Parsing %s", localPath);
@@ -327,7 +352,36 @@ public class SourceRoot {
                 }
             }
             return FileVisitResult.CONTINUE;
-        });
+        });*/
+        ParallelParse parse = new ParallelParse(path,  new SourceRoot.ParallelParse.VisitFileCallback() {
+			
+			@Override
+			public FileVisitResult process(Path file, BasicFileAttributes attrs) {
+				
+				 if (!attrs.isDirectory() && file.toString().endsWith(".java")) {
+		                Path localPath = root.relativize(file);
+		                Log.trace("Parsing %s", localPath);
+		                try {
+		                    ParseResult<CompilationUnit> result = new JavaParser(configuration)
+		                            .parse(COMPILATION_UNIT, provider(file));
+		                   // result.getResult().ifPresent(cu -> cu.setStorage(file));
+		                   if(result.getResult()!=null){
+		                	   result.getResult().setStorage(file);
+		                   }
+		                    
+		                    if (callback.process(localPath, file, result) == SAVE) {
+		                        if (result.getResult()!=null) {
+		                            save(result.getResult(), path);
+		                        }
+		                    }
+		                } catch (IOException e) {
+		                    Log.error(e);
+		                }
+		            }
+		            return FileVisitResult.CONTINUE;
+			}
+		});
+        
         ForkJoinPool pool = new ForkJoinPool();
         pool.invoke(parse);
         return this;
@@ -370,9 +424,12 @@ public class SourceRoot {
         final Path path = fileInPackageRelativePath(startPackage, filename);
         final ParseResult<CompilationUnit> parseResult = new ParseResult<>(
                 compilationUnit,
-                new ArrayList<>(),
+                new ArrayList<Problem>(),
                 null,
                 null);
+        
+        
+        
         cache.put(path, parseResult);
         return this;
     }
@@ -383,12 +440,12 @@ public class SourceRoot {
      */
     public SourceRoot add(CompilationUnit compilationUnit) {
         assertNotNull(compilationUnit);
-        if (compilationUnit.getStorage().isPresent()) {
-            final Path path = compilationUnit.getStorage().get().getPath();
+        if (compilationUnit.getStorage()!=null) {
+            final Path path = compilationUnit.getStorage().getPath();
             Log.trace("Adding new file %s", path);
             final ParseResult<CompilationUnit> parseResult = new ParseResult<>(
                     compilationUnit,
-                    new ArrayList<>(),
+                    new ArrayList<Problem>(),
                     null,
                     null);
             cache.put(path, parseResult);
@@ -405,7 +462,7 @@ public class SourceRoot {
         assertNotNull(cu);
         assertNotNull(path);
         cu.setStorage(path);
-        cu.getStorage().get().save(printer);
+        cu.getStorage().save(printer);
         return this;
     }
 
@@ -417,9 +474,9 @@ public class SourceRoot {
         Log.info("Saving all files (%s) to %s", cache.size(), root);
         for (Map.Entry<Path, ParseResult<CompilationUnit>> cu : cache.entrySet()) {
             final Path path = root.resolve(cu.getKey());
-            if (cu.getValue().getResult().isPresent()) {
+            if (cu.getValue().getResult()!=null) {
                 Log.trace("Saving %s", path);
-                save(cu.getValue().getResult().get(), path);
+                save(cu.getValue().getResult(), path);
             }
         }
         return this;
@@ -444,10 +501,16 @@ public class SourceRoot {
      * added manually.
      */
     public List<CompilationUnit> getCompilationUnits() {
-        return cache.values().stream()
+        /*return cache.values().stream()
                 .filter(ParseResult::isSuccessful)
                 .map(p -> p.getResult().get())
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+    	List<CompilationUnit> list=new ArrayList<>();
+    	for (ParseResult<CompilationUnit> compilationUnit : cache.values()) {
+			if(compilationUnit.isSuccessful()) list.add(compilationUnit.getResult());
+		}
+    	return list;
+    	
     }
 
     /**

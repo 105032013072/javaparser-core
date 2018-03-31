@@ -22,11 +22,12 @@
 package com.github.javaparser.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.stream.Collectors;
+
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.GenericVisitor;
@@ -152,7 +153,7 @@ public class VisitorList<N extends Node> implements List<N> {
     }
 
     @Override
-    public ListIterator<N> listIterator(int index) {
+    public ListIterator<N> listIterator(final int index) {
         return new ListIterator<N>() {
             final ListIterator<EqualsHashcodeOverridingFacade> itr = innerList.listIterator(index);
 
@@ -241,7 +242,7 @@ public class VisitorList<N extends Node> implements List<N> {
     }
 
     @Override
-    public List<N> subList(int fromIndex, int toIndex) {
+    public List<N> subList(final int fromIndex, final int toIndex) {
         return new VisitorList<N>(hashcodeVisitor, equalsVisitor) {
             {
                 this.innerList = VisitorList.this.innerList.subList(fromIndex, toIndex);
@@ -251,12 +252,24 @@ public class VisitorList<N extends Node> implements List<N> {
 
     @Override
     public Object[] toArray() {
-        return innerList.stream().map(facade -> facade.overridden).collect(Collectors.toList()).toArray();
+        //return innerList.stream().map(facade -> facade.overridden).collect(Collectors.toList()).toArray();
+    	List<Object> list=new ArrayList<>();
+    	for (EqualsHashcodeOverridingFacade facade : innerList) {
+			list.add(facade.overridden);
+		}
+    	Object[] arrat=new Object[list.size()];
+    	list.toArray(arrat);
+    	return arrat;
     }
 
     @Override
     public <T> T[] toArray(T[] arr) {
-        return innerList.stream().map(facade -> facade.overridden).collect(Collectors.toList()).toArray(arr);
+       // return innerList.stream().map(facade -> facade.overridden).collect(Collectors.toList()).toArray(arr);
+    	List<T> list=new ArrayList<>();
+    	for (EqualsHashcodeOverridingFacade facade : innerList) {
+			list.add((T) facade.overridden);
+		}
+    	return list.toArray(arr);
     }
 
     @Override

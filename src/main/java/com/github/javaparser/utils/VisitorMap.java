@@ -7,9 +7,10 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 /**
  * A map that overrides the equals and hashcode calculation of the added nodes
@@ -96,7 +97,10 @@ public class VisitorMap<N extends Node, V> implements Map<N, V> {
 
     @Override
     public void putAll(Map<? extends N, ? extends V> m) {
-        m.forEach(this::put);
+        /*m.forEach(this::put);*/
+    	for (java.util.Map.Entry<? extends N, ? extends V> entry : m.entrySet()) {
+			this.put(entry.getKey(), entry.getValue());
+		}
     }
 
     @Override
@@ -106,9 +110,14 @@ public class VisitorMap<N extends Node, V> implements Map<N, V> {
 
     @Override
     public Set<N> keySet() {
-        return innerMap.keySet().stream()
+       /* return innerMap.keySet().stream()
                 .map(k -> k.overridden)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet());*/
+    	Set<N> set=new HashSet<>();
+    	for (VisitorMap<N, V>.EqualsHashcodeOverridingFacade k : innerMap.keySet()) {
+			set.add(k.overridden);
+		}
+    	return set;
     }
 
     @Override
@@ -118,8 +127,13 @@ public class VisitorMap<N extends Node, V> implements Map<N, V> {
 
     @Override
     public Set<Entry<N, V>> entrySet() {
-        return innerMap.entrySet().stream()
+        /*return innerMap.entrySet().stream()
                 .map(e -> new HashMap.SimpleEntry<>(e.getKey().overridden, e.getValue()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet());*/
+    	Set<Entry<N, V>> set=new HashSet<>();
+    	for (Entry<EqualsHashcodeOverridingFacade, V> e : innerMap.entrySet()) {
+    		set.add(new HashMap.SimpleEntry<>(e.getKey().overridden, e.getValue()));
+		}
+    	return set;
     }
 }
