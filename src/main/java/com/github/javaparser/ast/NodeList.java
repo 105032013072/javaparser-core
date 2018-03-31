@@ -465,9 +465,9 @@ public class NodeList<N extends Node> implements List<N>, Iterable<N>, HasParent
     /**
      * @see java.util.List#spliterator()
      */
-    public Iterator<N> spliterator() {
+   /* public Iterator<N> spliterator() {
         return innerList.iterator();
-    }
+    }*/
 
     private void notifyElementAdded(int index, Node nodeAddedOrRemoved) {
        // this.observers.forEach(o -> o.listChange(this, AstObserver.ListChangeType.ADDITION, index, nodeAddedOrRemoved));

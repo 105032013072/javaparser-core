@@ -80,15 +80,17 @@ class JavadocParser {
         blockLines.forEach(l -> document.addBlockTag(parseBlockTag(l)));
         return document;*/
     	
-    	
+    	//for jdk1.7
     	
     	 List<String> cleanLines = cleanLines(normalizeEolInTextBlock(commentContent, EOL));
     	 int indexOfFirstBlockTag=-1;
     	 for (String string : cleanLines) {
 			if(JavadocParser.isABlockLine(string)){
 				indexOfFirstBlockTag=cleanLines.indexOf(string);
+				break;
 			}
 		}
+    	
     	 
          List<String> blockLines;
          String descriptionText;

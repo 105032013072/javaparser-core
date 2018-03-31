@@ -144,6 +144,7 @@ class CommentsInserter {
                         attributedComments.add(previousComment);
                         previousComment = null;
                     }
+                	
                 }
             }
         }
