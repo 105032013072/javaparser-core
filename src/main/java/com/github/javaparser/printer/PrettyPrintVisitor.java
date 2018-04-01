@@ -337,7 +337,7 @@ public class PrettyPrintVisitor implements VoidVisitor<Void> {
         if (configuration.isPrintComments() && configuration.isPrintJavadoc()) {
             printer.println("/**");
             final String commentContent = normalizeEolInTextBlock(n.getContent(), configuration.getEndOfLineCharacter());
-            String[] lines = commentContent.split("\\R");
+            String[] lines = commentContent.split("\r\n");
             boolean skippingLeadingEmptyLines = true;
             boolean prependEmptyLine = false;
             for (String line : lines) {
