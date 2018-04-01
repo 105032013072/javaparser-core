@@ -254,7 +254,7 @@ public class Utils {
      */
     public static String normalizeEolInTextBlock(String content, String endOfLineCharacter) {
         return content
-                .replaceAll("\\R", endOfLineCharacter);
+                .replaceAll("\\r", endOfLineCharacter);
     }
 
     /**
